@@ -1,0 +1,78 @@
+apply plugin: 'org.jetbrains.kotlin.multiplatform'
+apply from: '../publishing.gradle'
+
+kotlin {
+    targets {
+        fromPreset(presets.jvm, 'jvm')
+        fromPreset(presets.iosX64, 'iosX64')
+        fromPreset(presets.iosArm64, 'iosArm64')
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation Deps.kotlin.stdlib.common
+                implementation Deps.kotlin.stdlib
+                implementation kotlin('test')
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation Deps.kotlin.stdlib.jdk8
+            }
+        }
+
+        iosX64Main {
+            dependencies {
+            }
+        }
+
+        iosArm64Main {
+            dependsOn iosX64Main
+        }
+
+        commonTest {
+            dependencies {
+                implementation kotlin('test')
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation kotlin('test-junit')
+            }
+        }
+
+        all {
+            group GROUP
+            version VERSION
+
+            languageSettings {
+                progressiveMode = true
+                useExperimentalAnnotation('kotlin.Experimental')
+            }
+        }
+
+    }
+}
+
+// workaround for https://youtrack.jetbrains.com/issue/KT-27170
+configurations {
+    compileClasspath
+}
+
+
+task sourcesJar(type: Jar) {
+    baseName = "mockingbird"
+    classifier = 'sources'
+    from kotlin.sourceSets.commonMain.kotlin.srcDirs, kotlin.sourceSets.jvmMain.kotlin.srcDirs
+}
+
+artifacts {
+    archives sourcesJar
+}

@@ -1,0 +1,52 @@
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = Deps.jacocoVersion
+}
+
+subprojects {
+    apply plugin: 'jacoco'
+}
+
+def mainSubProject = "mockingbird"
+
+task jacocoTestReport(type: JacocoReport,
+        dependsOn: ["allTest"]) {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+        xml.destination = file("${project(":${mainSubProject}").buildDir}/reports/jacoco/jacocoUnitTestReport.xml")
+        html.destination = file("${project(":${mainSubProject}").buildDir}/reports/jacoco/html")
+    }
+
+    def srcDirectoryList = []
+    def classDirectoryList = []
+    def executionDataList = []
+
+    def classPathExcludeList = []
+
+    subprojects.findAll { it.name != 'app' }.forEach { subProject ->
+
+        //common main directory
+        def commonMainSourceDirs = "$subProject.projectDir/src/commonMain/kotlin"
+        //Android directory (main)
+        def androidMainSourceDirs = "$subProject.projectDir/src/androidMain/kotlin"
+        def iosMainSourceDirs = "$subProject.projectDir/src/iosX46Main/kotlin"
+
+        def kotlinDebugPath = "${subProject.buildDir}/tmp/kotlin-classes/debug"
+
+        def classDirectories = fileTree(
+                dir: kotlinDebugPath,
+                excludes: classPathExcludeList
+        )
+        def executionData = fileTree(dir: subProject.buildDir, includes: ['jacoco/jvmTest.exec'])
+
+        srcDirectoryList.addAll(commonMainSourceDirs, androidMainSourceDirs, iosMainSourceDirs)
+        classDirectoryList.add(classDirectories)
+        executionDataList.add(executionData)
+    }
+
+    classDirectories.from = files(classDirectoryList)
+    executionData.from = files(executionDataList)
+    sourceDirectories.from = files(srcDirectoryList)
+}

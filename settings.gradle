@@ -1,0 +1,3 @@
+include ':mockingbird'
+
+enableFeaturePreview('GRADLE_METADATA')

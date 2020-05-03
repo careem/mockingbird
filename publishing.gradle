@@ -1,0 +1,68 @@
+apply plugin: 'maven-publish'
+
+def getReleaseRepositoryUrl() {
+    return hasProperty('careem_artifactory_url') ? careem_artifactory_url : System.env.careem_artifactory_url
+}
+
+def getSnapshotRepositoryUrl() {
+    return hasProperty('careem_artifactory_snapshot_url') ? careem_artifactory_snapshot_url : System.env.careem_artifactory_snapshot_url
+}
+
+def getRepositoryUsername() {
+    return hasProperty('careem_artifactory_username') ? careem_artifactory_username : System.env.careem_artifactory_username
+}
+
+def getRepositoryPassword() {
+    return hasProperty('careem_artifactory_password') ? careem_artifactory_password : System.env.careem_artifactory_password
+}
+
+task emptySourcesJar(type: Jar) {
+    classifier = 'sources'
+}
+
+publishing {
+    publications.all {
+        pom.withXml {
+            def root = asNode()
+
+            root.children().last() + {
+                resolveStrategy = Closure.DELEGATE_FIRST
+
+                name POM_NAME
+                description POM_DESCRIPTION
+
+                scm {
+                    url POM_SCM_URL
+                }
+                developers {
+                    developer {
+                        organization POM_DEVELOPER_ORG
+                        organizationUrl POM_DEVELOPER_URL
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username getRepositoryUsername()
+                password getRepositoryPassword()
+            }
+
+            if (project.version.endsWith('-SNAPSHOT')) {
+                url getSnapshotRepositoryUrl()
+            } else {
+                url getReleaseRepositoryUrl()
+            }
+        }
+    }
+
+    afterEvaluate {
+        publications.getByName('kotlinMultiplatform') {
+            // Source jars are only created for platforms, not the common artifact.
+            artifact emptySourcesJar
+        }
+    }
+}
