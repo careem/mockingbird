@@ -35,7 +35,7 @@ object Deps {
     const val shadow = "com.github.jengelman.gradle.plugins:shadow:$shadowVersion"
 
     // Jacoco
-    const val jacocoVersion = "0.8.2"
+    const val jacocoVersion = "0.8.5"
     const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
 
     // Robolectric
