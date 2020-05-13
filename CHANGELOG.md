@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.1.0
 * Renaming `threadedTest` to `runOnWorker`
 * Adding support for multithreaded tests (experimental, only mock calls are supported from different thread)
 * Fixed Expected , actual reversed
