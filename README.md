@@ -13,7 +13,7 @@ implementation "com.careem.mockingbird:mockingbird:1.0.0"
 ## Usage
 
 MockingBird doesn't use any annotation processor or reflection. This means that it is a bit more verbose to
-write respect to libraries like `Mockito` or `Mockk`
+with respect to libraries like `Mockito` or `Mockk`
 
 ### Mocks
 The first step you need to do is create a mock class for the object you want to mock, 
@@ -78,7 +78,7 @@ class MyDependencyMock : MyDependency, Mock {
 ### Mocking
 
 When your mocks are ready you can write your tests and specify the behavior you want when a method 
-on you mock is called.
+on your mock is called.
 
 To do that you will use:
 1. `every`
