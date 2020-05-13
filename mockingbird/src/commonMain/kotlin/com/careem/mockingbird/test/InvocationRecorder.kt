@@ -99,6 +99,9 @@ internal class InvocationRecorder {
         }
     }
 
+    /**
+     * Helper to compare invocation and any() matcher
+     */
     private fun compareInvocation(
         storedInvocation: Invocation,
         actualInvocation: Invocation

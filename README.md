@@ -41,6 +41,7 @@ class MyDependencyMock : MyDependency, Mock {
         const val method1 = "method1"
         const val method2 = "method2"
         const val method3 = "method3"
+        const val method4 = "method4"
     }
 
     object Arg {
@@ -48,6 +49,7 @@ class MyDependencyMock : MyDependency, Mock {
         const val value = "value"
         const val value1 = "value1"
         const val value2 = "value2"
+        const val object1 = "object1"
     }
 
     override fun method1(str: String) = mockUnit(
@@ -72,22 +74,30 @@ class MyDependencyMock : MyDependency, Mock {
             Arg.value2 to value2
         )
     )
+
+    override fun method4(object1: Object): Int = mock(
+        methodName = Method.method4,
+        arguments = mapOf(
+            Arg.object1 to object1
+        )
+    )
 }    
 ```
 
 ### Mocking
 
 When your mocks are ready you can write your tests and specify the behavior you want when a method 
-on your mock is called.
+on your mock is called, and verify the method is called your mock.
 
 To do that you will use:
 1. `every`
 2. `everyAnswer`
+3. `verify`
 
 #### every
-Every allows you to specify the value you want to return for a specific invocation
+`every` allows you to specify the value you want to return for a specific invocation
 
-If you want to return 3 when `myDependencyMock.method3(4, 5)` is called your `every` will look like
+If you want to return 3 when `myDependencyMock.method3(4, 5)` is called, your `every` will look like
 ```kotlin
 testMock.every(
     methodName = MyDependencyMock.Method.method3,
@@ -95,16 +105,7 @@ testMock.every(
 ) { 3 }
 ```
 
-If you don't care about the value for the second argument for example you can mock it like
-
-```kotlin
-testMock.every(
-    methodName = MyDependencyMock.Method.method3,
-    arguments = mapOf(MyDependencyMock.Arg.value1 to 4, MyDependencyMock.Arg.value2 to any())
-) { 3 }
-```
-
-#### everyAnswer
+#### everyAnswers
 
 If you wish to perform specific logic when you mock is called you can use `everyAnswer`, here you can 
 specify the behavior you want for your mock. A typical use case is when you want to invoke a callback 
@@ -124,10 +125,72 @@ myMock.everyAnswers(
 }
 ```
 
-### Verify
+#### Verify
 
-// TODO complete here
+After the invocation of your mock is defined, you need to verify it is invoked to make your unit test
+valid. For example if you want to verify `myDependencyMock.method3(4, 5)` is invoked, you should do
+something like:
+```kotlin
+testMock.verify(
+    exactly = 1,
+    methodName = MyDependencyMock.Method.method3,
+    arguments = mapOf(MyDependencyMock.Arg.value1 to 4, MyDependencyMock.Arg.value2 to 5)
+)
+```
+Note: `exactly` is how many times you want to verify invocation of your mock is invoked, by default
+it will be 1, so no need to set it up if you want to verify exactly 1 time invocation.
 
-### Slot 
+### Matching
 
-// TODO complete here
+When your mocks are ready you can write your tests and specify the behavior you want when a method 
+on your mock is called, and verify the method is called your mock.
+Sometimes besides mocking, we want to verify the equality of argument that passed to the mock's
+invocation, sometimes we don't care about the argument value or sometimes we want to strongly verify 
+that the invocation is **not** invoked no matter what arguments is passed. In all these cases, we need
+matching arguments. 
+
+To do matching, you will use:
+1. `any()`
+2. `Slot` and `capture`
+
+#### Any
+
+As it looks like, `any()` matcher will give you ability to ignore the compare of argument when mocking
+invocation or verify it. For example, if you want to return 3 when `myDependencyMock.method3` is 
+called no matter what two arguments is passed in, your `every` will look like:
+```kotlin
+testMock.every(
+    methodName = MyDependencyMock.Method.method3,
+    arguments = mapOf(MyDependencyMock.Arg.value1 to any(), MyDependencyMock.Arg.value2 to any())
+) { 3 }
+```
+By doing this, both `myDependencyMock.method3(1,2)` or `myDependencyMock.method3(3,4)` will all 
+returns 3. Similar to this `every`, you can easily verify `myDependencyMock.method3` is invoked and
+ignore the argument comparing by:
+```kotlin
+testMock.verify(
+    exactly = 1,
+    methodName = MyDependencyMock.Method.method3,
+    arguments = mapOf(MyDependencyMock.Arg.value1 to any(), MyDependencyMock.Arg.value2 to any())
+)
+```
+A normal use case on verify with `any()` matcher is verify invocation is invoked `exactly = 0` with
+`any()` arguments which means it is never invoked completely.
+
+#### Slot & Capture
+
+Another use case for matching is: for example you want to verify `myDependencyMock.method4(object1)`
+is invoked, but the reference of object1 is not mocked or initiated inside the test case, In this case
+an easy way to verify, or say matching, is create a object `slot` and then `capture` this object when 
+verify the invocation, something like:
+```kotlin
+val objectSlot = Slot<Object>()
+testMock.every(
+    methodName = MyDependencyMock.Method.method4,
+    arguments = mapOf(MyDependencyMock.Arg.object1 to capture(objectSlot))
+) { 1 }
+// verify the captured object's property here
+assertEquals(expectedProperty, objectSlot.captured.property)
+```
+Note: a common use case for this capturing is when a new instance is created inside testing method and
+you want to compare some properties of the captured object initialized correctly.
