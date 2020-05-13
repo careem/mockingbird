@@ -1,13 +1,18 @@
 package com.careem.mockingbird.test
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class InvocationRecorderTest {
 
     private val invocationRecorder = InvocationRecorder()
+
+    @Test
+    fun `test empty list when no invocations registered for an instance`(){
+        val mock = object : Mock {}
+
+        val mockInvocations = invocationRecorder.getInvocations(mock)
+        assertTrue(mockInvocations.isEmpty())
+    }
 
     @Test
     fun `test invocations stored properly for multiple instances`() {

@@ -68,7 +68,7 @@ internal class InvocationRecorder {
     fun getResponse(instance: Any, invocation: Invocation, relaxed: Boolean = false): Any? {
         val instanceHash = instance.hashCode()
         return if (instanceHash in responses.keys) {
-            responses[instanceHash]?.let {
+            responses[instanceHash]!!.let {
                 val lambda = findResponseByInvocation(it, invocation, relaxed)
                 return@let lambda(invocation)
             }
