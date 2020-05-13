@@ -106,8 +106,23 @@ testMock.every(
 
 #### everyAnswer
 
-// TODO complete here
+If you wish to perform specific logic when you mock is called you can use `everyAnswer`, here you can 
+specify the behavior you want for your mock. A typical use case is when you want to invoke a callback 
+that was passed as parameter to the mocked function.
 
+The code for a callback invocation will look like
+
+```kotlin
+myMock.everyAnswers(
+    methodName = MyMock.Method.run,
+    arguments = mapOf(
+        MyMock.Arg.callback to callback,
+    )
+) {
+    val callback = it.arguments[MyMock.Arg.callback] as () -> Unit
+    callback.invoke()
+}
+```
 
 ### Verify
 
