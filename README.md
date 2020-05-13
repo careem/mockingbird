@@ -23,7 +23,7 @@ The library provides 2 functions to help you write your mocks.
 1. `mock` this function allows you to mock non-Unit methods 
 1. `mockUnit` this function allows you to mock Unit methods 
 
-These helpers enable you to map you mock invocations to MockingBird environment.
+These helpers enable you to map your mock invocations to MockingBird environment.
 
 Your mock class must implements `Mock` in addition to extending the real class or implementing an interface
 
