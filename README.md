@@ -12,7 +12,7 @@ implementation "com.careem.mockingbird:mockingbird:1.0.0"
 
 ## Usage
 
-MockingBird doesn't use any annotation processor or reflection. This means that it is a bit more verbose to
+MockingBird doesn't use any annotation processor or reflection. This means that it is a bit more verbose
 with respect to libraries like `Mockito` or `Mockk`
 
 ### Mocks
