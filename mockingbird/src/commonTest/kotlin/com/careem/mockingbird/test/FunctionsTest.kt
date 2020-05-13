@@ -13,7 +13,10 @@ class FunctionsTest {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(MyDependencyMock.Arg.value1 to TEST_INT, MyDependencyMock.Arg.value2 to TEST_INT)
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
         ) { 1 }
 
         val value = runOnWorker {
@@ -24,11 +27,26 @@ class FunctionsTest {
     }
 
     @Test
+    fun `test every when no args`() {
+        val testMock = MyDependencyMock()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method4
+        ) { 1 }
+
+        val value = testMock.method4()
+
+        assertEquals(1, value)
+    }
+
+    @Test
     fun `test every`() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(MyDependencyMock.Arg.value1 to TEST_INT, MyDependencyMock.Arg.value2 to TEST_INT)
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
         ) { 1 }
 
         val value = testMock.method3(TEST_INT, TEST_INT)
@@ -57,6 +75,22 @@ class FunctionsTest {
             arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
         )
         assertEquals(TEST_STRING, iWillBeSet.value)
+    }
+
+    @Test
+    fun `test everyAnswer when no args and answer returns a value`() {
+        val testMock = MyDependencyMock()
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method4
+        ) {
+            return@everyAnswers 5
+        }
+
+        val value = testMock.method4()
+        testMock.verify(
+            methodName = MyDependencyMock.Method.method4
+        )
+        assertEquals(5, value)
     }
 
     @Test
@@ -101,25 +135,37 @@ class FunctionsTest {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(MyDependencyMock.Arg.value1 to TEST_INT, MyDependencyMock.Arg.value2 to TEST_INT)
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
         ) { 1 }
         assertEquals(1, testMock.method3(TEST_INT, TEST_INT))
 
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(MyDependencyMock.Arg.value1 to any(), MyDependencyMock.Arg.value2 to TEST_INT)
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to any(),
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
         ) { 2 }
         assertEquals(2, testMock.method3(100, TEST_INT))
 
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(MyDependencyMock.Arg.value1 to TEST_INT, MyDependencyMock.Arg.value2 to any())
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to any()
+            )
         ) { 3 }
         assertEquals(3, testMock.method3(TEST_INT, 200))
 
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(MyDependencyMock.Arg.value1 to any(), MyDependencyMock.Arg.value2 to any())
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to any(),
+                MyDependencyMock.Arg.value2 to any()
+            )
         ) { 4 }
         assertEquals(4, testMock.method3(300, 200))
         assertEquals(1, testMock.method3(TEST_INT, TEST_INT))
@@ -137,29 +183,44 @@ class FunctionsTest {
         testMock.verify(
             exactly = 0,
             methodName = MyDependencyMock.Method.method2,
-            arguments = mapOf(MyDependencyMock.Arg.str to any(), MyDependencyMock.Arg.value to any())
+            arguments = mapOf(
+                MyDependencyMock.Arg.str to any(),
+                MyDependencyMock.Arg.value to any()
+            )
         )
 
         testMock.method2(TEST_STRING, TEST_INT)
         testMock.verify(
             exactly = 1,
             methodName = MyDependencyMock.Method.method2,
-            arguments = mapOf(MyDependencyMock.Arg.str to any(), MyDependencyMock.Arg.value to TEST_INT)
+            arguments = mapOf(
+                MyDependencyMock.Arg.str to any(),
+                MyDependencyMock.Arg.value to TEST_INT
+            )
         )
         testMock.verify(
             exactly = 1,
             methodName = MyDependencyMock.Method.method2,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING, MyDependencyMock.Arg.value to any())
+            arguments = mapOf(
+                MyDependencyMock.Arg.str to TEST_STRING,
+                MyDependencyMock.Arg.value to any()
+            )
         )
         testMock.verify(
             exactly = 1,
             methodName = MyDependencyMock.Method.method2,
-            arguments = mapOf(MyDependencyMock.Arg.str to any(), MyDependencyMock.Arg.value to any())
+            arguments = mapOf(
+                MyDependencyMock.Arg.str to any(),
+                MyDependencyMock.Arg.value to any()
+            )
         )
         testMock.verify(
             exactly = 1,
             methodName = MyDependencyMock.Method.method2,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING, MyDependencyMock.Arg.value to TEST_INT)
+            arguments = mapOf(
+                MyDependencyMock.Arg.str to TEST_STRING,
+                MyDependencyMock.Arg.value to TEST_INT
+            )
         )
     }
 
@@ -171,6 +232,7 @@ class FunctionsTest {
             fun method1(str: String)
             fun method2(str: String, value: Int)
             fun method3(value1: Int, value2: Int): Int
+            fun method4(): Int
         }
 
         class MyDependencyMock : MyDependency, Mock {
@@ -178,6 +240,7 @@ class FunctionsTest {
                 const val method1 = "method1"
                 const val method2 = "method2"
                 const val method3 = "method3"
+                const val method4 = "method4"
             }
 
             object Arg {
@@ -208,6 +271,10 @@ class FunctionsTest {
                     Arg.value1 to value1,
                     Arg.value2 to value2
                 )
+            )
+
+            override fun method4(): Int = mock(
+                methodName = Method.method4
             )
         }
     }
