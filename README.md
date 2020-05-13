@@ -27,7 +27,7 @@ These helpers enable you to map you mock invocations to MockingBird environment.
 
 Your mock class must implements `Mock` in addition to extending the real class or implementing an interface
 
-You can find and example on how to create a mock on the code below
+You can find an example on how to create a mock on the code below
 
 ```koltin
 interface MyDependency {
