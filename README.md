@@ -29,7 +29,7 @@ Your mock class must implements `Mock` in addition to extending the real class o
 
 You can find an example on how to create a mock on the code below
 
-```koltin
+```kotlin
 interface MyDependency {
     fun method1(str: String)
     fun method2(str: String, value: Int)
