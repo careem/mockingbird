@@ -71,7 +71,7 @@ fun <T, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap())
 
 
 /**
- * Convinient function to mock a function
+ * Convenient function to mock a unit function
  * @param methodName name of the method that you want mock
  * @param arguments names of the function that you want to mock
  * @param relaxed specify if we want to crash if no mock behavior is provided for the function (relaxed=false => crash)
