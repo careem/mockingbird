@@ -1,28 +1,35 @@
 package com.careem.mockingbird.test
 
+import co.touchlab.stately.isolate.IsolateState
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
+import kotlin.native.concurrent.SharedImmutable
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-internal val invocationRecorder = InvocationRecorder()
+@SharedImmutable
+internal val invocationRecorder = IsolateState { InvocationRecorder() }
 
 interface Mock
 
 fun <T> T.verify(exactly: Int = 1, methodName: String, arguments: Map<String, Any?> = emptyMap()) {
-    assertTrue(this is Mock, "You can't verify a non mock object")
-    val methodInvocations = invocationRecorder.getInvocations(this)
-        .filter { it.methodName == methodName }
-    val argumentsInvocations = methodInvocations
-        .filter { compareArguments(it.arguments, arguments) }
+    invocationRecorder.access { recorder ->
+        assertTrue(this is Mock, "You can't verify a non mock object")
+        val methodInvocations = recorder.getInvocations(this)
+            .filter { it.methodName == methodName }
+        val argumentsInvocations = methodInvocations
+            .filter { compareArguments(it.arguments, arguments) }
 
-    assertEquals(
-        argumentsInvocations.size,
-        exactly,
-        """
+        assertEquals(
+            exactly,
+            argumentsInvocations.size,
+            """
             Expected $exactly invocations but found ${argumentsInvocations.size} that match the provided arguments
             expected: ${Invocation(methodName = methodName, arguments = arguments)}        
             found: $methodInvocations
         """.trimIndent()
-    )
+        )
+    }
 }
 
 fun <T, R> T.every(
@@ -30,12 +37,14 @@ fun <T, R> T.every(
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
 ) {
-    assertTrue(this is Mock, "You can't mock responses for a non mock")
-    invocationRecorder.storeResponse(
-        this,
-        Invocation(methodName = methodName, arguments = arguments),
-        returns()
-    )
+    invocationRecorder.access { recorder ->
+        assertTrue(this is Mock, "You can't mock responses for a non mock")
+        recorder.storeResponse(
+            this,
+            Invocation(methodName = methodName, arguments = arguments),
+            returns()
+        )
+    }
 }
 
 fun <T, R> T.everyAnswers(
@@ -43,19 +52,23 @@ fun <T, R> T.everyAnswers(
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
 ) {
-    assertTrue(this is Mock, "You can't mock responses for a non mock")
-    invocationRecorder.storeAnswer(
-        this,
-        Invocation(methodName = methodName, arguments = arguments),
-        answer
-    )
+    invocationRecorder.access { recorder ->
+        assertTrue(this is Mock, "You can't mock responses for a non mock")
+        recorder.storeAnswer(
+            this,
+            Invocation(methodName = methodName, arguments = arguments),
+            answer
+        )
+    }
 }
 
-fun <T, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R {
-    val invocation = Invocation(methodName = methodName, arguments = arguments)
-    mockInternal(invocation)
-    return invocationRecorder.getResponse(this as Any, invocation) as R
-}
+fun <T, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R =
+    invocationRecorder.access { recorder ->
+        val invocation = Invocation(methodName = methodName, arguments = arguments)
+        mockInternal(recorder, invocation)
+        return@access recorder.getResponse(this as Any, invocation) as R
+    }
+
 
 /**
  * Convinient function to mock a function
@@ -68,13 +81,15 @@ fun <T> T.mockUnit(
     arguments: Map<String, Any?> = emptyMap(),
     relaxed: Boolean = true
 ) {
-    val invocation = Invocation(methodName = methodName, arguments = arguments)
-    mockInternal(invocation)
-    invocationRecorder.getResponse(
-        instance = this as Any,
-        invocation = invocation,
-        relaxed = relaxed
-    )
+    invocationRecorder.access { recorder ->
+        val invocation = Invocation(methodName = methodName, arguments = arguments)
+        mockInternal(recorder, invocation)
+        recorder.getResponse(
+            instance = this as Any,
+            invocation = invocation,
+            relaxed = relaxed
+        )
+    }
 }
 
 /**
@@ -101,7 +116,14 @@ class AnyMatcher
  * Usage example @see [FunctionsTest]
  */
 class Slot<T> {
-    var captured: T? = null
+    private val _captured: AtomicRef<T?> = atomic(null)
+    var captured: T?
+        get() {
+            return _captured.value
+        }
+        set(value) {
+            _captured.value = value
+        }
 }
 
 /**
@@ -132,9 +154,9 @@ private fun compareArguments(
     return true
 }
 
-private fun <T> T.mockInternal(invocation: Invocation) {
+private fun <T> T.mockInternal(recorder: InvocationRecorder, invocation: Invocation) {
     assertTrue(this is Mock, "You can't mock a non Mock object")
-    invocationRecorder.storeInvocation(
+    recorder.storeInvocation(
         instance = this,
         invocation = invocation
     )

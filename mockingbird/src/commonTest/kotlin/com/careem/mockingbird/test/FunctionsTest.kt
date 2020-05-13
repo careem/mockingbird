@@ -1,5 +1,7 @@
 package com.careem.mockingbird.test
 
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -7,23 +9,74 @@ import kotlin.test.assertNull
 class FunctionsTest {
 
     @Test
-    fun `test everyAnswer`() {
+    fun `test every when mock called from worker`() {
         val testMock = TestMock()
-        var iWillBeSet: String? = null
+        testMock.every(
+            methodName = TestMock.Method.testMethod3,
+            arguments = mapOf(TestMock.Arg.value1 to TEST_INT, TestMock.Arg.value2 to TEST_INT)
+        ) { 1 }
+
+        val value = threadedTest {
+            testMock.testMethod3(TEST_INT, TEST_INT)
+        }
+
+        assertEquals(1, value)
+    }
+
+    @Test
+    fun `test every`() {
+        val testMock = TestMock()
+        testMock.every(
+            methodName = TestMock.Method.testMethod3,
+            arguments = mapOf(TestMock.Arg.value1 to TEST_INT, TestMock.Arg.value2 to TEST_INT)
+        ) { 1 }
+
+        val value = testMock.testMethod3(TEST_INT, TEST_INT)
+
+        assertEquals(1, value)
+    }
+
+    @Test
+    fun `test everyAnswer when mock called from worker`() {
+        val testMock = TestMock()
+        val iWillBeSet: AtomicRef<String?> = atomic(null)
         testMock.everyAnswers(
             methodName = TestMock.Method.testMethod1,
             arguments = mapOf(TestMock.Arg.str to TEST_STRING)
         ) {
-            iWillBeSet = TEST_STRING
+            iWillBeSet.value = TEST_STRING
         }
-        assertNull(iWillBeSet)
+        assertNull(iWillBeSet.value)
+
+        threadedTest {
+            testMock.testMethod1(TEST_STRING)
+        }
+
+        testMock.verify(
+            methodName = TestMock.Method.testMethod1,
+            arguments = mapOf(TestMock.Arg.str to TEST_STRING)
+        )
+        assertEquals(TEST_STRING, iWillBeSet.value)
+    }
+
+    @Test
+    fun `test everyAnswer`() {
+        val testMock = TestMock()
+        val iWillBeSet: AtomicRef<String?> = atomic(null)
+        testMock.everyAnswers(
+            methodName = TestMock.Method.testMethod1,
+            arguments = mapOf(TestMock.Arg.str to TEST_STRING)
+        ) {
+            iWillBeSet.value = TEST_STRING
+        }
+        assertNull(iWillBeSet.value)
 
         testMock.testMethod1(TEST_STRING)
         testMock.verify(
             methodName = TestMock.Method.testMethod1,
             arguments = mapOf(TestMock.Arg.str to TEST_STRING)
         )
-        assertEquals(TEST_STRING, iWillBeSet)
+        assertEquals(TEST_STRING, iWillBeSet.value)
     }
 
     @Test
@@ -112,6 +165,7 @@ class FunctionsTest {
 
     companion object {
         private const val TEST_STRING = "test_string"
+        private const val TEST_STRING_2 = "test_string_2"
         private const val TEST_INT = 3
 
         interface TestInterface {

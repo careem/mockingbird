@@ -13,6 +13,8 @@ kotlin {
             dependencies {
                 implementation Deps.kotlin.stdlib.common
                 implementation Deps.kotlin.stdlib
+                implementation Deps.kotlinx.atomicfu.common
+                implementation Deps.touchlab.stately.isolate.common
                 implementation kotlin('test')
                 implementation kotlin('test-common')
                 implementation kotlin('test-annotations-common')
@@ -22,11 +24,13 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation Deps.kotlin.stdlib.jdk8
+                implementation Deps.kotlinx.atomicfu.jvm
             }
         }
 
         iosX64Main {
             dependencies {
+                implementation Deps.kotlinx.atomicfu.native
             }
         }
 

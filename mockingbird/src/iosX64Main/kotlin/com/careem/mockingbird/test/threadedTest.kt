@@ -5,11 +5,8 @@ import kotlin.native.concurrent.Worker
 import kotlin.native.concurrent.freeze
 
 actual fun <T> threadedTest(body: () -> T): T {
-    body()
-
-    body.freeze()
     val worker = Worker.start()
-    val future = worker.execute(TransferMode.SAFE, { body }) {
+    val future = worker.execute(TransferMode.SAFE, { body.freeze() }) {
         println("Running body in worker")
         runCatching(it)
     }
