@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.2.0
 * Added `spy` function to support spy operation
 * Enforced type safety for all function, now you will get type error before runtime if you try to `verify` a non Mock
 
