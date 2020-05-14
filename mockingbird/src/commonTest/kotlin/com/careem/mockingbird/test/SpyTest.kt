@@ -22,6 +22,21 @@ class SpyTest {
     }
 
     @Test
+    fun `test spy calls mocked function when mock provided and default args`() {
+        val expect = 9
+
+        val realImpl = MyDependencyImpl()
+        val spy = MyDependencySpy(realImpl)
+        spy.every(
+            methodName = MyDependencySpy.Method.method4
+        ) { expect }
+
+        val res = spy.method4()
+
+        assertEquals(expect, res)
+    }
+
+    @Test
     fun `test spy calls mocked function when mock provided for specific args`() {
         val value1 = 3
         val value2 = 4

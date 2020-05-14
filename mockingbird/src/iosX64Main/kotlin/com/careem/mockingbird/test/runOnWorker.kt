@@ -6,7 +6,8 @@ import kotlin.native.concurrent.freeze
 
 actual fun <T> runOnWorker(body: () -> T): T {
     val worker = Worker.start()
-    val future = worker.execute(TransferMode.SAFE, { body.freeze() }) {
+    body.freeze()
+    val future = worker.execute(TransferMode.SAFE, { body }) {
         println("Running body in worker")
         runCatching(it)
     }

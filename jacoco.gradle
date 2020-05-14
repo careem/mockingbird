@@ -23,7 +23,12 @@ task jacocoTestReport(type: JacocoReport,
     def classDirectoryList = []
     def executionDataList = []
 
-    def classPathExcludeList = []
+    def classPathExcludeList = [
+            '**/*Test*.*',
+            '**/*Mock*.*',
+            '**/*Spy*.*',
+            '**/Helpers*.*'
+    ]
 
     subprojects.findAll { it.name != 'app' }.forEach { subProject ->
 
