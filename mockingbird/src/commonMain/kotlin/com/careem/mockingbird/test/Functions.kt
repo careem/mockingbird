@@ -12,7 +12,11 @@ internal val invocationRecorder = IsolateState { InvocationRecorder() }
 interface Mock
 interface Spy : Mock
 
-fun <T: Mock> T.verify(exactly: Int = 1, methodName: String, arguments: Map<String, Any?> = emptyMap()) {
+fun <T : Mock> T.verify(
+    exactly: Int = 1,
+    methodName: String,
+    arguments: Map<String, Any?> = emptyMap()
+) {
     invocationRecorder.access { recorder ->
         val methodInvocations = recorder.getInvocations(this)
             .filter { it.methodName == methodName }
@@ -31,7 +35,7 @@ fun <T: Mock> T.verify(exactly: Int = 1, methodName: String, arguments: Map<Stri
     }
 }
 
-fun <T: Mock, R> T.every(
+fun <T : Mock, R> T.every(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
@@ -45,7 +49,7 @@ fun <T: Mock, R> T.every(
     }
 }
 
-fun <T: Mock, R> T.everyAnswers(
+fun <T : Mock, R> T.everyAnswers(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
@@ -59,7 +63,13 @@ fun <T: Mock, R> T.everyAnswers(
     }
 }
 
-fun <T: Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R =
+/**
+ * Convenient function to mock a unit function
+ * @param methodName name of the method that you want to mock
+ * @param arguments map between names and method arguments
+ * @return returns the mocked result for the method call described by arguments above ( it crash if no mock behavior provided )
+ */
+fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R =
     invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(recorder, invocation)
@@ -69,11 +79,11 @@ fun <T: Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = empty
 
 /**
  * Convenient function to mock a unit function
- * @param methodName name of the method that you want mock
- * @param arguments names of the function that you want to mock
+ * @param methodName name of the method that you want to mock
+ * @param arguments map between names and method arguments
  * @param relaxed specify if we want to crash if no mock behavior is provided for the function (relaxed=false => crash)
  */
-fun <T: Mock> T.mockUnit(
+fun <T : Mock> T.mockUnit(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     relaxed: Boolean = true
@@ -89,7 +99,14 @@ fun <T: Mock> T.mockUnit(
     }
 }
 
-fun <T: Spy, R> T.spy(
+/**
+ * Convenient function to spy methods
+ * @param methodName name of the method that you want to spy
+ * @param arguments map between names and method arguments
+ * @return returns the mocked result for the method call described by arguments above if the method
+ * has been mocked, the result of the real invocation otherwise
+ */
+fun <T : Spy, R> T.spy(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     delegate: () -> R
@@ -168,7 +185,7 @@ private fun compareArguments(
     return true
 }
 
-private fun <T: Mock> T.recordInvocation(recorder: InvocationRecorder, invocation: Invocation) {
+private fun <T : Mock> T.recordInvocation(recorder: InvocationRecorder, invocation: Invocation) {
     recorder.storeInvocation(
         instance = this,
         invocation = invocation
