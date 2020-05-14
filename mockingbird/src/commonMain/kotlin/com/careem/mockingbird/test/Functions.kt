@@ -5,16 +5,15 @@ import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.native.concurrent.SharedImmutable
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @SharedImmutable
 internal val invocationRecorder = IsolateState { InvocationRecorder() }
 
 interface Mock
+interface Spy : Mock
 
-fun <T> T.verify(exactly: Int = 1, methodName: String, arguments: Map<String, Any?> = emptyMap()) {
+fun <T: Mock> T.verify(exactly: Int = 1, methodName: String, arguments: Map<String, Any?> = emptyMap()) {
     invocationRecorder.access { recorder ->
-        assertTrue(this is Mock, "You can't verify a non mock object")
         val methodInvocations = recorder.getInvocations(this)
             .filter { it.methodName == methodName }
         val argumentsInvocations = methodInvocations
@@ -32,13 +31,12 @@ fun <T> T.verify(exactly: Int = 1, methodName: String, arguments: Map<String, An
     }
 }
 
-fun <T, R> T.every(
+fun <T: Mock, R> T.every(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
 ) {
     invocationRecorder.access { recorder ->
-        assertTrue(this is Mock, "You can't mock responses for a non mock")
         recorder.storeResponse(
             this,
             Invocation(methodName = methodName, arguments = arguments),
@@ -47,13 +45,12 @@ fun <T, R> T.every(
     }
 }
 
-fun <T, R> T.everyAnswers(
+fun <T: Mock, R> T.everyAnswers(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
 ) {
     invocationRecorder.access { recorder ->
-        assertTrue(this is Mock, "You can't mock responses for a non mock")
         recorder.storeAnswer(
             this,
             Invocation(methodName = methodName, arguments = arguments),
@@ -62,10 +59,10 @@ fun <T, R> T.everyAnswers(
     }
 }
 
-fun <T, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R =
+fun <T: Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R =
     invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        mockInternal(recorder, invocation)
+        recordInvocation(recorder, invocation)
         return@access recorder.getResponse(this as Any, invocation) as R
     }
 
@@ -76,14 +73,14 @@ fun <T, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap())
  * @param arguments names of the function that you want to mock
  * @param relaxed specify if we want to crash if no mock behavior is provided for the function (relaxed=false => crash)
  */
-fun <T> T.mockUnit(
+fun <T: Mock> T.mockUnit(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     relaxed: Boolean = true
 ) {
     invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        mockInternal(recorder, invocation)
+        recordInvocation(recorder, invocation)
         recorder.getResponse(
             instance = this as Any,
             invocation = invocation,
@@ -91,6 +88,23 @@ fun <T> T.mockUnit(
         )
     }
 }
+
+fun <T: Spy, R> T.spy(
+    methodName: String,
+    arguments: Map<String, Any?> = emptyMap(),
+    delegate: () -> R
+): R =
+    invocationRecorder.access { recorder ->
+        val invocation = Invocation(methodName = methodName, arguments = arguments)
+        recordInvocation(recorder, invocation)// TODO change name
+        val mockResponse = recorder.getResponse(
+            instance = this as Any,
+            invocation = invocation,
+            relaxed = true
+        ) as R
+        return@access mockResponse ?: delegate()
+    }
+
 
 /**
  * Capture any [Slot] which will be using to compare the property inside
@@ -154,8 +168,7 @@ private fun compareArguments(
     return true
 }
 
-private fun <T> T.mockInternal(recorder: InvocationRecorder, invocation: Invocation) {
-    assertTrue(this is Mock, "You can't mock a non Mock object")
+private fun <T: Mock> T.recordInvocation(recorder: InvocationRecorder, invocation: Invocation) {
     recorder.storeInvocation(
         instance = this,
         invocation = invocation

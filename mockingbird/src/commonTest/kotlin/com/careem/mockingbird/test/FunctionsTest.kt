@@ -1,5 +1,8 @@
 package com.careem.mockingbird.test
 
+import com.careem.mockingbird.test.Mocks.MyDependencyMock
+import com.careem.mockingbird.test.Mocks.TEST_INT
+import com.careem.mockingbird.test.Mocks.TEST_STRING
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.test.Test
@@ -9,108 +12,62 @@ import kotlin.test.assertNull
 class FunctionsTest {
 
     @Test
-    fun `test every when mock called from worker`() {
-        val testMock = MyDependencyMock()
-        testMock.every(
-            methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(
-                MyDependencyMock.Arg.value1 to TEST_INT,
-                MyDependencyMock.Arg.value2 to TEST_INT
-            )
-        ) { 1 }
-
-        val value = runOnWorker {
-            testMock.method3(TEST_INT, TEST_INT)
-        }
-
-        assertEquals(1, value)
-    }
-
-    @Test
-    fun `test every when no args`() {
-        val testMock = MyDependencyMock()
-        testMock.every(
-            methodName = MyDependencyMock.Method.method4
-        ) { 1 }
-
-        val value = testMock.method4()
-
-        assertEquals(1, value)
-    }
-
-    @Test
-    fun `test every`() {
-        val testMock = MyDependencyMock()
-        testMock.every(
-            methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(
-                MyDependencyMock.Arg.value1 to TEST_INT,
-                MyDependencyMock.Arg.value2 to TEST_INT
-            )
-        ) { 1 }
-
-        val value = testMock.method3(TEST_INT, TEST_INT)
-
-        assertEquals(1, value)
-    }
-
-    @Test
     fun `test everyAnswer when mock called from worker`() {
-        val testMock = MyDependencyMock()
+        val testMock = Mocks.MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
         testMock.everyAnswers(
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+            methodName = Mocks.MyDependencyMock.Method.method1,
+            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
         ) {
-            iWillBeSet.value = TEST_STRING
+            iWillBeSet.value = Mocks.TEST_STRING
         }
         assertNull(iWillBeSet.value)
 
         runOnWorker {
-            testMock.method1(TEST_STRING)
+            testMock.method1(Mocks.TEST_STRING)
         }
 
         testMock.verify(
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+            methodName = Mocks.MyDependencyMock.Method.method1,
+            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
         )
-        assertEquals(TEST_STRING, iWillBeSet.value)
+        assertEquals(Mocks.TEST_STRING, iWillBeSet.value)
     }
 
     @Test
     fun `test everyAnswer when no args and answer returns a value`() {
-        val testMock = MyDependencyMock()
+        val testMock = Mocks.MyDependencyMock()
         testMock.everyAnswers(
-            methodName = MyDependencyMock.Method.method4
+            methodName = Mocks.MyDependencyMock.Method.method4
         ) {
             return@everyAnswers 5
         }
 
         val value = testMock.method4()
         testMock.verify(
-            methodName = MyDependencyMock.Method.method4
+            methodName = Mocks.MyDependencyMock.Method.method4
         )
         assertEquals(5, value)
     }
 
     @Test
     fun `test everyAnswer`() {
-        val testMock = MyDependencyMock()
+        val testMock = Mocks.MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
         testMock.everyAnswers(
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+            methodName = Mocks.MyDependencyMock.Method.method1,
+            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
         ) {
-            iWillBeSet.value = TEST_STRING
+            iWillBeSet.value = Mocks.TEST_STRING
         }
         assertNull(iWillBeSet.value)
 
-        testMock.method1(TEST_STRING)
+        testMock.method1(Mocks.TEST_STRING)
         testMock.verify(
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+            methodName = Mocks.MyDependencyMock.Method.method1,
+            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
         )
-        assertEquals(TEST_STRING, iWillBeSet.value)
+        assertEquals(Mocks.TEST_STRING, iWillBeSet.value)
     }
 
     @Test
@@ -222,60 +179,5 @@ class FunctionsTest {
                 MyDependencyMock.Arg.value to TEST_INT
             )
         )
-    }
-
-    companion object {
-        private const val TEST_STRING = "test_string"
-        private const val TEST_INT = 3
-
-        interface MyDependency {
-            fun method1(str: String)
-            fun method2(str: String, value: Int)
-            fun method3(value1: Int, value2: Int): Int
-            fun method4(): Int
-        }
-
-        class MyDependencyMock : MyDependency, Mock {
-            object Method {
-                const val method1 = "method1"
-                const val method2 = "method2"
-                const val method3 = "method3"
-                const val method4 = "method4"
-            }
-
-            object Arg {
-                const val str = "str"
-                const val value = "value"
-                const val value1 = "value1"
-                const val value2 = "value2"
-            }
-
-            override fun method1(str: String) = mockUnit(
-                methodName = Method.method1,
-                arguments = mapOf(
-                    Arg.str to str
-                )
-            )
-
-            override fun method2(str: String, value: Int) = mockUnit(
-                methodName = Method.method2,
-                arguments = mapOf(
-                    Arg.str to str,
-                    Arg.value to value
-                )
-            )
-
-            override fun method3(value1: Int, value2: Int): Int = mock(
-                methodName = Method.method3,
-                arguments = mapOf(
-                    Arg.value1 to value1,
-                    Arg.value2 to value2
-                )
-            )
-
-            override fun method4(): Int = mock(
-                methodName = Method.method4
-            )
-        }
     }
 }
