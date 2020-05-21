@@ -1,4 +1,5 @@
-# MockingBird [![Build Status](https://app.bitrise.io/app/0f4e1b30e3e56dfb/status.svg?token=iHecTZF7GpuyTMqiFj618Q&branch=master)](https://app.bitrise.io/build/c0b2c4e103c222bb)
+# MockingBird [![Build Status](https://app.bitrise.io/app/0f4e1b30e3e56dfb/status.svg?token=iHecTZF7GpuyTMqiFj618Q&branch=master)](https://app.bitrise.io/build/c0b2c4e103c222bb) 
+![version](https://img.shields.io/badge/version-1.2.0-blue) ![coverage](https://img.shields.io/badge/coverage-95%25-yellowgreen)
 
 A Koltin multiplatform library that provides an easier way to mock and write unit tests for a multiplatform project
 
@@ -7,7 +8,7 @@ A Koltin multiplatform library that provides an easier way to mock and write uni
 In you multiplatform project include
 
 ```groovy
-implementation "com.careem.mockingbird:mockingbird:1.0.0"
+implementation "com.careem.mockingbird:mockingbird:1.2.0"
 ```
 
 ## Usage
