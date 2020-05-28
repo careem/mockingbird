@@ -13,7 +13,7 @@ def getRepositoryUsername() {
 }
 
 def getRepositoryPassword() {
-    return hasProperty('careem_artifactory_password') ? careem_artifactory_password : System.env.careem_artifactory_password
+    return hasProperty('careem_artifactory_api_key') ? careem_artifactory_api_key : System.env.careem_artifactory_api_key
 }
 
 task emptySourcesJar(type: Jar) {
