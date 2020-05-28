@@ -8,6 +8,18 @@ kotlin {
         fromPreset(presets.iosArm64, 'iosArm64')
     }
 
+    targets.all {
+        compilations.all {
+            kotlinOptions {
+                // `.toString` required to avoid the following error when building for macOS:
+                // org.codehaus.groovy.runtime.GStringImpl cannot be cast to java.lang.String
+                freeCompilerArgs += "-Xplugin=${project.rootDir}/mockingbird-mock-plugin/build/libs/mockingbird-mock-plugin-1.2.0-SNAPSHOT-all.jar".toString()
+            }
+        }
+    }
+
+    jvm()
+
     sourceSets {
         commonMain {
             dependencies {
@@ -25,6 +37,9 @@ kotlin {
             dependencies {
                 implementation Deps.kotlin.stdlib.jdk8
                 implementation Deps.kotlinx.atomicfu.jvm
+                compileOnly "io.arrow-kt:arrow-annotations:0.10.5"
+                // To run :create-plugin:shadowJar when building this project
+                compileOnly project(path: ':mockingbird-mock-plugin', configuration: 'shadow')
             }
         }
 
@@ -69,7 +84,6 @@ kotlin {
 configurations {
     compileClasspath
 }
-
 
 task sourcesJar(type: Jar) {
     baseName = "mockingbird"

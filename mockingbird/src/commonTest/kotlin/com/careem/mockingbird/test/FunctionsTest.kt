@@ -10,6 +10,8 @@ class FunctionsTest {
 
     @Test
     fun `test every when mock called from worker`() {
+
+        helloWorld()
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,

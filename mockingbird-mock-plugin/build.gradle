@@ -1,0 +1,29 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "com.github.johnrengelman.shadow"
+}
+
+dependencies {
+    implementation Deps.kotlin.stdlib
+    implementation Deps.kotlin.kotlinCompilerEmbeddable
+    implementation Deps.arrow.compilerPlugin
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = Deps.jvmTargetVersion
+    }
+}
+
+// Create a new JAR with: Arrow Meta + new plugin
+shadowJar {
+    configurations = [project.configurations.compileOnly]
+    dependencies {
+        exclude("org.jetbrains.kotlin:kotlin-stdlib")
+        exclude("org.jetbrains.kotlin:kotlin-compiler-embeddable")
+        // FIXME: On iOS/macOS. Enabling this allows the plugin to be registered, but the
+        // transform still isn't happening
+        relocate 'org.jetbrains.kotlin.com.intellij', 'com.intellij'
+        relocate 'org.jetbrains.kotlin.load', 'kotlin.reflect.jvm.internal.impl.load'
+    }
+}

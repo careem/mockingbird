@@ -10,7 +10,7 @@ subprojects {
 
 def mainSubProject = "mockingbird"
 
-task jacocoTestReport(type: JacocoReport,
+task jacocoUnitTestReport(type: JacocoReport,
         dependsOn: []) {
     reports {
         xml.enabled = true

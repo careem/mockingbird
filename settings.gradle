@@ -1,3 +1,4 @@
+include ':mockingbird-mock-plugin'
 include ':mockingbird'
 
 enableFeaturePreview('GRADLE_METADATA')

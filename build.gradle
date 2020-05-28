@@ -1,5 +1,3 @@
-apply from: 'jacoco.gradle'
-
 buildscript {
     repositories {
         google()
@@ -7,12 +5,29 @@ buildscript {
         mavenCentral()
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url "https://plugins.gradle.org/m2/" }
+        maven {
+            url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
+        }
+
     }
     dependencies {
         classpath Deps.kotlin.plugin
         classpath Deps.jacoco
+        classpath Deps.arrow.gradlePlugin
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
     }
 }
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.3.71"
+
+    // This option will be possible when there is a version of Arrow Meta Compiler Plugin in Maven Central repository.
+    // Then, "buildscript" and "apply" section won't be necessary.
+    // id "io.arrow-kt.arrow" version "$ARROW_META_VERSION"
+}
+
+apply from: 'jacoco.gradle'
+apply plugin: "io.arrow-kt.arrow"
 
 allprojects {
     group GROUP
@@ -24,9 +39,6 @@ allprojects {
         jcenter()
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
