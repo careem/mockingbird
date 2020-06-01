@@ -58,7 +58,7 @@ internal class InvocationRecorder {
     }
 
     /**
-     * This function will return the mocked response previosly stored for the specific invocation
+     * This function will return the mocked response previously stored for the specific invocation
      * @param instance the instance of the mock
      * @param invocation the Invocation object @see [Invocation]
      * @param relaxed specify if we want to crash when no mock behavior provided

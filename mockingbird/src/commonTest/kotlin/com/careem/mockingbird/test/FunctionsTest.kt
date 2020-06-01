@@ -7,71 +7,72 @@ import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class FunctionsTest {
 
     @Test
     fun `test everyAnswer when mock called from worker`() {
-        val testMock = Mocks.MyDependencyMock()
+        val testMock = MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
         testMock.everyAnswers(
-            methodName = Mocks.MyDependencyMock.Method.method1,
-            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
         ) {
-            iWillBeSet.value = Mocks.TEST_STRING
+            iWillBeSet.value = TEST_STRING
         }
         assertNull(iWillBeSet.value)
 
         runOnWorker {
-            testMock.method1(Mocks.TEST_STRING)
+            testMock.method1(TEST_STRING)
         }
 
         testMock.verify(
-            methodName = Mocks.MyDependencyMock.Method.method1,
-            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
         )
-        assertEquals(Mocks.TEST_STRING, iWillBeSet.value)
+        assertEquals(TEST_STRING, iWillBeSet.value)
     }
 
     @Test
     fun `test everyAnswer when no args and answer returns a value`() {
-        val testMock = Mocks.MyDependencyMock()
+        val testMock = MyDependencyMock()
         testMock.everyAnswers(
-            methodName = Mocks.MyDependencyMock.Method.method4
+            methodName = MyDependencyMock.Method.method4
         ) {
             return@everyAnswers 5
         }
 
         val value = testMock.method4()
         testMock.verify(
-            methodName = Mocks.MyDependencyMock.Method.method4
+            methodName = MyDependencyMock.Method.method4
         )
         assertEquals(5, value)
     }
 
     @Test
     fun `test everyAnswer`() {
-        val testMock = Mocks.MyDependencyMock()
+        val testMock = MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
         testMock.everyAnswers(
-            methodName = Mocks.MyDependencyMock.Method.method1,
-            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
         ) {
-            iWillBeSet.value = Mocks.TEST_STRING
+            iWillBeSet.value = TEST_STRING
         }
         assertNull(iWillBeSet.value)
 
-        testMock.method1(Mocks.TEST_STRING)
+        testMock.method1(TEST_STRING)
         testMock.verify(
-            methodName = Mocks.MyDependencyMock.Method.method1,
-            arguments = mapOf(Mocks.MyDependencyMock.Arg.str to Mocks.TEST_STRING)
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
         )
-        assertEquals(Mocks.TEST_STRING, iWillBeSet.value)
+        assertEquals(TEST_STRING, iWillBeSet.value)
     }
 
     @Test
-    fun `test capture slot`() {
+    fun `test capture slot with correct argument`() {
         val testMock = MyDependencyMock()
         val stringSlot = Slot<String>()
         testMock.every(
@@ -85,6 +86,26 @@ class FunctionsTest {
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
         assertEquals(TEST_STRING, stringSlot.captured)
+    }
+
+    @Test
+    fun `test capture slot with wrong argument`() {
+        val testMock = MyDependencyMock()
+        val stringSlot = Slot<String>()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        try {
+            testMock.method1(TEST_STRING)
+            testMock.verify(
+                methodName = MyDependencyMock.Method.method1,
+                arguments = mapOf(MyDependencyMock.Arg.value to capture(stringSlot))
+            )
+        } catch (error: AssertionError) {
+            assertNotNull(error)
+        }
     }
 
     @Test
@@ -178,6 +199,89 @@ class FunctionsTest {
                 MyDependencyMock.Arg.str to TEST_STRING,
                 MyDependencyMock.Arg.value to TEST_INT
             )
+        )
+    }
+
+    @Test
+    fun `test throw assertError when argument size is wrong`() {
+        val testMock = MyDependencyMock()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method3,
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
+        ) { TEST_INT }
+
+        try {
+            testMock.method3(TEST_INT, TEST_INT)
+            testMock.verify(
+                methodName = MyDependencyMock.Method.method3,
+                arguments = mapOf(
+                    MyDependencyMock.Arg.value1 to TEST_INT
+                )
+            )
+        } catch (error: AssertionError) {
+            assertNotNull(error)
+        }
+    }
+
+    @Test
+    fun `test throw assertError when argument key is wrong`() {
+        val testMock = MyDependencyMock()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method3,
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
+        ) { TEST_INT }
+
+        try {
+            testMock.method3(TEST_INT, TEST_INT)
+            testMock.verify(
+                methodName = MyDependencyMock.Method.method3,
+                arguments = mapOf(
+                    MyDependencyMock.Arg.value1 to TEST_INT,
+                    "wrong_key" to TEST_INT
+                )
+            )
+        } catch (error: AssertionError) {
+            assertNotNull(error)
+        }
+    }
+
+    @Test
+    fun `test throw assertError when argument value is wrong`() {
+        val testMock = MyDependencyMock()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method3,
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
+        ) { TEST_INT }
+
+        try {
+            testMock.method3(TEST_INT, TEST_INT)
+            testMock.verify(
+                methodName = MyDependencyMock.Method.method3,
+                arguments = mapOf(
+                    MyDependencyMock.Arg.value1 to TEST_INT,
+                    MyDependencyMock.Arg.value2 to "wrong_value"
+                )
+            )
+        } catch (error: AssertionError) {
+            assertNotNull(error)
+        }
+    }
+
+    @Test
+    fun `test no need to call every on unit function without arguments`() {
+        val testMock = MyDependencyMock()
+        testMock.method5()
+        testMock.verify(
+            methodName = MyDependencyMock.Method.method5
         )
     }
 }

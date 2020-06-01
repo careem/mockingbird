@@ -7,7 +7,7 @@ import kotlin.native.concurrent.SharedImmutable
 import kotlin.test.assertEquals
 
 @SharedImmutable
-internal val invocationRecorder = IsolateState { InvocationRecorder() }
+private val invocationRecorder = IsolateState { InvocationRecorder() }
 
 interface Mock
 interface Spy : Mock
@@ -64,7 +64,7 @@ fun <T : Mock, R> T.everyAnswers(
 }
 
 /**
- * Convenient function to mock a unit function
+ * Function to mock a function
  * @param methodName name of the method that you want to mock
  * @param arguments map between names and method arguments
  * @return returns the mocked result for the method call described by arguments above ( it crash if no mock behavior provided )
@@ -171,6 +171,9 @@ private fun compareArguments(
     invocationArguments: Map<String, Any?>,
     expectedArguments: Map<String, Any?>
 ): Boolean {
+    if (invocationArguments.size != expectedArguments.size) {
+        return false
+    }
     for ((arg, value) in expectedArguments) {
         if (value is Captured<*> && arg in invocationArguments) {
             value.setCapturedValue(invocationArguments[arg])
