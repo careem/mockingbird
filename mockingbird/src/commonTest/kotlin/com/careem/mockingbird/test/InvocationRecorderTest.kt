@@ -128,6 +128,48 @@ class InvocationRecorderTest {
     }
 
     @Test
+    fun `test crash if response stored but wrong argument size`() {
+        val mock = object : Mock {}
+        val invocation1 = Invocation(METHOD_1, ARGS_1)
+        val invocation2 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to "value1"))
+        val responseInv1 = "Yo"
+        var e: IllegalStateException? = null
+
+        invocationRecorder.storeResponse(mock, invocation1, responseInv1)
+
+        val response1 = invocationRecorder.getResponse(mock, invocation1)
+        assertEquals(responseInv1, response1)
+        try {
+            invocationRecorder.getResponse(mock, invocation2)
+        } catch (ise: IllegalStateException) {
+            e = ise
+            assertEquals("Not mocked response for current object and instance", e.message)
+        }
+        assertNotNull(e)
+    }
+
+    @Test
+    fun `test crash if response stored but wrong argument key `() {
+        val mock = object : Mock {}
+        val invocation1 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to "value1"))
+        val invocation2 = Invocation(METHOD_1, mapOf("wrong_key" to "value1"))
+        val responseInv1 = "Yo"
+        var e: IllegalStateException? = null
+
+        invocationRecorder.storeResponse(mock, invocation1, responseInv1)
+
+        val response1 = invocationRecorder.getResponse(mock, invocation1)
+        assertEquals(responseInv1, response1)
+        try {
+            invocationRecorder.getResponse(mock, invocation2)
+        } catch (ise: IllegalStateException) {
+            e = ise
+            assertEquals("Not mocked response for current object and instance", e.message)
+        }
+        assertNotNull(e)
+    }
+
+    @Test
     fun `test any() matcher works properly`() {
         val mock = object : Mock {}
         val mock2 = object : Mock {}

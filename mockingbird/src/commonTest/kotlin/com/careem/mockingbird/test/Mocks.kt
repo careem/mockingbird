@@ -12,6 +12,7 @@ object Mocks {
         fun method2(str: String, value: Int)
         fun method3(value1: Int, value2: Int): Int
         fun method4(): Int
+        fun method5()
     }
 
     class MyDependencyMock : MyDependency, Mock {
@@ -20,6 +21,7 @@ object Mocks {
             const val method2 = "method2"
             const val method3 = "method3"
             const val method4 = "method4"
+            const val method5 = "method5"
         }
 
         object Arg {
@@ -55,6 +57,10 @@ object Mocks {
         override fun method4(): Int = mock(
             methodName = Method.method4
         )
+
+        override fun method5() = mockUnit(
+            methodName = Method.method5
+        )
     }
 
     class MyDependencySpy(private val delegate: MyDependency) : MyDependency, Spy {
@@ -64,6 +70,7 @@ object Mocks {
             const val method2 = "method2"
             const val method3 = "method3"
             const val method4 = "method4"
+            const val method5 = "method5"
         }
 
         object Arg {
@@ -103,16 +110,21 @@ object Mocks {
             methodName = Method.method4,
             delegate = { delegate.method4() }
         )
+
+        override fun method5() = spy(
+            methodName = Method.method5,
+            delegate = { delegate.method5() }
+        )
     }
 
     class MyDependencyImpl : MyDependency {
         private var value: AtomicInt = atomic(0)
         override fun method1(str: String) {
-
+            // no-ops
         }
 
         override fun method2(str: String, value: Int) {
-
+            // no-ops
         }
 
         override fun method3(value1: Int, value2: Int): Int {
@@ -122,6 +134,10 @@ object Mocks {
 
         override fun method4(): Int {
             return value.value
+        }
+
+        override fun method5() {
+            // no-ops
         }
     }
 }
