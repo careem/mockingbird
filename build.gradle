@@ -27,6 +27,80 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
+    project.apply plugin: 'org.jetbrains.kotlin.multiplatform'
+    if (shouldPublish) {
+        project.apply from: '../publishing.gradle'
+    }
+
+    project.group = GROUP
+    project.version = VERSION
+
+    project.kotlin {
+        sourceSets {
+            commonMain {
+                dependencies {
+                    implementation Deps.kotlin.stdlib.common
+                }
+            }
+
+            commonTest {
+                dependencies {
+                    implementation Deps.kotlin.test.common
+                    implementation Deps.kotlin.test.annotationsCommon
+                }
+            }
+        }
+    }
+}
+
+void setupAllTargetsWithDefaultSourceSets(Project project) {
+    setupIosTargets(project)
+    setupJvmTarget(project)
+    setupJsTarget(project)
+
+    project.kotlin {
+        sourceSets {
+            jvmJsCommonMain.dependsOn commonMain
+            jvmJsCommonTest.dependsOn commonTest
+
+            jvmMain.dependsOn jvmJsCommonMain
+            jvmTest.dependsOn jvmJsCommonTest
+
+            jsMain.dependsOn jvmJsCommonMain
+            jsTest.dependsOn jvmJsCommonTest
+        }
+    }
+}
+
+private void setupIosTargets(Project project) {
+    project.kotlin {
+        targets.fromPreset(presets.iosX64, 'iosX64')
+        targets.fromPreset(presets.iosArm64, 'iosArm64')
+    }
+}
+
+private void setupJvmTarget(Project project) {
+    project.kotlin {
+        targets.fromPreset(presets.jvm, 'jvm')
+
+        sourceSets {
+            jvmMain {
+                dependencies {
+                    implementation Deps.kotlin.stdlib
+                }
+            }
+
+            jvmTest {
+                dependencies {
+                    implementation Deps.kotlin.test.junit
+                    implementation kotlin('test-junit')
+                }
+            }
+        }
+    }
+}
+
+private void setupJsTarget(Project project) {
+    project.apply plugin: JsPlugin
 }

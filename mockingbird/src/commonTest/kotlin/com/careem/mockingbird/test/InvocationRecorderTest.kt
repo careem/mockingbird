@@ -7,7 +7,7 @@ class InvocationRecorderTest {
     private val invocationRecorder = InvocationRecorder()
 
     @Test
-    fun `test empty list when no invocations registered for an instance`(){
+    fun testEmptyListWhenNoInvocationsRegisteredForAnInstance(){
         val mock = object : Mock {}
 
         val mockInvocations = invocationRecorder.getInvocations(mock)
@@ -15,7 +15,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test invocations stored properly for multiple instances`() {
+    fun testInvocationsStoredProperlyForMultipleInstances() {
         val mock = object : Mock {}
         val mock2 = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
@@ -42,7 +42,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test responses stored properly for multiple instances`() {
+    fun testResponsesStoredProperlyForMultipleInstances() {
         val mock = object : Mock {}
         val mock2 = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
@@ -65,7 +65,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test answers stored properly`() {
+    fun testAnswersStoredProperly() {
         val mock = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
@@ -80,7 +80,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test get response when relaxed and unit function`() {
+    fun testGetResponseWhenRelaxedAndUnitFunction() {
         val mock = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
@@ -89,12 +89,12 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test get response when relaxed and not unit function`() {
+    fun testGetResponseWhenRelaxedAndNotUnitFunction() {
         // TODO not supported
     }
 
     @Test
-    fun `test answers side effect on unit function`() {
+    fun testAnswersSideEffectOnUnitFunction() {
         val mock = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
@@ -113,7 +113,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test crash if no response store for invocation`() {
+    fun testCrashIfNoResponseStoreForInvocation() {
         val mock = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
@@ -128,7 +128,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test crash if response stored but wrong argument size`() {
+    fun testCrashIfResponseStoredButWrongArgumentSize() {
         val mock = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
         val invocation2 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to "value1"))
@@ -149,7 +149,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test crash if response stored but wrong argument key `() {
+    fun testCrashIfResponseStoredButWrongArgumentKey() {
         val mock = object : Mock {}
         val invocation1 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to "value1"))
         val invocation2 = Invocation(METHOD_1, mapOf("wrong_key" to "value1"))
@@ -170,7 +170,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun `test any() matcher works properly`() {
+    fun testAnyMatcherWorksProperly() {
         val mock = object : Mock {}
         val mock2 = object : Mock {}
         val invocation1 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to any()))

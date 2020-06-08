@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 class EveryTest {
 
     @Test
-    fun `test every when mock called from worker`() {
+    fun testEveryWhenMockCalledFromWorker() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
@@ -26,7 +26,7 @@ class EveryTest {
     }
 
     @Test
-    fun `test every when no args`() {
+    fun testEveryWhenNoArgs() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method4
@@ -38,7 +38,7 @@ class EveryTest {
     }
 
     @Test
-    fun `test every`() {
+    fun testEvery() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,

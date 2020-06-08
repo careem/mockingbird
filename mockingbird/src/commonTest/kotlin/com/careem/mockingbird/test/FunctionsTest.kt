@@ -13,7 +13,7 @@ import kotlin.test.assertNull
 class FunctionsTest {
 
     @Test
-    fun `test everyAnswer when mock called from worker`() {
+    fun testEveryAnswerWhenMockCalledFromWorker() {
         val testMock = MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
         testMock.everyAnswers(
@@ -36,7 +36,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test everyAnswer when no args and answer returns a value`() {
+    fun testEveryAnswerWhenNoArgsAndAnswerReturnsAValue() {
         val testMock = MyDependencyMock()
         testMock.everyAnswers(
             methodName = MyDependencyMock.Method.method4
@@ -52,7 +52,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test everyAnswer`() {
+    fun testEveryAnswer() {
         val testMock = MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
         testMock.everyAnswers(
@@ -72,7 +72,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test capture slot with correct argument`() {
+    fun testCaptureSlotWithCorrectArgument() {
         val testMock = MyDependencyMock()
         val stringSlot = Slot<String>()
         testMock.every(
@@ -89,7 +89,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test capture slot with wrong argument`() {
+    fun testCaptureSlotWithWrongArgument() {
         val testMock = MyDependencyMock()
         val stringSlot = Slot<String>()
         testMock.every(
@@ -109,7 +109,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test any() matcher works properly for every()`() {
+    fun testAnyMatcherWorksProperlyForEvery() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
@@ -150,7 +150,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test any() matcher works properly for verify()`() {
+    fun testAnyMatcherWorksProperlyForVerify() {
         val testMock = MyDependencyMock()
         testMock.method1(TEST_STRING)
         testMock.verify(
@@ -203,7 +203,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test throw assertError when argument size is wrong`() {
+    fun testThrowAssertErrorWhenArgumentSizeIsWrong() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
@@ -227,7 +227,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test throw assertError when argument key is wrong`() {
+    fun testThrowAssertErrorWhenArgumentKeyIsWrong() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
@@ -252,7 +252,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test throw assertError when argument value is wrong`() {
+    fun testThrowAssertErrorWhenArgumentValueIsWrong() {
         val testMock = MyDependencyMock()
         testMock.every(
             methodName = MyDependencyMock.Method.method3,
@@ -277,7 +277,7 @@ class FunctionsTest {
     }
 
     @Test
-    fun `test no need to call every on unit function without arguments`() {
+    fun testNoNeedToCallEveryOnUnitFunctionWithoutArguments() {
         val testMock = MyDependencyMock()
         testMock.method5()
         testMock.verify(

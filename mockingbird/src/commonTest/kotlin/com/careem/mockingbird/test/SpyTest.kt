@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 class SpyTest {
 
     @Test
-    fun `test spy calls real function when no mock provided`() {
+    fun testSpyCallsRealFunctionWhenNoMockProvided() {
         val value1 = 3
         val value2 = 4
         val expect = value1 + value2
@@ -22,7 +22,7 @@ class SpyTest {
     }
 
     @Test
-    fun `test spy calls mocked function when mock provided and default args`() {
+    fun testSpyCallsMockedFunctionWhenMockProvidedAndDefaultArgs() {
         val expect = 9
 
         val realImpl = MyDependencyImpl()
@@ -37,7 +37,7 @@ class SpyTest {
     }
 
     @Test
-    fun `test spy calls mocked function when mock provided for specific args`() {
+    fun testSpyCallsMockedFunctionWhenMockProvidedForSpecificArgs() {
         val value1 = 3
         val value2 = 4
         val expect = value1 - value2
@@ -58,7 +58,7 @@ class SpyTest {
     }
 
     @Test
-    fun `test spy calls real function when no mock provided for specific args`() {
+    fun testSpyCallsRealFunctionWhenNoMockProvidedForSpecificArgs() {
         val value1 = 3
         val value2 = 4
         val expect = value1 + value2
@@ -79,7 +79,7 @@ class SpyTest {
     }
 
     @Test
-    fun `test verify real function called on spied object when no mock provided`() {
+    fun testVerifyRealFunctionCalledOnSpiedObjectWhenNoMockProvided() {
         val value1 = 3
         val value2 = 4
         val realImpl = MyDependencyImpl()
