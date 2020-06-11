@@ -1,8 +1,6 @@
 package com.careem.mockingbird.test
 
 import co.touchlab.stately.isolate.IsolateState
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
 import kotlin.native.concurrent.SharedImmutable
 import kotlin.test.assertEquals
 
@@ -12,6 +10,50 @@ private val invocationRecorder = IsolateState { InvocationRecorder() }
 interface Mock
 interface Spy : Mock
 
+/**
+ * Function to specify the return value of an invocation
+ * @param methodName name of the method that you want to mock
+ * @param arguments map between names and method arguments
+ */
+fun <T : Mock, R> T.every(
+    methodName: String,
+    arguments: Map<String, Any?> = emptyMap(),
+    returns: () -> R
+) {
+    invocationRecorder.access { recorder ->
+        recorder.storeResponse(
+            this,
+            Invocation(methodName = methodName, arguments = arguments),
+            returns()
+        )
+    }
+}
+
+/**
+ * Function to specify the behavior when an invocation is called
+ * @param methodName name of the method that you want to mock
+ * @param arguments map between names and method arguments
+ */
+fun <T : Mock, R> T.everyAnswers(
+    methodName: String,
+    arguments: Map<String, Any?> = emptyMap(),
+    answer: (Invocation) -> R
+) {
+    invocationRecorder.access { recorder ->
+        recorder.storeAnswer(
+            this,
+            Invocation(methodName = methodName, arguments = arguments),
+            answer
+        )
+    }
+}
+
+/**
+ * Function to verify invocation is invoked with specific arguments
+ * @param exactly number of times invocation is invoked
+ * @param methodName name of the method that you want to mock
+ * @param arguments map between names and method arguments
+ */
 fun <T : Mock> T.verify(
     exactly: Int = 1,
     methodName: String,
@@ -31,34 +73,6 @@ fun <T : Mock> T.verify(
             expected: ${Invocation(methodName = methodName, arguments = arguments)}        
             found: $methodInvocations
         """.trimIndent()
-        )
-    }
-}
-
-fun <T : Mock, R> T.every(
-    methodName: String,
-    arguments: Map<String, Any?> = emptyMap(),
-    returns: () -> R
-) {
-    invocationRecorder.access { recorder ->
-        recorder.storeResponse(
-            this,
-            Invocation(methodName = methodName, arguments = arguments),
-            returns()
-        )
-    }
-}
-
-fun <T : Mock, R> T.everyAnswers(
-    methodName: String,
-    arguments: Map<String, Any?> = emptyMap(),
-    answer: (Invocation) -> R
-) {
-    invocationRecorder.access { recorder ->
-        recorder.storeAnswer(
-            this,
-            Invocation(methodName = methodName, arguments = arguments),
-            answer
         )
     }
 }
@@ -122,49 +136,11 @@ fun <T : Spy, R> T.spy(
         return@access mockResponse ?: delegate()
     }
 
-
-/**
- * Capture any [Slot] which will be using to compare the property inside
- */
-fun <T> capture(slot: Slot<T>): Captured<T> {
-    return Captured(slot)
-}
-
 /**
  * A any() matcher which will matching any object
  */
 fun any(): AnyMatcher {
     return AnyMatcher()
-}
-
-/**
- * A placeholder for where using any() as a testing matcher
- */
-class AnyMatcher
-
-/**
- * A slot using to fetch the method invocation and compare the property inside invocation arguments
- * Usage example @see [FunctionsTest]
- */
-class Slot<T> {
-    private val _captured: AtomicRef<T?> = atomic(null)
-    var captured: T?
-        get() {
-            return _captured.value
-        }
-        set(value) {
-            _captured.value = value
-        }
-}
-
-/**
- * A class to indicate this argument is captured by [Slot]
- * Usage example @see [FunctionsTest]
- */
-class Captured<T>(private val slot: Slot<T>) {
-    fun setCapturedValue(value: Any?) {
-        slot.captured = value as T
-    }
 }
 
 private fun compareArguments(
@@ -175,7 +151,7 @@ private fun compareArguments(
         return false
     }
     for ((arg, value) in expectedArguments) {
-        if (value is Captured<*> && arg in invocationArguments) {
+        if (value is CapturedMatcher<*> && arg in invocationArguments) {
             value.setCapturedValue(invocationArguments[arg])
         } else if (value is AnyMatcher) {
             continue

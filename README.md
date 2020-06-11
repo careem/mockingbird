@@ -264,20 +264,39 @@ testMock.verify(
 A normal use case on verify with `any()` matcher is verify invocation is invoked `exactly = 0` with
 `any()` arguments which means it is never invoked completely.
 
-#### Slot & Capture
+#### Arguments Capturing
 
 Another use case for matching is: for example you want to verify `myDependencyMock.method4(object1)`
-is invoked, but the reference of object1 is not mocked or initiated inside the test case, In this case
-an easy way to verify, or say matching, is create a object `slot` and then `capture` this object when 
-verify the invocation, something like:
+is invoked, but the reference of object1 is not mocked or initiated inside the test case, In this case,
+an easy way to verify, or say matching arguments, is create a object `Slot` or `CapturedList` and then
+`capture` this object when verify the invocation, something like:
 ```kotlin
 val objectSlot = Slot<Object>()
+val objectCapturedList = CapturedList<Object>()
+
 testMock.every(
+    methodName = MyDependencyMock.Method.method1,
+    arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+) {}
+
+// capturing by slot
+testMock.verify(
     methodName = MyDependencyMock.Method.method4,
     arguments = mapOf(MyDependencyMock.Arg.object1 to capture(objectSlot))
-) { 1 }
-// verify the captured object's property here
+)
 assertEquals(expectedProperty, objectSlot.captured.property)
+
+// capturing by capturedList
+testMock.verify(
+    methodName = MyDependencyMock.Method.method4,
+    arguments = mapOf(MyDependencyMock.Arg.object1 to capture(objectCapturedList))
+)
+assertTrue { objectCapturedList.assertSize(2) }
+assertTrue { capturedList.assertItem(0, expectedProperty) }
+assertTrue { capturedList.assertItem(1, expectedProperty) }
 ```
-Note: a common use case for this capturing is when a new instance is created inside testing method and
-you want to compare some properties of the captured object initialized correctly.
+For capturing slot, a common use case for this capturing is when a new instance is created inside testing
+method and you want to compare some properties of the captured object initialized correctly. For capturing
+list, a common use case is invocation is invoked multiple times and you want to verify the arguments of
+each separately.
+

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Added `CapturedList` class to support capture mutable arguments in `verify` function
 
 ## 1.3.0
 * Supporting Javascript for nodeJs without browser
