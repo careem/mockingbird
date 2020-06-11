@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.3.0
 * Supporting Javascript for nodeJs without browser
 
 ## 1.2.0
