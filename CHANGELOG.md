@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Supporting Javascript for nodeJs without browser
 
 ## 1.2.0
 * Added `spy` function to support spy operation
