@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Added more info when not mocked response
 * Added `CapturedList` class to support capture mutable arguments in `verify` function
 
 ## 1.3.0
