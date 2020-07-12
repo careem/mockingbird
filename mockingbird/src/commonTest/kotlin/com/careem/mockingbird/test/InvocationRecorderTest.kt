@@ -122,7 +122,7 @@ class InvocationRecorderTest {
             invocationRecorder.getResponse(mock, invocation1)
         } catch (ise: IllegalStateException) {
             e = ise
-            assertEquals("Not mocked response for current object and instance", e.message)
+            assertEquals("Not mocked response for current object and instance, instance:$mock, invocation: $invocation1", e.message)
         }
         assertNotNull(e)
     }
@@ -143,7 +143,7 @@ class InvocationRecorderTest {
             invocationRecorder.getResponse(mock, invocation2)
         } catch (ise: IllegalStateException) {
             e = ise
-            assertEquals("Not mocked response for current object and instance", e.message)
+            assertEquals("Not mocked response for current object and instance, invocation: $invocation2", e.message)
         }
         assertNotNull(e)
     }
@@ -164,7 +164,7 @@ class InvocationRecorderTest {
             invocationRecorder.getResponse(mock, invocation2)
         } catch (ise: IllegalStateException) {
             e = ise
-            assertEquals("Not mocked response for current object and instance", e.message)
+            assertEquals("Not mocked response for current object and instance, invocation: $invocation2", e.message)
         }
         assertNotNull(e)
     }

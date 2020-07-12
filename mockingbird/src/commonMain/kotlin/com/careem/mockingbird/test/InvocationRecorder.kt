@@ -75,7 +75,7 @@ internal class InvocationRecorder {
         } else if (relaxed) {
             null
         } else {
-            throw IllegalStateException("Not mocked response for current object and instance")
+            throw IllegalStateException("Not mocked response for current object and instance, instance:$instance, invocation: $invocation")
         }
     }
 
@@ -95,7 +95,7 @@ internal class InvocationRecorder {
         if (relaxed) {
             return { null }
         } else {
-            throw IllegalStateException("Not mocked response for current object and instance")
+            throw IllegalStateException("Not mocked response for current object and instance, invocation: $invocation")
         }
     }
 
