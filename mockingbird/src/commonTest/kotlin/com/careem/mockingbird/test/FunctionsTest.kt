@@ -322,10 +322,7 @@ class FunctionsTest {
                 timeoutMillis = VERIFY_TIMEOUT,
                 methodName = MyDependencyMock.Method.method5
             )
-        } catch (e: AssertionError) {
-            println(e)
-            // TODO complete
-        } finally {
+        } catch (e: AssertionError) { } finally {
             val verifyEndTime = getSystemTimeInMillis()
 
             println(verifyStartTime)
@@ -334,6 +331,30 @@ class FunctionsTest {
             assertTrue { verifyEndTime - verifyStartTime > VERIFY_TIMEOUT }
             assertTrue { verifyEndTime - verifyStartTime < VERIFY_TIMEOUT + BUFFER_TIME }
         }
+    }
+
+    @Test
+    fun testVerifySuccessBeforeTimeout() {
+        val testMock = MyDependencyMock()
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method4
+        ) {
+            return@everyAnswers 5
+        }
+
+        testMock.method4()
+
+        val verifyStartTime = getSystemTimeInMillis()
+        testMock.verify(
+            timeoutMillis = VERIFY_TIMEOUT,
+            methodName = MyDependencyMock.Method.method4
+        )
+        val verifyEndTime = getSystemTimeInMillis()
+
+        println(verifyStartTime)
+        println(verifyEndTime)
+
+        assertTrue { verifyEndTime - verifyStartTime < VERIFY_TIMEOUT }
     }
 
     companion object {

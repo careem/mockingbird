@@ -88,9 +88,9 @@ fun <T : Mock> T.verify(
 }
 
 internal fun <T : Mock> T.rawVerify(
-    exactly: Int = 1,
+    exactly: Int,
     methodName: String,
-    arguments: Map<String, Any?> = emptyMap()
+    arguments: Map<String, Any?>
 ) {
     invocationRecorder.access { recorder ->
         val methodInvocations = recorder.getInvocations(this)
