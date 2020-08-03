@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.4.0
 * Added support for timeout during `verify`
 * Added more info when not mocked response
 * Added `CapturedList` class to support capture mutable arguments in `verify` function
