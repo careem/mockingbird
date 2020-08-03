@@ -6,7 +6,11 @@ import com.careem.mockingbird.test.Mocks.TEST_STRING
 import com.careem.mockingbird.util.getSystemTimeInMillis
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class FunctionsTest {
 
@@ -322,7 +326,8 @@ class FunctionsTest {
                 timeoutMillis = VERIFY_TIMEOUT,
                 methodName = MyDependencyMock.Method.method5
             )
-        } catch (e: AssertionError) { } finally {
+        } catch (e: AssertionError) {
+        } finally {
             val verifyEndTime = getSystemTimeInMillis()
 
             println(verifyStartTime)
