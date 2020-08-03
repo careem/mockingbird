@@ -3,12 +3,14 @@ package com.careem.mockingbird.test
 import com.careem.mockingbird.test.Mocks.MyDependencyMock
 import com.careem.mockingbird.test.Mocks.TEST_INT
 import com.careem.mockingbird.test.Mocks.TEST_STRING
+import com.careem.mockingbird.util.getSystemTimeInMillis
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class FunctionsTest {
 
@@ -306,5 +308,61 @@ class FunctionsTest {
         testMock.verify(
             methodName = MyDependencyMock.Method.method5
         )
+    }
+
+    @Test
+    fun testVerifyFailedAfterTimeout() {
+        val testMock = MyDependencyMock()
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method4
+        ) {
+            return@everyAnswers 5
+        }
+
+        testMock.method4()
+        val verifyStartTime = getSystemTimeInMillis()
+        try {
+            testMock.verify(
+                timeoutMillis = VERIFY_TIMEOUT,
+                methodName = MyDependencyMock.Method.method5
+            )
+        } catch (e: AssertionError) {
+        } finally {
+            val verifyEndTime = getSystemTimeInMillis()
+
+            println(verifyStartTime)
+            println(verifyEndTime)
+
+            assertTrue { verifyEndTime - verifyStartTime > VERIFY_TIMEOUT }
+        }
+    }
+
+    @Test
+    fun testVerifySuccessBeforeTimeout() {
+        val testMock = MyDependencyMock()
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method4
+        ) {
+            return@everyAnswers 5
+        }
+
+        testMock.method4()
+
+        val verifyStartTime = getSystemTimeInMillis()
+        testMock.verify(
+            timeoutMillis = VERIFY_TIMEOUT,
+            methodName = MyDependencyMock.Method.method4
+        )
+        val verifyEndTime = getSystemTimeInMillis()
+
+        println(verifyStartTime)
+        println(verifyEndTime)
+
+        assertTrue { verifyEndTime - verifyStartTime < VERIFY_TIMEOUT }
+    }
+
+    companion object {
+        const val VERIFY_TIMEOUT = 500L
+        const val BUFFER_TIME = 300L
     }
 }

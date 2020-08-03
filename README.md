@@ -221,11 +221,15 @@ something like:
 testMock.verify(
     exactly = 1,
     methodName = MyDependencyMock.Method.method3,
-    arguments = mapOf(MyDependencyMock.Arg.value1 to 4, MyDependencyMock.Arg.value2 to 5)
+    arguments = mapOf(MyDependencyMock.Arg.value1 to 4, MyDependencyMock.Arg.value2 to 5),
+    timeoutMillis = 5000L
 )
 ```
 Note: `exactly` is how many times you want to verify invocation of your mock is invoked, by default
 it will be 1, so no need to set it up if you want to verify exactly 1 time invocation.
+
+Note: when `timeoutMillis` is set with a value greater than 0 the test condition will be evaluated multiple
+times up to `timeoutMillis`. If the condition is not satisfied within the given timeout the verify will fail.
 
 ### Matching
 

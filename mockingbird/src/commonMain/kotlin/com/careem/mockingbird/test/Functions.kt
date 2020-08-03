@@ -1,11 +1,15 @@
 package com.careem.mockingbird.test
 
 import co.touchlab.stately.isolate.IsolateState
+import kotlinx.atomicfu.atomic
 import kotlin.native.concurrent.SharedImmutable
 import kotlin.test.assertEquals
 
 @SharedImmutable
 private val invocationRecorder = IsolateState { InvocationRecorder() }
+
+@SharedImmutable
+internal const val AWAIT_POOLING_TIME = 10L
 
 interface Mock
 interface Spy : Mock
@@ -53,11 +57,40 @@ fun <T : Mock, R> T.everyAnswers(
  * @param exactly number of times invocation is invoked
  * @param methodName name of the method that you want to mock
  * @param arguments map between names and method arguments
+ * @param timeoutMillis milliseconds allowed to wait until the condition is considered false
  */
 fun <T : Mock> T.verify(
     exactly: Int = 1,
     methodName: String,
-    arguments: Map<String, Any?> = emptyMap()
+    arguments: Map<String, Any?> = emptyMap(),
+    timeoutMillis: Long = 0L
+) {
+    val elapsedTime = atomic(0L)
+    val run = atomic(true)
+    while (run.value && elapsedTime.value < timeoutMillis) {
+        try {
+            this.rawVerify(
+                exactly = exactly,
+                methodName = methodName,
+                arguments = arguments
+            )
+            run.value = false
+        } catch (e: AssertionError) {
+            sleep(AWAIT_POOLING_TIME)
+            elapsedTime.value += AWAIT_POOLING_TIME
+        }
+    }
+    this.rawVerify(
+        exactly = exactly,
+        methodName = methodName,
+        arguments = arguments
+    )
+}
+
+internal fun <T : Mock> T.rawVerify(
+    exactly: Int,
+    methodName: String,
+    arguments: Map<String, Any?>
 ) {
     invocationRecorder.access { recorder ->
         val methodInvocations = recorder.getInvocations(this)
