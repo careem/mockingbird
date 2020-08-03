@@ -228,8 +228,8 @@ testMock.verify(
 Note: `exactly` is how many times you want to verify invocation of your mock is invoked, by default
 it will be 1, so no need to set it up if you want to verify exactly 1 time invocation.
 
-Note: when `timeoutMillis` is set with a value greater than 0 the condition will be evaluated multipla
-times up to `timeoutMillis` if the condition doesn't match given the timeout the verify will fail.
+Note: when `timeoutMillis` is set with a value greater than 0 the test condition will be evaluated multiple
+times up to `timeoutMillis`. If the condition is not satisfied within the given timeout the verify will fail.
 
 ### Matching
 
