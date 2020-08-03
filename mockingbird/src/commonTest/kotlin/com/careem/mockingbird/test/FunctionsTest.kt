@@ -334,7 +334,6 @@ class FunctionsTest {
             println(verifyEndTime)
 
             assertTrue { verifyEndTime - verifyStartTime > VERIFY_TIMEOUT }
-            assertTrue { verifyEndTime - verifyStartTime < VERIFY_TIMEOUT + BUFFER_TIME }
         }
     }
 
