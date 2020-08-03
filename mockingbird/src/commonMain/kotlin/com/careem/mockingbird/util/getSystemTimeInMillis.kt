@@ -1,3 +1,3 @@
 package com.careem.mockingbird.util
 
-expect fun getSystemTimeInMillis(): Long
+internal expect fun getSystemTimeInMillis(): Long
