@@ -23,6 +23,7 @@ object Deps {
     val kotlinx = Kotlinx
     val touchlab = TouchLab
     val junit = JUnit
+    val square = Square
 
     // Jacoco
     private const val jacocoVersion = "0.8.7"
@@ -44,17 +45,54 @@ object Deps {
 
     object Kotlinx {
         val atomicfu = AtomicFu
+        val metadata = Metadata()
+        val metadataVersion = "0.1.0"
 
         object AtomicFu {
             private const val atomicFuVersion = "0.16.2"
             const val plugin = "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicFuVersion"
             const val common = "org.jetbrains.kotlinx:atomicfu:$atomicFuVersion"
         }
+
+        class Metadata(
+            private val name: String = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:$metadataVersion"
+        ) : CharSequence by name {
+
+            override fun toString(): String = name
+        }
+    }
+
+    object Square {
+        val kotlinPoet = KotlinPoet()
+        val kotlinPoetMetadata = KotlinPoetMetadata()
+        val kotlinPoetMetadataSpecs = KotlinPoetMetadataSpecs()
+        private val kotlinPoetVersion = "1.5.0"
+
+        class KotlinPoet(
+            private val name: String = "com.squareup:kotlinpoet:$kotlinPoetVersion"
+        ) : CharSequence by name {
+            override fun toString(): String = name
+        }
+
+        class KotlinPoetMetadata(
+            private val name: String = "com.squareup:kotlinpoet-metadata:$kotlinPoetVersion"
+        ) : CharSequence by name {
+            override fun toString(): String = name
+        }
+
+        class KotlinPoetMetadataSpecs(
+            private val name: String = "com.squareup:kotlinpoet-metadata-specs:$kotlinPoetVersion"
+        ) : CharSequence by name {
+            override fun toString(): String = name
+        }
+
     }
 
     object Kotlin {
         val test = Test()
         const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+
+        const val reflectJvm = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
         class Test(private val name: String = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion") :
             CharSequence by name {
