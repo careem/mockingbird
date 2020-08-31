@@ -1,12 +1,9 @@
 setupMultiplatformLibrary(project)
 setupAllTargetsWithDefaultSourceSets(project)
-apply plugin: MockCodeGenPlugin
 
 kotlin {
     sourceSets {
         commonMain {
-            kotlin.srcDir("build/generated/mockingbird")
-            print(kotlin.srcDirs)
             dependencies {
                 implementation project(":mockingbird")
                 implementation Deps.touchlab.stately.isolate.common
@@ -52,4 +49,10 @@ kotlin {
             dependsOn iosX64Main
         }
     }
+}
+
+apply plugin: MockCodeGenPlugin
+
+task generateMocks() {
+    project.apply plugin: MockCodeGenPlugin
 }

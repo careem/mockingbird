@@ -1,0 +1,3 @@
+package jojo
+
+interface MyType
