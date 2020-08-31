@@ -1,6 +1,9 @@
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.metadata.ImmutableKmClass
 import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
@@ -165,8 +168,19 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
 //        val pippoSample = ClassName("com.careem.mockingbird.samples", "PippoSample")
 //        pippoSample
 
+        val methodObjectBuilder = TypeSpec.objectBuilder("Method")
+        for (function in kmClass.functions) {
+            methodObjectBuilder.addProperty(
+                PropertySpec.builder(function.name, String::class)
+                    .initializer("%S", function.name)
+                    .addModifiers(KModifier.CONST)
+                    .build()
+            )
+        }
+
         val greeterClass = ClassName(packageName, "${kmClass.name}Mock")
         val mockClassBuilder = TypeSpec.classBuilder("${kmClass.name}Mock")
+            .addType(methodObjectBuilder.build())
 //                    .superclass(Class.forName(kmClass.name)) // TODO fix this
 //                    .primaryConstructor(
 //                        FunSpec.constructorBuilder()
@@ -189,7 +203,7 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
             if (isUnitFunction(function)) {
                 mockUnitFunction(mockClassBuilder, function)
             } else {
-                mockFunction()
+                mockFunction()// TODO finish
             }
         }
         // TODO support properties
@@ -225,7 +239,12 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
             "kotlin/String" -> "java.lang.String"
             "kotlin/Int" -> "java.lang.Integer"
             "kotlin/Long" -> "java.lang.Long"
-            //TODo complete
+            "kotlin/Boolean" -> "java.lang.Boolean"
+            "kotlin/Double" -> "java.lang.Double"
+            "kotlin/Float" -> "java.lang.Float"
+            "kotlin/Short" -> "java.lang.Short"
+            "kotlin/Char" -> "java.lang.Char"
+            //TODo complete/ revise
             else -> rawType.replace("/", ".")
         }
         return Class.forName(javaClass).kotlin
@@ -235,15 +254,6 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
         mockClassBuilder: TypeSpec.Builder,
         function: ImmutableKmFunction
     ) {
-
-//        mockUnit(
-//        methodName = Method.error,
-//        arguments = mapOf(
-//            Arg.tag to tag,
-//            Arg.message to message,
-//            Arg.throwable to throwable
-//        )
-//    )
         println(function.valueParameters)
         val funBuilder = FunSpec.builder(function.name)
 
@@ -252,11 +262,52 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
 //            println(clazz)
             println(valueParam.type)
             funBuilder.addParameter(valueParam.name, extractType(valueParam.type!!))// TODO fix this
+
         }
+        funBuilder.addMockUnitStatement(function)
         mockClassBuilder.addFunction(
             funBuilder.build()
         )
     }
+
+    // TODO generalize
+    fun FunSpec.Builder.addMockUnitStatement(function: ImmutableKmFunction) {
+        val mockUnit = MemberName("com.careem.mockingbird.test", "mockUnit")
+        println(mockUnit)
+        val v = mutableListOf<String>()
+        for (i in function.valueParameters.indices) {
+            v.add("Arg.%S to %S")
+        }
+        val args = v.joinToString(separator = ",")
+        val argsValue = mutableListOf<Any>(mockUnit, MemberName("", function.name))
+        for (vp in function.valueParameters) {
+            argsValue.add(vp.name)
+        }
+        println(argsValue)
+        val statementString = """
+            return %M(
+                methodName = Method.%M,
+                arguments = mapOf(
+                    $args
+                )
+        """.trimIndent()
+
+        this.addStatement(statementString, *(argsValue.toTypedArray()))
+
+//        this.addStatement("methodName = Method.%S", function.name)
+////        this.addStatement("arguments = mapOf(")
+////
+
+//////        // TODo iterate
+//////        for (valueParam in function.valueParameters) {
+//////            this.addStatement("Arg.%S to %S", valueParam.name, valueParam.name)//TODO be carefull with commas
+//////        }
+////
+////
+////        this.addStatement(")")
+//        this.addStatement(")")
+    }
+
 
     private fun mockFunction() {
 
