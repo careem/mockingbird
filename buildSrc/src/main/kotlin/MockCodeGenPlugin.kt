@@ -4,12 +4,15 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.metadata.ImmutableKmClass
 import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
+import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import kotlinx.metadata.KmClassifier
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
+import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
@@ -19,18 +22,20 @@ annotation class Mock
 interface Pippo {
     fun showRandom(): Boolean
     fun sayHi()
+    fun sayHiInt(value: Int)//int
     fun sayHiWith(param: String)
+//    fun sayHiWith(param: MyType)
 }
 
-data class Taco(val seasoning: String, val soft: Boolean) {
-
-    @Mock
-    private lateinit var pippo: Pippo
-
-    fun prepare() {
-
-    }
-}
+//data class Taco(val seasoning: String, val soft: Boolean) {
+//
+//    @Mock
+//    private lateinit var pippo: Pippo
+//
+//    fun prepare() {
+//
+//    }
+//}
 
 //class LoggerMock : Logger, Mock {
 //    object Method {
@@ -108,15 +113,30 @@ data class Taco(val seasoning: String, val soft: Boolean) {
 abstract class MockCodeGenPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
+        // TODO delete file before build
+        configureSourceSets(target)
 //        extractMocks(target)
 
-        val kmClasses = listOf(Pippo::class.toImmutableKmClass())
+//        val clazz = Class.forName("com.careem.mockingbird.samples.PippoSample").kotlin
+        val clazz = Class.forName("Pippo")
+        print(clazz)
+        val kmClasses = listOf(clazz.toImmutableKmClass())
         generateClasses(target, kmClasses)
     }
 
     private fun extractMocks(target: Project) {
         println(">>> Extraction: $target")
         extractClassMetadata()
+    }
+
+    private fun configureSourceSets(target: Project) {
+
+        // TODO check if kmpProject before this
+        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
+            sourceSets.getByName("commonTest") {
+                kotlin.srcDir("build/generated/mockingbird")
+            }
+        }
     }
 
 //    private fun generateClasses(target: Project, classNames: List<ImmutableKmClass>) {
@@ -142,6 +162,9 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
 
         // TODO fix package name
         println("Generating mocks for ${kmClass.name}")
+//        val pippoSample = ClassName("com.careem.mockingbird.samples", "PippoSample")
+//        pippoSample
+
         val greeterClass = ClassName(packageName, "${kmClass.name}Mock")
         val mockClassBuilder = TypeSpec.classBuilder("${kmClass.name}Mock")
 //                    .superclass(Class.forName(kmClass.name)) // TODO fix this
@@ -188,6 +211,26 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
         return classifier is KmClassifier.Class && classifier.name == "kotlin/Unit"
     }
 
+    private fun extractTypeString(type: ImmutableKmType): String {
+        return if (type.classifier is KmClassifier.Class) {
+            (type.classifier as KmClassifier.Class).name
+        } else {
+            throw IllegalArgumentException("I can't mock this type: ${type.classifier}")
+        }
+    }
+
+    private fun extractType(type: ImmutableKmType): KClass<*> {
+        val rawType = extractTypeString(type)
+        val javaClass = when (rawType) {
+            "kotlin/String" -> "java.lang.String"
+            "kotlin/Int" -> "java.lang.Integer"
+            "kotlin/Long" -> "java.lang.Long"
+            //TODo complete
+            else -> rawType.replace("/", ".")
+        }
+        return Class.forName(javaClass).kotlin
+    }
+
     private fun mockUnitFunction(
         mockClassBuilder: TypeSpec.Builder,
         function: ImmutableKmFunction
@@ -203,8 +246,12 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
 //    )
         println(function.valueParameters)
         val funBuilder = FunSpec.builder(function.name)
+
         for (valueParam in function.valueParameters) {
-            funBuilder.addParameter(valueParam.name, Int::class)// TODO fix this
+//            val clazz = extractType(valueParam.type!!)
+//            println(clazz)
+            println(valueParam.type)
+            funBuilder.addParameter(valueParam.name, extractType(valueParam.type!!))// TODO fix this
         }
         mockClassBuilder.addFunction(
             funBuilder.build()

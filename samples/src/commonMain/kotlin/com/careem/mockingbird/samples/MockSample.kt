@@ -1,12 +1,11 @@
 package com.careem.mockingbird.samples
 
-import com.careem.mockingbird.PippoMock
 import com.careem.mockingbird.test.Mock
 import com.careem.mockingbird.test.mock
 import com.careem.mockingbird.test.mockUnit
 import com.careem.mockingbird.test.verify
 
-interface Pippo {
+interface PippoSample {
     fun showRandom(): Boolean
     fun sayHi()
     fun sayHiWith(param: String)
@@ -78,7 +77,4 @@ fun main() {
             MyDependencyMock.Arg.object1 to argument
         )
     )
-
-    val pippoMock: PippoMock = PippoMock()
-
 }
