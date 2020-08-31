@@ -276,11 +276,12 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
         println(mockUnit)
         val v = mutableListOf<String>()
         for (i in function.valueParameters.indices) {
-            v.add("Arg.%S to %S")
+            v.add("Arg.%M to %S")
         }
         val args = v.joinToString(separator = ",")
         val argsValue = mutableListOf<Any>(mockUnit, MemberName("", function.name))
         for (vp in function.valueParameters) {
+            argsValue.add(MemberName("", vp.name))
             argsValue.add(vp.name)
         }
         println(argsValue)
