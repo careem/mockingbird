@@ -1,0 +1,55 @@
+setupMultiplatformLibrary(project)
+setupAllTargetsWithDefaultSourceSets(project)
+apply plugin: MockCodeGenPlugin
+
+kotlin {
+    sourceSets {
+        commonMain {
+            kotlin.srcDir("build/generated/mockingbird")
+            print(kotlin.srcDirs)
+            dependencies {
+                implementation project(":mockingbird")
+                implementation Deps.touchlab.stately.isolate.common
+                implementation kotlin('test')
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation kotlin('test')
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation Deps.kotlinx.atomicfu.jvm
+            }
+        }
+
+        jsMain {
+            dependsOn jvmJsCommonMain
+            dependencies {
+                implementation Deps.kotlinx.atomicfu.js
+                implementation Deps.kotlin.test.js
+            }
+        }
+
+        jsTest {
+            dependsOn jvmJsCommonTest
+        }
+
+        iosX64Main {
+            dependencies {
+                implementation Deps.kotlinx.atomicfu.native
+            }
+        }
+
+        iosArm64Main {
+            dependsOn iosX64Main
+        }
+    }
+}

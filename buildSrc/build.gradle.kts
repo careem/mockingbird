@@ -3,6 +3,7 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
     google()
     jcenter()
     gradlePluginPortal()
@@ -11,6 +12,10 @@ repositories {
 
 dependencies {
     implementation(Deps.kotlin.plugin)
+    implementation(Deps.square.kotlinPoet)
+    implementation(Deps.square.kotlinPoetMetadata)
+    implementation(Deps.square.kotlinPoetMetadataSpecs)
+    implementation(Deps.kotlinx.metadata)
 }
 
 kotlin {

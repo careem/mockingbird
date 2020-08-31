@@ -98,3 +98,7 @@ private void setupJvmTarget(Project project) {
 private void setupJsTarget(Project project) {
     project.apply plugin: JsPlugin
 }
+
+task generateMocks(){
+    project.apply plugin: MockCodeGenPlugin
+}
