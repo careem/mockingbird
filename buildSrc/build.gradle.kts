@@ -20,5 +20,10 @@ dependencies {
 
 kotlin {
     // Add Deps to compilation, so it will become available in main project
-    sourceSets.getByName("main").kotlin.srcDir("buildSrc/src/main/kotlin")
+    sourceSets.getByName("main").kotlin.srcDirs(
+        "buildSrc/src/main/kotlin"
+//        "../samples/src/commonMain/kotlin" // TODO fix
+
+    )
+    println("ROOT:${rootProject.allprojects}")
 }

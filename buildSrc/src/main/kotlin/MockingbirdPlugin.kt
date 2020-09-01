@@ -113,7 +113,7 @@ interface Pippo {
 
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
-abstract class MockCodeGenPlugin : Plugin<Project> {
+abstract class MockingbirdPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         // TODO delete file before build
@@ -142,18 +142,10 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
         }
     }
 
-//    private fun generateClasses(target: Project, classNames: List<ImmutableKmClass>) {
-//        generateClass(target, classNames)
-////        target.subprojects.forEach {
-////            generateClasses(it, classNames)
-////        }
-//    }
-
     private fun generateClasses(project: Project, classNames: List<ImmutableKmClass>) {
         for (kmClass in classNames) {
             generateMockClassFor(project, kmClass)
         }
-
     }
 
     private fun generateMockClassFor(project: Project, kmClass: ImmutableKmClass) {
@@ -168,19 +160,11 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
 //        val pippoSample = ClassName("com.careem.mockingbird.samples", "PippoSample")
 //        pippoSample
 
-        val methodObjectBuilder = TypeSpec.objectBuilder("Method")
-        for (function in kmClass.functions) {
-            methodObjectBuilder.addProperty(
-                PropertySpec.builder(function.name, String::class)
-                    .initializer("%S", function.name)
-                    .addModifiers(KModifier.CONST)
-                    .build()
-            )
-        }
 
         val greeterClass = ClassName(packageName, "${kmClass.name}Mock")
         val mockClassBuilder = TypeSpec.classBuilder("${kmClass.name}Mock")
-            .addType(methodObjectBuilder.build())
+            .addType(kmClass.buildMethodObject())
+            .addType(kmClass.buildArgObject())
 //                    .superclass(Class.forName(kmClass.name)) // TODO fix this
 //                    .primaryConstructor(
 //                        FunSpec.constructorBuilder()
@@ -200,24 +184,43 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
 //
 //            .build()
         for (function in kmClass.functions) {
-            if (isUnitFunction(function)) {
-                mockUnitFunction(mockClassBuilder, function)
-            } else {
-                mockFunction()// TODO finish
-            }
+            this.mockFunction(mockClassBuilder, function, isUnitFunction(function))
         }
         // TODO support properties
         val file = FileSpec.builder(packageName, "${kmClass.name}Mock")
             .addType(mockClassBuilder.build())
-//            .addFunction(
-//                FunSpec.builder("main")
-//                    .addParameter("args", String::class, KModifier.VARARG)
-//                    .addStatement("%T(args[0]).greet()", greeterClass)
-//                    .build()
-//            )
             .build()
 
         file.writeTo(outputDir)
+    }
+
+    private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
+        val methodObjectBuilder = TypeSpec.objectBuilder(MockingbirdPlugin.METHOD)
+        for (function in this.functions) {
+            methodObjectBuilder.addProperty(
+                PropertySpec.builder(function.name, String::class)
+                    .initializer("%S", function.name)
+                    .addModifiers(KModifier.CONST)
+                    .build()
+            )
+        }
+        return methodObjectBuilder.build()
+    }
+
+    private fun ImmutableKmClass.buildArgObject(): TypeSpec {
+        val argObjectBuilder = TypeSpec.objectBuilder(MockingbirdPlugin.ARG)
+        for (function in this.functions) {
+            for (arg in function.valueParameters) {
+                argObjectBuilder.addProperty(
+                    PropertySpec.builder(arg.name, String::class)
+                        .initializer("%S", arg.name)
+                        .addModifiers(KModifier.CONST)
+                        .build()
+                )
+            }
+
+        }
+        return argObjectBuilder.build()
     }
 
     private fun isUnitFunction(function: ImmutableKmFunction): Boolean {
@@ -234,8 +237,7 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
     }
 
     private fun extractType(type: ImmutableKmType): KClass<*> {
-        val rawType = extractTypeString(type)
-        val javaClass = when (rawType) {
+        val javaClass = when (val rawType = extractTypeString(type)) {
             "kotlin/String" -> "java.lang.String"
             "kotlin/Int" -> "java.lang.Integer"
             "kotlin/Long" -> "java.lang.Long"
@@ -250,30 +252,34 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
         return Class.forName(javaClass).kotlin
     }
 
-    private fun mockUnitFunction(
+    private fun mockFunction(
         mockClassBuilder: TypeSpec.Builder,
-        function: ImmutableKmFunction
+        function: ImmutableKmFunction,
+        isUnit: Boolean
     ) {
-        println(function.valueParameters)
+        // TODO return type
         val funBuilder = FunSpec.builder(function.name)
-
         for (valueParam in function.valueParameters) {
-//            val clazz = extractType(valueParam.type!!)
-//            println(clazz)
             println(valueParam.type)
             funBuilder.addParameter(valueParam.name, extractType(valueParam.type!!))// TODO fix this
-
         }
-        funBuilder.addMockUnitStatement(function)
+        if (!isUnit) {
+            funBuilder.returns(extractType(function.returnType))
+        }
+        funBuilder.addMockStatement(function, isUnit)
         mockClassBuilder.addFunction(
             funBuilder.build()
         )
     }
 
-    // TODO generalize
-    fun FunSpec.Builder.addMockUnitStatement(function: ImmutableKmFunction) {
-        val mockUnit = MemberName("com.careem.mockingbird.test", "mockUnit")
-        println(mockUnit)
+    fun FunSpec.Builder.addMockStatement(function: ImmutableKmFunction, isUnit: Boolean) {
+        // TODO remove duplicates in args and method names
+        val mockFunction = if (isUnit) {
+            MockingbirdPlugin.MOCK_UNIT
+        } else {
+            MockingbirdPlugin.MOCK
+        }
+        val mockUnit = MemberName("com.careem.mockingbird.test", mockFunction)
         val v = mutableListOf<String>()
         for (i in function.valueParameters.indices) {
             v.add("Arg.%M to %S")
@@ -285,33 +291,17 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
             argsValue.add(vp.name)
         }
         println(argsValue)
+        val codeBlocks = mutableListOf("methodName = Method.%M")
+        if (args.isNotEmpty()) {
+            codeBlocks.add("arguments = mapOf($args)")
+        }
         val statementString = """
             return %M(
-                methodName = Method.%M,
-                arguments = mapOf(
-                    $args
-                )
+                ${codeBlocks.joinToString(separator = ",\n")}
+            )
         """.trimIndent()
 
         this.addStatement(statementString, *(argsValue.toTypedArray()))
-
-//        this.addStatement("methodName = Method.%S", function.name)
-////        this.addStatement("arguments = mapOf(")
-////
-
-//////        // TODo iterate
-//////        for (valueParam in function.valueParameters) {
-//////            this.addStatement("Arg.%S to %S", valueParam.name, valueParam.name)//TODO be carefull with commas
-//////        }
-////
-////
-////        this.addStatement(")")
-//        this.addStatement(")")
-    }
-
-
-    private fun mockFunction() {
-
     }
 
     private fun extractClassMetadata() {
@@ -332,7 +322,15 @@ abstract class MockCodeGenPlugin : Plugin<Project> {
 //        println("Class has annotations: ${kmClass.hasAnnotations}")
 //        kmClass.functions.forEach { println(it.name) }
     }
+
+    companion object {
+        private const val METHOD = "Method"
+        private const val ARG = "Arg"
+        private const val MOCK_UNIT = "mockUnit"
+        private const val MOCK = "mock"
+    }
 }
+
 
 
 
