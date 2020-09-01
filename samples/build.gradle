@@ -51,8 +51,8 @@ kotlin {
     }
 }
 
-apply plugin: MockCodeGenPlugin
+//apply plugin: MockCodeGenPlugin
 
 task generateMocks() {
-    project.apply plugin: MockCodeGenPlugin
+    apply plugin: MockingbirdPlugin
 }
