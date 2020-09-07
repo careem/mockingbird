@@ -5,16 +5,20 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.metadata.ImmutableKmClass
 import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
 import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import kotlinx.metadata.KmClassifier
+import kotlinx.metadata.jvm.KotlinClassHeader
+import kotlinx.metadata.jvm.KotlinClassMetadata
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
+import java.net.URLClassLoader
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.PROPERTY)
@@ -120,11 +124,83 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         configureSourceSets(target)
 //        extractMocks(target)
 
+
+//        val header = KotlinClassHeader(
+//
+//        /* pass Metadata.k, Metadata.d1, Metadata.d2, etc as arguments ... */
+//        )
+//        val metadata = KotlinClassMetadata.read(header)
+
+
+        // TODO this requires project build already executed
+        val context = Thread.currentThread().contextClassLoader
+        println("Context calss loader:${context}")
+        val file = File("/Users/marcosignoretto/Documents/careem/mockingbird/samples/build/classes/kotlin/jvm/main")
+
+        // Convert File to a URL
+        val url = file.toURI().toURL()          // file:/c:/myclasses/
+        val urls = arrayOf(url)
+        val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader) // FIXME tis class loaded is not loading kotlin Metadata
+        Thread.currentThread().contextClassLoader = cl
+//        val externalClass = cl.loadClass("com.careem.mockingbird.samples.MyDependency")
+        val externalClass = cl.loadClass("com.careem.mockingbird.samples.PippoSample")
+        //externalClass.toImmutableKmClass() // FIXME this crash because Metadata not found but it is there
+        println(externalClass.getAnnotation(Metadata::class.java)) //FIXME this prints null
+
+        println("annotations")
+
+        // FIXME I can't get metadata
+        for (ann in externalClass.annotations) {
+            println(ann)
+        }
+        println("++++")
+
+
+        println("tricky annotation")
+        val metaClass = externalClass.asClassName()
+//        val annotation: Annotation? = metaClass.getAnnotation(Metadata::class.java)
+//        if(annotation == null){
+//            return getMetadata(element.enclosingElement!!)
+//        }
+        println(metaClass.packageName)
+        println(metaClass.annotations)
+
+        println(externalClass)
+
+//        for (method in externalClass.declaredMethods) {
+//            println(method.returnType)
+//            println(method.name)
+//            println("Parameters:")
+//            println("(")
+//            for (param in method.parameters) {
+//                println(param.name)
+//                println(param.type)
+//            }
+//            println(")")
+//        }
+
+
 //        val clazz = Class.forName("com.careem.mockingbird.samples.PippoSample").kotlin
         val clazz = Class.forName("Pippo")
         print(clazz)
         val kmClasses = listOf(clazz.toImmutableKmClass())
         generateClasses(target, kmClasses)
+    }
+
+    fun getMetadata(clazz: Class<*>): KotlinClassMetadata {
+        val annotation = clazz.getAnnotation(Metadata::class.java)
+        if (annotation == null) {
+            return getMetadata(clazz.enclosingClass)
+        }
+
+        return annotation.let {
+            KotlinClassHeader(
+                it.kind, it.metadataVersion, it.bytecodeVersion,
+                it.data1, it.data2, it.extraString, it.packageName, it.extraInt
+            )
+        }.let {
+            KotlinClassMetadata.read(it)!!
+        }
     }
 
     private fun extractMocks(target: Project) {
@@ -195,6 +271,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
+        println("===> Methods")
         val methodObjectBuilder = TypeSpec.objectBuilder(MockingbirdPlugin.METHOD)
         for (function in this.functions) {
             methodObjectBuilder.addProperty(
@@ -208,6 +285,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun ImmutableKmClass.buildArgObject(): TypeSpec {
+        println("===> Arg")
         val argObjectBuilder = TypeSpec.objectBuilder(MockingbirdPlugin.ARG)
         for (function in this.functions) {
             for (arg in function.valueParameters) {
@@ -257,7 +335,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         function: ImmutableKmFunction,
         isUnit: Boolean
     ) {
-        // TODO return type
+        println("===> Mocking")
         val funBuilder = FunSpec.builder(function.name)
         for (valueParam in function.valueParameters) {
             println(valueParam.type)
