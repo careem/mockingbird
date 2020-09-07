@@ -39,6 +39,7 @@ object Deps {
 
             object Isolate {
                 const val common = "co.touchlab:stately-isolate:$statelyVersion"
+                const val jvm = "co.touchlab:stately-isolate-jvm:$statelyVersion"
             }
         }
     }

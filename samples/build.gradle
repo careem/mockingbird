@@ -15,6 +15,7 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation project(":mockingbird")
                 implementation kotlin('test')
                 implementation kotlin('test-common')
                 implementation kotlin('test-annotations-common')

@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
     implementation(Deps.kotlin.plugin)
+    implementation(Deps.kotlin.reflect)
     implementation(Deps.square.kotlinPoet)
     implementation(Deps.square.kotlinPoetMetadata)
     implementation(Deps.square.kotlinPoetMetadataSpecs)
