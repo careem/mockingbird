@@ -1,20 +1,20 @@
 object Deps {
 
-    private const val kotlinVersion = "1.3.71"
+    private const val kotlinVersion = "1.4.0"
 
     val kotlin = Kotlin
     val kotlinx = Kotlinx
     val touchlab = TouchLab
 
     // Jacoco
-    const val jacocoVersion = "0.8.5"
+    private const val jacocoVersion = "0.8.5"
     const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
 
     object TouchLab {
         val stately = Stately
 
         object Stately {
-            private const val statelyVersion = "1.0.3-a4"
+            private const val statelyVersion = "1.1.0-a1"
 
             val isolate = Isolate
 
@@ -28,33 +28,18 @@ object Deps {
         val atomicfu = AtomicFu
 
         object AtomicFu {
-            private const val atomicFuVersion = "0.14.2"
+            private const val atomicFuVersion = "0.14.4"
             const val plugin = "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicFuVersion"
-
-            const val common = "org.jetbrains.kotlinx:atomicfu-common:$atomicFuVersion"
-            const val jvm = "org.jetbrains.kotlinx:atomicfu:$atomicFuVersion"
-            const val js = "org.jetbrains.kotlinx:atomicfu-js:$atomicFuVersion"
-            const val native = "org.jetbrains.kotlinx:atomicfu-native:$atomicFuVersion"
+            const val common = "org.jetbrains.kotlinx:atomicfu:$atomicFuVersion"
         }
     }
 
     object Kotlin {
-        val stdlib = Stdlib()
         val test = Test
         const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
-        class Stdlib(
-            private val name: String = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        ) : CharSequence by name {
-            val jdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-            val js = "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
-            val common = "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion"
-
-            override fun toString(): String = name
-        }
-
         object Test {
-            const val common = "org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion"
+            const val common = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
             const val junit = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
             const val js = "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
             const val test = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"

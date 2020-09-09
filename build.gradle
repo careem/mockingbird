@@ -38,12 +38,6 @@ void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
 
     project.kotlin {
         sourceSets {
-            commonMain {
-                dependencies {
-                    implementation Deps.kotlin.stdlib.common
-                }
-            }
-
             commonTest {
                 dependencies {
                     implementation Deps.kotlin.test.common
@@ -87,7 +81,7 @@ private void setupJvmTarget(Project project) {
         sourceSets {
             jvmMain {
                 dependencies {
-                    implementation Deps.kotlin.stdlib
+
                 }
             }
 
