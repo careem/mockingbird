@@ -25,6 +25,14 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Mock
 
+/**
+ * How to run
+ * 1) Clear cache and build folders
+ * 2) Comment out plugin apply form sample
+ * 3) Build
+ * 4) Uncomment plugin apply
+ * 5) execute plugin
+ */
 
 interface Pippo {
     fun showRandom(): Boolean
@@ -120,8 +128,9 @@ interface Pippo {
 abstract class MockingbirdPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
-        // TODO delete file before build
-        configureSourceSets(target)
+        try {
+            // TODO delete file before build
+            configureSourceSets(target)
 //        extractMocks(target)
 
 
@@ -132,40 +141,48 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 //        val metadata = KotlinClassMetadata.read(header)
 
 
-        // TODO this requires project build already executed
-        val context = Thread.currentThread().contextClassLoader
-        println("Context calss loader:${context}")
-        val file = File("/Users/marcosignoretto/Documents/careem/mockingbird/samples/build/classes/kotlin/jvm/main")
+            // TODO this requires project build already executed
+            val context = Thread.currentThread().contextClassLoader
+            println("Context calss loader:${context}")
+            val file =
+                File("/Users/marcosignoretto/Documents/careem/mockingbird/samples/build/classes/kotlin/jvm/main")
 
-        // Convert File to a URL
-        val url = file.toURI().toURL()          // file:/c:/myclasses/
-        val urls = arrayOf(url)
-        val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader) // FIXME tis class loaded is not loading kotlin Metadata
-        Thread.currentThread().contextClassLoader = cl
+            // Convert File to a URL
+            val url = file.toURI().toURL()          // file:/c:/myclasses/
+            val urls = arrayOf(url)
+            val cl = URLClassLoader(
+                urls,
+                Thread.currentThread().contextClassLoader
+            ) // FIXME tis class loaded is not loading kotlin Metadata
+            Thread.currentThread().contextClassLoader = cl
 //        val externalClass = cl.loadClass("com.careem.mockingbird.samples.MyDependency")
-        val externalClass = cl.loadClass("com.careem.mockingbird.samples.PippoSample")
-        //externalClass.toImmutableKmClass() // FIXME this crash because Metadata not found but it is there
-        println(externalClass.getAnnotation(Metadata::class.java)) //FIXME this prints null
+            val externalClass = cl.loadClass("com.careem.mockingbird.samples.PippoSample")
+            //externalClass.toImmutableKmClass() // FIXME this crash because Metadata not found but it is there
+            println(externalClass.getAnnotation(Metadata::class.java)) //FIXME this prints null
 
-        println("annotations")
+//            val externalClass2 =
+//                Class.forName("com.careem.mockingbird.samples.PippoSample", false, cl)
+//            println("CLASS LOADER 2:${externalClass2.getAnnotation(Metadata::class.java)}") //FIXME this prints null
 
-        // FIXME I can't get metadata
-        for (ann in externalClass.annotations) {
-            println(ann)
-        }
-        println("++++")
+            println("annotations")
+
+            // FIXME I can't get metadata
+            for (ann in externalClass.annotations) {
+                println(ann)
+            }
+            println("++++")
 
 
-        println("tricky annotation")
-        val metaClass = externalClass.asClassName()
+            println("tricky annotation")
+            val metaClass = externalClass.asClassName()
 //        val annotation: Annotation? = metaClass.getAnnotation(Metadata::class.java)
 //        if(annotation == null){
 //            return getMetadata(element.enclosingElement!!)
 //        }
-        println(metaClass.packageName)
-        println(metaClass.annotations)
+            println(metaClass.packageName)
+            println(metaClass.annotations)
 
-        println(externalClass)
+            println(externalClass)
 
 //        for (method in externalClass.declaredMethods) {
 //            println(method.returnType)
@@ -181,10 +198,14 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
 
 //        val clazz = Class.forName("com.careem.mockingbird.samples.PippoSample").kotlin
-        val clazz = Class.forName("Pippo")
-        print(clazz)
-        val kmClasses = listOf(clazz.toImmutableKmClass())
-        generateClasses(target, kmClasses)
+            val clazz = Class.forName("Pippo")
+            print(clazz)
+            val kmClasses = listOf(externalClass.toImmutableKmClass())
+            generateClasses(target, kmClasses)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
     }
 
     fun getMetadata(clazz: Class<*>): KotlinClassMetadata {
@@ -225,6 +246,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun generateMockClassFor(project: Project, kmClass: ImmutableKmClass) {
+        val simpleName = kmClass.name.substringAfterLast("/")
         val outputDir =
             File(project.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
         outputDir.mkdirs()
@@ -232,16 +254,16 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         val packageName = "com.careem.mockingbird"
 
         // TODO fix package name
-        println("Generating mocks for ${kmClass.name}")
+        println("Generating mocks for ${simpleName}")
 //        val pippoSample = ClassName("com.careem.mockingbird.samples", "PippoSample")
 //        pippoSample
 
 
-        val greeterClass = ClassName(packageName, "${kmClass.name}Mock")
-        val mockClassBuilder = TypeSpec.classBuilder("${kmClass.name}Mock")
+        val greeterClass = ClassName(packageName, "${simpleName}Mock")
+        val mockClassBuilder = TypeSpec.classBuilder("${simpleName}Mock")
             .addType(kmClass.buildMethodObject())
             .addType(kmClass.buildArgObject())
-//                    .superclass(Class.forName(kmClass.name)) // TODO fix this
+//                    .superclass(Class.forName(simpleName)) // TODO fix this
 //                    .primaryConstructor(
 //                        FunSpec.constructorBuilder()
 //                            .addParameter("name", String::class)
@@ -263,7 +285,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             this.mockFunction(mockClassBuilder, function, isUnitFunction(function))
         }
         // TODO support properties
-        val file = FileSpec.builder(packageName, "${kmClass.name}Mock")
+        val file = FileSpec.builder(packageName, "${simpleName}Mock")
             .addType(mockClassBuilder.build())
             .build()
 
