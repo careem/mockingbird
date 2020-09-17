@@ -1,29 +1,21 @@
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.metadata.ImmutableKmClass
 import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
 import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import kotlinx.metadata.KmClassifier
-import kotlinx.metadata.jvm.KotlinClassHeader
-import kotlinx.metadata.jvm.KotlinClassMetadata
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 import java.net.URLClassLoader
 import kotlin.reflect.KClass
-
-@Target(AnnotationTarget.PROPERTY)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class Mock
 
 /**
  * How to run
@@ -34,95 +26,6 @@ annotation class Mock
  * 5) execute plugin
  */
 
-interface Pippo {
-    fun showRandom(): Boolean
-    fun sayHi()
-    fun sayHiInt(value: Int)//int
-    fun sayHiWith(param: String)
-//    fun sayHiWith(param: MyType)
-}
-
-//data class Taco(val seasoning: String, val soft: Boolean) {
-//
-//    @Mock
-//    private lateinit var pippo: Pippo
-//
-//    fun prepare() {
-//
-//    }
-//}
-
-//class LoggerMock : Logger, Mock {
-//    object Method {
-//        const val debug = "debug"
-//        const val info = "info"
-//        const val error = "error"
-//        const val warning = "warning"
-//        const val verbose = "verbose"
-//    }
-//
-//    object Arg {
-//        const val tag = "tag"
-//        const val message = "message"
-//        const val throwable = "throwable"
-//    }
-//
-//    override fun debug(tag: String, message: String) = mockUnit(
-//        methodName = Method.debug,
-//        arguments = mapOf(Arg.tag to tag, Arg.message to message)
-//    )
-//
-//    override fun info(tag: String, message: String) = mockUnit(
-//        methodName = Method.info,
-//        arguments = mapOf(Arg.tag to tag, Arg.message to message)
-//    )
-//
-//    override fun error(tag: String, throwable: Throwable) = mockUnit(
-//        methodName = Method.error,
-//        arguments = mapOf(Arg.tag to tag, Arg.throwable to throwable)
-//    )
-//
-//    override fun error(tag: String, message: String) = mockUnit(
-//        methodName = Method.error,
-//        arguments = mapOf(Arg.tag to tag, Arg.message to message)
-//    )
-//
-//    override fun error(tag: String, message: String, throwable: Throwable) = mockUnit(
-//        methodName = Method.error,
-//        arguments = mapOf(
-//            Arg.tag to tag,
-//            Arg.message to message,
-//            Arg.throwable to throwable
-//        )
-//    )
-//
-//    override fun warning(tag: String, message: String) = mockUnit(
-//        methodName = Method.warning,
-//        arguments = mapOf(
-//            Arg.tag to tag,
-//            Arg.message to message
-//        )
-//    )
-//
-//    override fun warning(tag: String, message: String, throwable: Throwable) = mockUnit(
-//        methodName = Method.warning,
-//        arguments = mapOf(
-//            Arg.tag to tag,
-//            Arg.message to message,
-//            Arg.throwable to throwable
-//        )
-//    )
-//
-//    override fun verbose(tag: String, message: String) = mockUnit(
-//        methodName = Method.verbose,
-//        arguments = mapOf(
-//            Arg.tag to tag,
-//            Arg.message to message
-//        )
-//    )
-//
-//}
-
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
@@ -131,106 +34,30 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         try {
             // TODO delete file before build
             configureSourceSets(target)
-//        extractMocks(target)
-
-
-//        val header = KotlinClassHeader(
-//
-//        /* pass Metadata.k, Metadata.d1, Metadata.d2, etc as arguments ... */
-//        )
-//        val metadata = KotlinClassMetadata.read(header)
 
 
             // TODO this requires project build already executed
-            val context = Thread.currentThread().contextClassLoader
-            println("Context calss loader:${context}")
             val file =
                 File("/Users/marcosignoretto/Documents/careem/mockingbird/samples/build/classes/kotlin/jvm/main")
 
             // Convert File to a URL
             val url = file.toURI().toURL()          // file:/c:/myclasses/
             val urls = arrayOf(url)
-            val cl = URLClassLoader(
-                urls,
-                Thread.currentThread().contextClassLoader
-            ) // FIXME tis class loaded is not loading kotlin Metadata
+            // Set kotlin class loader as parent in this way kotlin metadata will be loaded
+            val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
             Thread.currentThread().contextClassLoader = cl
-//        val externalClass = cl.loadClass("com.careem.mockingbird.samples.MyDependency")
             val externalClass = cl.loadClass("com.careem.mockingbird.samples.PippoSample")
-            //externalClass.toImmutableKmClass() // FIXME this crash because Metadata not found but it is there
-            println(externalClass.getAnnotation(Metadata::class.java)) //FIXME this prints null
 
-//            val externalClass2 =
-//                Class.forName("com.careem.mockingbird.samples.PippoSample", false, cl)
-//            println("CLASS LOADER 2:${externalClass2.getAnnotation(Metadata::class.java)}") //FIXME this prints null
-
-            println("annotations")
-
-            // FIXME I can't get metadata
-            for (ann in externalClass.annotations) {
-                println(ann)
-            }
-            println("++++")
-
-
-            println("tricky annotation")
-            val metaClass = externalClass.asClassName()
-//        val annotation: Annotation? = metaClass.getAnnotation(Metadata::class.java)
-//        if(annotation == null){
-//            return getMetadata(element.enclosingElement!!)
-//        }
-            println(metaClass.packageName)
-            println(metaClass.annotations)
-
-            println(externalClass)
-
-//        for (method in externalClass.declaredMethods) {
-//            println(method.returnType)
-//            println(method.name)
-//            println("Parameters:")
-//            println("(")
-//            for (param in method.parameters) {
-//                println(param.name)
-//                println(param.type)
-//            }
-//            println(")")
-//        }
-
-
-//        val clazz = Class.forName("com.careem.mockingbird.samples.PippoSample").kotlin
-            val clazz = Class.forName("Pippo")
-            print(clazz)
             val kmClasses = listOf(externalClass.toImmutableKmClass())
             generateClasses(target, kmClasses)
         } catch (e: Exception) {
+            // Useful to debug
             e.printStackTrace()
             throw e
         }
     }
 
-    fun getMetadata(clazz: Class<*>): KotlinClassMetadata {
-        val annotation = clazz.getAnnotation(Metadata::class.java)
-        if (annotation == null) {
-            return getMetadata(clazz.enclosingClass)
-        }
-
-        return annotation.let {
-            KotlinClassHeader(
-                it.kind, it.metadataVersion, it.bytecodeVersion,
-                it.data1, it.data2, it.extraString, it.packageName, it.extraInt
-            )
-        }.let {
-            KotlinClassMetadata.read(it)!!
-        }
-    }
-
-    private fun extractMocks(target: Project) {
-        println(">>> Extraction: $target")
-        extractClassMetadata()
-    }
-
     private fun configureSourceSets(target: Project) {
-
         // TODO check if kmpProject before this
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.getByName("commonTest") {
@@ -246,6 +73,12 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun generateMockClassFor(project: Project, kmClass: ImmutableKmClass) {
+        val classToMock = Thread.currentThread().contextClassLoader.loadClass(
+            kmClass.name.replace(
+                "/",
+                "."
+            )
+        )
         val simpleName = kmClass.name.substringAfterLast("/")
         val outputDir =
             File(project.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
@@ -254,16 +87,13 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         val packageName = "com.careem.mockingbird"
 
         // TODO fix package name
-        println("Generating mocks for ${simpleName}")
-//        val pippoSample = ClassName("com.careem.mockingbird.samples", "PippoSample")
-//        pippoSample
-
-
-        val greeterClass = ClassName(packageName, "${simpleName}Mock")
+        println("Generating mocks for $simpleName")
         val mockClassBuilder = TypeSpec.classBuilder("${simpleName}Mock")
             .addType(kmClass.buildMethodObject())
             .addType(kmClass.buildArgObject())
-//                    .superclass(Class.forName(simpleName)) // TODO fix this
+//            .addSuperinterface(Mock::class) // TODO fix this
+            .addSuperinterface(classToMock) // TODO check if interface or generic open class
+
 //                    .primaryConstructor(
 //                        FunSpec.constructorBuilder()
 //                            .addParameter("name", String::class)
@@ -359,6 +189,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     ) {
         println("===> Mocking")
         val funBuilder = FunSpec.builder(function.name)
+            .addModifiers(KModifier.OVERRIDE)
         for (valueParam in function.valueParameters) {
             println(valueParam.type)
             funBuilder.addParameter(valueParam.name, extractType(valueParam.type!!))// TODO fix this
@@ -375,9 +206,9 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     fun FunSpec.Builder.addMockStatement(function: ImmutableKmFunction, isUnit: Boolean) {
         // TODO remove duplicates in args and method names
         val mockFunction = if (isUnit) {
-            MockingbirdPlugin.MOCK_UNIT
+            MOCK_UNIT
         } else {
-            MockingbirdPlugin.MOCK
+            MOCK
         }
         val mockUnit = MemberName("com.careem.mockingbird.test", mockFunction)
         val v = mutableListOf<String>()
@@ -402,25 +233,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         """.trimIndent()
 
         this.addStatement(statementString, *(argsValue.toTypedArray()))
-    }
-
-    private fun extractClassMetadata() {
-
-
-//        val kmClass = Taco::class.toImmutableKmClass()
-//
-//        // Now you can access misc information about Taco from a Kotlin lens
-//        println(kmClass.name)
-//        kmClass.properties.forEach {
-//            println(it.name)
-//            println(it.jvmFlags)
-//            println(it.)
-//            println(it.flags)
-//            println(it.hasAnnotations)
-//            println("================")
-//        }
-//        println("Class has annotations: ${kmClass.hasAnnotations}")
-//        kmClass.functions.forEach { println(it.name) }
     }
 
     companion object {
