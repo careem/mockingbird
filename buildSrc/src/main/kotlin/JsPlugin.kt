@@ -20,11 +20,7 @@ abstract class JsPlugin : Plugin<Project> {
                     }
                 }
             }
-            sourceSets.getByName("${TARGET_NAME_JS}Main") {
-                dependencies {
-                    implementation(Deps.kotlin.stdlib.js)
-                }
-            }
+
             sourceSets.getByName("${TARGET_NAME_JS}Test") {
                 dependencies {
                     implementation(Deps.kotlin.test.js)
