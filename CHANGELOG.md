@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+## 1.5.0
+
 ## 1.4.0
 * Added support for timeout during `verify`
 * Added more info when not mocked response
