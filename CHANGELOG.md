@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Upgrade Kotlin 1.4.20
 
 ## 1.5.0
+* Upgrade Kotlin 1.4.0
 
 ## 1.4.0
 * Added support for timeout during `verify`
