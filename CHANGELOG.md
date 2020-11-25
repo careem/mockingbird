@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+## 1.6.0
+
 ## 1.5.0
 
 ## 1.4.0
