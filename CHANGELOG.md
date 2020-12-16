@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+* Fixed issue where mockign a dependency was freezing the mock as well
+
 ## 1.4.0
 * Added support for timeout during `verify`
 * Added more info when not mocked response

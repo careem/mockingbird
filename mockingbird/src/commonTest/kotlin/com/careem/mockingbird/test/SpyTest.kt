@@ -2,10 +2,36 @@ package com.careem.mockingbird.test
 
 import com.careem.mockingbird.test.Mocks.MyDependencyImpl
 import com.careem.mockingbird.test.Mocks.MyDependencySpy
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class SpyTest {
+
+    @Test
+    @Ignore
+    fun testSpyNotFrozenWhenSpyFunctionIsCalled() {
+        val realImpl = MyDependencyImpl()
+        val spy = MyDependencySpy(realImpl)
+        spy.method1("str")
+        assertFalse{ spy.isFrozen }
+    }
+
+
+    @Test
+    fun testSpyNotFrozenWhenSpyFunctionIsCalledAndBehaviorMocked() {
+        val expect = 9
+
+        val realImpl = MyDependencyImpl()
+        val spy = MyDependencySpy(realImpl)
+        spy.every(
+            methodName = MyDependencySpy.Method.method4
+        ) { expect }
+
+        spy.method4()
+        assertFalse{ spy.isFrozen }
+    }
 
     @Test
     fun testSpyCallsRealFunctionWhenNoMockProvided() {

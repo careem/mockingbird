@@ -10,7 +10,7 @@ class InvocationRecorderTest {
     fun testEmptyListWhenNoInvocationsRegisteredForAnInstance(){
         val mock = object : Mock {}
 
-        val mockInvocations = invocationRecorder.getInvocations(mock)
+        val mockInvocations = invocationRecorder.getInvocations(mock.hashCode())
         assertTrue(mockInvocations.isEmpty())
     }
 
@@ -21,12 +21,12 @@ class InvocationRecorderTest {
         val invocation1 = Invocation(METHOD_1, ARGS_1)
         val invocation2 = Invocation(METHOD_2, ARGS_1)
 
-        invocationRecorder.storeInvocation(mock, invocation1)
-        invocationRecorder.storeInvocation(mock, invocation2)
-        invocationRecorder.storeInvocation(mock2, invocation1)
+        invocationRecorder.storeInvocation(mock.hashCode(), invocation1)
+        invocationRecorder.storeInvocation(mock.hashCode(), invocation2)
+        invocationRecorder.storeInvocation(mock2.hashCode(), invocation1)
 
-        val mockInvocations = invocationRecorder.getInvocations(mock)
-        val mock2Invocations = invocationRecorder.getInvocations(mock2)
+        val mockInvocations = invocationRecorder.getInvocations(mock.hashCode())
+        val mock2Invocations = invocationRecorder.getInvocations(mock2.hashCode())
 
         assertEquals(
             listOf(
@@ -51,13 +51,13 @@ class InvocationRecorderTest {
         val responseInv2 = "YoYo"
         val responseInv3 = "Ahhhhhhh"
 
-        invocationRecorder.storeResponse(mock, invocation1, responseInv1)
-        invocationRecorder.storeResponse(mock, invocation2, responseInv2)
-        invocationRecorder.storeResponse(mock2, invocation1, responseInv3)
+        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock.hashCode(), invocation2, responseInv2)
+        invocationRecorder.storeResponse(mock2.hashCode(), invocation1, responseInv3)
 
-        val response1 = invocationRecorder.getResponse(mock, invocation1)
-        val response2 = invocationRecorder.getResponse(mock, invocation2)
-        val response3 = invocationRecorder.getResponse(mock2, invocation1)
+        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
+        val response2 = invocationRecorder.getResponse(mock.hashCode(), invocation2)
+        val response3 = invocationRecorder.getResponse(mock2.hashCode(), invocation1)
 
         assertEquals(responseInv1, response1)
         assertEquals(responseInv2, response2)
@@ -72,9 +72,9 @@ class InvocationRecorderTest {
         val responseInv1 = "Yo"
         val responseAnswer1: (Invocation) -> String = { _ -> responseInv1 }
 
-        invocationRecorder.storeAnswer(mock, invocation1, responseAnswer1)
+        invocationRecorder.storeAnswer(mock.hashCode(), invocation1, responseAnswer1)
 
-        val response1 = invocationRecorder.getResponse(mock, invocation1)
+        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
 
         assertEquals(responseInv1, response1)
     }
@@ -84,7 +84,7 @@ class InvocationRecorderTest {
         val mock = object : Mock {}
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
-        val response = invocationRecorder.getResponse(mock, invocation1, relaxed = true)
+        val response = invocationRecorder.getResponse(mock.hashCode(), invocation1, relaxed = true)
         assertNull(response)
     }
 
@@ -105,10 +105,10 @@ class InvocationRecorderTest {
 
         assertNull(iWillBeSet)
 
-        invocationRecorder.storeAnswer(mock, invocation1, responseAnswer1)
+        invocationRecorder.storeAnswer(mock.hashCode(), invocation1, responseAnswer1)
         assertNull(iWillBeSet)
 
-        invocationRecorder.getResponse(mock, invocation1)
+        invocationRecorder.getResponse(mock.hashCode(), invocation1)
         assertEquals(SIDE_EFFECT_VALUE, iWillBeSet)
     }
 
@@ -119,10 +119,10 @@ class InvocationRecorderTest {
 
         var e: IllegalStateException? = null
         try {
-            invocationRecorder.getResponse(mock, invocation1)
+            invocationRecorder.getResponse(mock.hashCode(), invocation1)
         } catch (ise: IllegalStateException) {
             e = ise
-            assertEquals("Not mocked response for current object and instance, instance:$mock, invocation: $invocation1", e.message)
+            assertEquals("Not mocked response for current object and instance, instance:${mock.hashCode()}, invocation: $invocation1", e.message)
         }
         assertNotNull(e)
     }
@@ -135,12 +135,12 @@ class InvocationRecorderTest {
         val responseInv1 = "Yo"
         var e: IllegalStateException? = null
 
-        invocationRecorder.storeResponse(mock, invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
 
-        val response1 = invocationRecorder.getResponse(mock, invocation1)
+        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
         assertEquals(responseInv1, response1)
         try {
-            invocationRecorder.getResponse(mock, invocation2)
+            invocationRecorder.getResponse(mock.hashCode(), invocation2)
         } catch (ise: IllegalStateException) {
             e = ise
             assertEquals("Not mocked response for current object and instance, invocation: $invocation2", e.message)
@@ -156,12 +156,12 @@ class InvocationRecorderTest {
         val responseInv1 = "Yo"
         var e: IllegalStateException? = null
 
-        invocationRecorder.storeResponse(mock, invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
 
-        val response1 = invocationRecorder.getResponse(mock, invocation1)
+        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
         assertEquals(responseInv1, response1)
         try {
-            invocationRecorder.getResponse(mock, invocation2)
+            invocationRecorder.getResponse(mock.hashCode(), invocation2)
         } catch (ise: IllegalStateException) {
             e = ise
             assertEquals("Not mocked response for current object and instance, invocation: $invocation2", e.message)
@@ -181,11 +181,11 @@ class InvocationRecorderTest {
         val responseInv1 = "Yo"
         val responseInv2 = "YoYo"
 
-        invocationRecorder.storeResponse(mock, invocation1, responseInv1)
-        invocationRecorder.storeResponse(mock2, invocation3, responseInv2)
+        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock2.hashCode(), invocation3, responseInv2)
 
-        val response1 = invocationRecorder.getResponse(mock, invocation2)
-        val response2 = invocationRecorder.getResponse(mock2, invocation4)
+        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation2)
+        val response2 = invocationRecorder.getResponse(mock2.hashCode(), invocation4)
 
         assertEquals(responseInv1, response1)
         assertEquals(responseInv2, response2)

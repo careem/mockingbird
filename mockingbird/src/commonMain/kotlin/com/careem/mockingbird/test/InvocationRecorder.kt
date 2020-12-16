@@ -11,11 +11,10 @@ internal class InvocationRecorder {
 
     /**
      * This function must be called by the mock when a function call is exceuted on it
-     * @param instance the instance of the mock
+     * @param instanceHash the instanceHash of the mock
      * @param invocation the Invocation object @see [Invocation]
      */
-    fun storeInvocation(instance: Any, invocation: Invocation) {
-        val instanceHash = instance.hashCode()
+    fun storeInvocation(instanceHash: Int, invocation: Invocation) {
         if (!recorder.containsKey(instanceHash)) {
             recorder[instanceHash] = mutableListOf()
         }
@@ -24,33 +23,31 @@ internal class InvocationRecorder {
 
     /**
      * This function returns the list of invocations registered for a certain mock
-     * @param instance the instance of the mock
+     * @param instanceHash the instanceHash of the mock
      * @return list of [Invocation]s object (all the methods calls with args)
      */
-    internal fun getInvocations(instance: Any): List<Invocation> {
-        val instanceHash = instance.hashCode()
+    internal fun getInvocations(instanceHash: Int): List<Invocation> {
         return recorder[instanceHash] ?: emptyList()
     }
 
     /**
      * This function tells to InvocationRecorder how to reply if invocation is received
-     * @param instance the instance of the mock
+     * @param instanceHash the instanceHash of the mock
      * @param invocation the Invocation object @see [Invocation]
      * @param response the object that must be returned if the specif invocation happen
      */
-    fun <T> storeResponse(instance: Any, invocation: Invocation, response: T) {
+    fun <T> storeResponse(instanceHash: Int, invocation: Invocation, response: T) {
         val answer: (Invocation) -> T = { _ -> response }
-        storeAnswer(instance, invocation, answer)
+        storeAnswer(instanceHash, invocation, answer)
     }
 
     /**
      * This function tells to InvocationRecorder how to reply if invocation is received
-     * @param instance the instance of the mock
+     * @param instanceHash the instanceHash of the mock
      * @param invocation the Invocation object @see [Invocation]
      * @param answer the lambda that must be invoked when the invocation happen
      */
-    fun <T> storeAnswer(instance: Any, invocation: Invocation, answer: (Invocation) -> T) {
-        val instanceHash = instance.hashCode()
+    fun <T> storeAnswer(instanceHash: Int, invocation: Invocation, answer: (Invocation) -> T) {
         if (!responses.containsKey(instanceHash)) {
             responses[instanceHash] = mutableMapOf()
         }
@@ -59,14 +56,13 @@ internal class InvocationRecorder {
 
     /**
      * This function will return the mocked response previously stored for the specific invocation
-     * @param instance the instance of the mock
+     * @param instanceHash the instanceHash of the mock
      * @param invocation the Invocation object @see [Invocation]
      * @param relaxed specify if we want to crash when no mock behavior provided
      * @throws IllegalStateException if no response was stored for the instance and invocation
      * @return the mocked response, or null if relaxed (throws if not relaxed)
      */
-    fun getResponse(instance: Any, invocation: Invocation, relaxed: Boolean = false): Any? {
-        val instanceHash = instance.hashCode()
+    fun getResponse(instanceHash: Int, invocation: Invocation, relaxed: Boolean = false): Any? {
         return if (instanceHash in responses.keys) {
             responses[instanceHash]!!.let {
                 val lambda = findResponseByInvocation(it, invocation, relaxed)
@@ -75,7 +71,7 @@ internal class InvocationRecorder {
         } else if (relaxed) {
             null
         } else {
-            throw IllegalStateException("Not mocked response for current object and instance, instance:$instance, invocation: $invocation")
+            throw IllegalStateException("Not mocked response for current object and instance, instance:$instanceHash, invocation: $invocation")
         }
     }
 
