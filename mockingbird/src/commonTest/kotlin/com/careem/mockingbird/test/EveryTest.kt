@@ -4,6 +4,7 @@ import com.careem.mockingbird.test.Mocks.TEST_INT
 import com.careem.mockingbird.test.Mocks.MyDependencyMock
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class EveryTest {
 
@@ -23,6 +24,20 @@ class EveryTest {
         }
 
         assertEquals(1, value)
+    }
+
+    @Test
+    fun testMockNotFrozenOnEvery() {
+        val testMock = MyDependencyMock()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method3,
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to TEST_INT,
+                MyDependencyMock.Arg.value2 to TEST_INT
+            )
+        ) { 1 }
+
+        assertFalse { testMock.isFrozen }
     }
 
     @Test
