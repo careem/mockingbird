@@ -24,11 +24,13 @@ fun <T : Mock, R> T.every(
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
 ) {
+    val hashCode = this.hashCode()
+    val value = returns()
     invocationRecorder.access { recorder ->
         recorder.storeResponse(
-            this,
+            hashCode,
             Invocation(methodName = methodName, arguments = arguments),
-            returns()
+            value
         )
     }
 }
@@ -43,9 +45,10 @@ fun <T : Mock, R> T.everyAnswers(
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
 ) {
+    val hashCode = this.hashCode()
     invocationRecorder.access { recorder ->
         recorder.storeAnswer(
-            this,
+            hashCode,
             Invocation(methodName = methodName, arguments = arguments),
             answer
         )
@@ -92,8 +95,9 @@ internal fun <T : Mock> T.rawVerify(
     methodName: String,
     arguments: Map<String, Any?>
 ) {
+    val hashCode = this.hashCode()
     invocationRecorder.access { recorder ->
-        val methodInvocations = recorder.getInvocations(this)
+        val methodInvocations = recorder.getInvocations(hashCode)
             .filter { it.methodName == methodName }
         val argumentsInvocations = methodInvocations
             .filter { compareArguments(it.arguments, arguments) }
@@ -116,12 +120,14 @@ internal fun <T : Mock> T.rawVerify(
  * @param arguments map between names and method arguments
  * @return returns the mocked result for the method call described by arguments above ( it crash if no mock behavior provided )
  */
-fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R =
-    invocationRecorder.access { recorder ->
+fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R {
+    val hashCode = this.hashCode()
+    return invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        recordInvocation(recorder, invocation)
-        return@access recorder.getResponse(this as Any, invocation) as R
+        recordInvocation(hashCode, recorder, invocation)
+        return@access recorder.getResponse(hashCode, invocation) as R
     }
+}
 
 
 /**
@@ -135,11 +141,12 @@ fun <T : Mock> T.mockUnit(
     arguments: Map<String, Any?> = emptyMap(),
     relaxed: Boolean = true
 ) {
+    val hashCode = this.hashCode()
     invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        recordInvocation(recorder, invocation)
+        recordInvocation(hashCode, recorder, invocation)
         recorder.getResponse(
-            instance = this as Any,
+            instanceHash = hashCode,
             invocation = invocation,
             relaxed = relaxed
         )
@@ -157,17 +164,19 @@ fun <T : Spy, R> T.spy(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     delegate: () -> R
-): R =
-    invocationRecorder.access { recorder ->
+): R {
+    val hashCode = this.hashCode()
+    return invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        recordInvocation(recorder, invocation)// TODO change name
+        recordInvocation(hashCode, recorder, invocation)// TODO change name
         val mockResponse = recorder.getResponse(
-            instance = this as Any,
+            instanceHash = hashCode,
             invocation = invocation,
             relaxed = true
         ) as R
         return@access mockResponse ?: delegate()
     }
+}
 
 /**
  * A any() matcher which will matching any object
@@ -197,9 +206,9 @@ private fun compareArguments(
     return true
 }
 
-private fun <T : Mock> T.recordInvocation(recorder: InvocationRecorder, invocation: Invocation) {
+private fun recordInvocation(instanceHash: Int, recorder: InvocationRecorder, invocation: Invocation) {
     recorder.storeInvocation(
-        instance = this,
+        instanceHash = instanceHash,
         invocation = invocation
     )
 }

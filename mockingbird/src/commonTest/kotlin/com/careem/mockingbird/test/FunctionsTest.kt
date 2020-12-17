@@ -8,6 +8,7 @@ import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -51,6 +52,38 @@ class FunctionsTest {
             methodName = MyDependencyMock.Method.method4
         )
         assertEquals(5, value)
+    }
+
+    @Test
+    fun testMockNotFrozenOnEveryAnswer() {
+        val testMock = MyDependencyMock()
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method4
+        ) {
+            return@everyAnswers 5
+        }
+
+        assertFalse { testMock.isFrozen }
+    }
+
+
+    @Test
+    fun testMockNotFrozenOnVerify() {
+        val testMock = MyDependencyMock()
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method4
+        ) {
+            return@everyAnswers 5
+        }
+
+        assertFalse { testMock.isFrozen }
+
+        testMock.method4()
+        assertFalse { testMock.isFrozen }
+        testMock.verify(
+            methodName = MyDependencyMock.Method.method4
+        )
+        assertFalse { testMock.isFrozen }
     }
 
     @Test

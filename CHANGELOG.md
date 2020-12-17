@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+* Fixed issue where mocking a dependency was freezing the mock as well
+
 ## 1.4.0
 * Added support for timeout during `verify`
 * Added more info when not mocked response
@@ -30,4 +32,3 @@ All notable changes to this project will be documented in this file.
 * `everyAnswer` function
 * `slot` feature
 * `any` matcher
-
