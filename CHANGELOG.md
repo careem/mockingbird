@@ -5,9 +5,15 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
-## 1.6.0
+## 1.6.0 ( 1.4.1 fix not present )
 
-## 1.5.0
+## 1.5.0 ( 1.4.1 fix not present )
+
+* Migration to Kotlin 1.4
+
+## 1.4.1
+
+* Fixed issue where mocking a dependency was freezing the mock as well
 
 ## 1.4.0
 * Added support for timeout during `verify`
@@ -34,4 +40,3 @@ All notable changes to this project will be documented in this file.
 * `everyAnswer` function
 * `slot` feature
 * `any` matcher
-
