@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+## 1.4.1
+
 * Fixed issue where mocking a dependency was freezing the mock as well
 
 ## 1.4.0
