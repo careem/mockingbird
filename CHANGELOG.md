@@ -5,11 +5,16 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+* Upgrade Kotlin 1.4.21
+* Included fix done in version (1.4.1)
+
 ## 1.6.0 ( 1.4.1 fix not present )
+
+* Upgrade Kotlin 1.4.20
 
 ## 1.5.0 ( 1.4.1 fix not present )
 
-* Migration to Kotlin 1.4
+* Upgrade Kotlin 1.4.0
 
 ## 1.4.1
 
