@@ -9,6 +9,11 @@ import kotlin.test.assertFalse
 
 class SpyTest {
 
+    /**
+     * Uncomment this test when issue:
+     * https://github.com/careem/mockingbird/issues/23
+     * will be fixed
+     */
     @Test
     @Ignore
     fun testSpyNotFrozenWhenSpyFunctionIsCalled() {
@@ -19,7 +24,13 @@ class SpyTest {
     }
 
 
+    /**
+     * Uncomment this test when issue:
+     * https://github.com/careem/mockingbird/issues/23
+     * will be fixed
+     */
     @Test
+    @Ignore
     fun testSpyNotFrozenWhenSpyFunctionIsCalledAndBehaviorMocked() {
         val expect = 9
 
