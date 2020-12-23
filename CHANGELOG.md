@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+## 1.7.0
+
 * Upgrade Kotlin 1.4.21
 * Included fix done in version (1.4.1)
 
