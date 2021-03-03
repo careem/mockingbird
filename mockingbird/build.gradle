@@ -11,13 +11,6 @@ kotlin {
             }
         }
 
-        commonTest {
-            dependencies {
-                implementation Deps.kotlin.test
-                implementation Deps.kotlin.test.annotationsCommon
-            }
-        }
-
         jvmMain {
             dependencies {
 
