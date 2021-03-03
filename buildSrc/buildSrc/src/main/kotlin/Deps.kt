@@ -35,16 +35,19 @@ object Deps {
     }
 
     object Kotlin {
-        val test = Test
+        val test = Test()
         const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
-        object Test {
-            const val common = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
-            const val junit = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
-            const val js = "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
-            const val test = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
-            const val annotationsCommon =
+        const val reflectJvm = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+        class Test(private val name: String = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion") :
+            CharSequence by name {
+            val annotationsCommon =
                 "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlinVersion"
+            val js = "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
+            val junit = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+
+            override fun toString() = name
         }
     }
 }

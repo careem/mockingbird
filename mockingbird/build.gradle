@@ -7,16 +7,14 @@ kotlin {
             dependencies {
                 implementation Deps.kotlinx.atomicfu.common
                 implementation Deps.touchlab.stately.isolate.common
-                implementation kotlin('test')
-                implementation kotlin('test-common')
+                implementation Deps.kotlin.test
             }
         }
 
         commonTest {
             dependencies {
-                implementation kotlin('test')
-                implementation kotlin('test-common')
-                implementation kotlin('test-annotations-common')
+                implementation Deps.kotlin.test
+                implementation Deps.kotlin.test.annotationsCommon
             }
         }
 
