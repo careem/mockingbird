@@ -40,7 +40,7 @@ void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
         sourceSets {
             commonTest {
                 dependencies {
-                    implementation Deps.kotlin.test.common
+                    implementation Deps.kotlin.test
                     implementation Deps.kotlin.test.annotationsCommon
                 }
             }
