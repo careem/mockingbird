@@ -13,4 +13,11 @@ data class Invocation(
         @Suppress("UNCHECKED_CAST")
         return arguments[name] as ArgumentType
     }
+
+    /**
+     * Returns the value of argument with given subscript cast to [ArgumentType].
+     *
+     * @throws [kotlin.ClassCastException] if value cannot be cast to [ArgumentType].
+     */
+    inline operator fun <reified  ArgumentType> get(name: String): ArgumentType = getArgument(name)
 }

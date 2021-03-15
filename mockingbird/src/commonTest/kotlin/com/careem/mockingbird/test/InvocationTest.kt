@@ -8,14 +8,14 @@ import kotlin.test.assertNull
 class InvocationTest {
     @Test
     fun castPresentArgumentToType() {
-        val arg: Int = invocation.getArgument("bar")
+        val arg: Int = invocation["bar"]
 
         assertEquals(10, arg)
     }
 
     @Test
     fun castAbsentArgumentToNullableType() {
-        val arg: Int? = invocation.getArgument("gibberish")
+        val arg: Int? = invocation["gibberish"]
 
         assertNull(arg)
     }
