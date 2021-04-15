@@ -19,5 +19,5 @@ data class Invocation(
      *
      * @throws [kotlin.ClassCastException] if value cannot be cast to [ArgumentType].
      */
-    inline operator fun <reified  ArgumentType> get(name: String): ArgumentType = getArgument(name)
+    inline operator fun <reified ArgumentType> get(name: String): ArgumentType = getArgument(name)
 }
