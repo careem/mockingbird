@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Add typed argument getter to Invocation
 
 ## 1.7.0
 
