@@ -24,25 +24,16 @@ kotlin {
 
         jvmMain {
             dependencies {
-                implementation Deps.kotlinx.atomicfu.jvm
             }
         }
 
         jsMain {
-            dependsOn jvmJsCommonMain
             dependencies {
-                implementation Deps.kotlinx.atomicfu.js
-                implementation Deps.kotlin.test.js
             }
-        }
-
-        jsTest {
-            dependsOn jvmJsCommonTest
         }
 
         iosX64Main {
             dependencies {
-                implementation Deps.kotlinx.atomicfu.native
             }
         }
 

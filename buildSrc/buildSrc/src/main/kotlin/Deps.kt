@@ -21,7 +21,6 @@ object Deps {
 
             object Isolate {
                 const val common = "co.touchlab:stately-isolate:$statelyVersion"
-                const val jvm = "co.touchlab:stately-isolate-jvm:$statelyVersion"
             }
         }
     }
@@ -49,7 +48,7 @@ object Deps {
         val kotlinPoet = KotlinPoet()
         val kotlinPoetMetadata = KotlinPoetMetadata()
         val kotlinPoetMetadataSpecs = KotlinPoetMetadataSpecs()
-        private val kotlinPoetVersion = "1.5.0"
+        private val kotlinPoetVersion = "1.7.2"
 
         class KotlinPoet(
             private val name: String = "com.squareup:kotlinpoet:$kotlinPoetVersion"
