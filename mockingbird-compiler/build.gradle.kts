@@ -1,14 +1,8 @@
+
 plugins {
     `kotlin-dsl`
-}
-
-gradlePlugin {
-    plugins {
-        register("mockingbird") {
-            id = "com.careem.mockingbird"
-            implementationClass = "com.careem.mockingbird.MockingbirdPlugin"
-        }
-    }
+    kotlin("jvm")
+    kotlin("kapt")
 }
 
 repositories {
@@ -25,11 +19,22 @@ kotlin {
 }
 
 dependencies {
-    implementation(Deps.kotlin.plugin)
     implementation(Deps.square.kotlinPoet)
     implementation(Deps.square.kotlinPoetMetadata)
-    implementation(Deps.square.kotlinPoetMetadataSpecs)
-    implementation(Deps.kotlinx.metadata)
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable")
+
+    kapt("com.google.auto.service:auto-service:1.0")
+    compileOnly("com.google.auto.service:auto-service-annotations:1.0")
+
+    testImplementation(kotlin("test-junit"))
+    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.3.4")
+}
+
+
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 //task pluginVersion {

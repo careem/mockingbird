@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+
 apply from: 'jacoco.gradle'
 
 buildscript {
@@ -91,6 +93,22 @@ private void setupJvmTarget(Project project) {
                     implementation kotlin('test-junit')
                 }
             }
+        }
+    }
+}
+
+subprojects {
+
+    def javaVersion = JavaVersion.VERSION_1_8
+
+    tasks.withType(JavaCompile).configureEach { task ->
+        task.sourceCompatibility = javaVersion
+        task.targetCompatibility = javaVersion
+    }
+
+    tasks.withType(KotlinJvmCompile).configureEach { task ->
+        task.kotlinOptions {
+            jvmTarget = javaVersion.toString()
         }
     }
 }

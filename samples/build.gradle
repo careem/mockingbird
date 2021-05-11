@@ -1,5 +1,9 @@
-setupMultiplatformLibrary(project)
-setupAllTargetsWithDefaultSourceSets(project)
+//setupMultiplatformLibrary(project)
+//setupAllTargetsWithDefaultSourceSets(project)
+
+plugins {
+    id 'com-careem-mockingbird'
+}
 
 kotlin {
     sourceSets {
@@ -45,6 +49,6 @@ kotlin {
 
 //apply plugin: MockCodeGenPlugin
 
-task generateMocks() {
-    apply plugin: MockingbirdPlugin
-}
+//task generateMocks() {
+//    apply plugin: MockingbirdPlugin
+//}

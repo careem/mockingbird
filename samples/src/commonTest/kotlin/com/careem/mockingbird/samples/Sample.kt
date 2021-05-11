@@ -1,6 +1,6 @@
 package com.careem.mockingbird.samples
 
-import com.careem.mockingbird.PippoSampleMock
+//import com.careem.mockingbird.PippoSampleMock
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -18,8 +18,8 @@ class TestClass {
 
     @Test
     fun main() {
-        val pippoMock: PippoSample = PippoSampleMock()
-        assertNotNull(pippoMock)
+//        val pippoMock: PippoSample = PippoSampleMock()
+//        assertNotNull(pippoMock)
     }
 
 }

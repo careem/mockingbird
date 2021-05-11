@@ -36,11 +36,11 @@ kotlin {
     }
 }
 
-task sourcesJar(type: Jar) {
-    baseName = "mockingbird"
-    classifier = 'sources'
-    from kotlin.sourceSets.commonMain.kotlin.srcDirs, kotlin.sourceSets.jvmMain.kotlin.srcDirs
-}
+//task sourcesJar(type: Jar) {
+//    baseName = "mockingbird"
+//    classifier = 'sources'
+//    from kotlin.sourceSets.commonMain.kotlin.srcDirs, kotlin.sourceSets.jvmMain.kotlin.srcDirs
+//}
 
 artifacts {
     archives sourcesJar

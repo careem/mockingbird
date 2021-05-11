@@ -1,6 +1,6 @@
 object Deps {
 
-    private const val kotlinVersion = "1.4.21"
+    private const val kotlinVersion = "1.5.0"
 
     val kotlin = Kotlin
     val kotlinx = Kotlinx
@@ -48,7 +48,7 @@ object Deps {
         val kotlinPoet = KotlinPoet()
         val kotlinPoetMetadata = KotlinPoetMetadata()
         val kotlinPoetMetadataSpecs = KotlinPoetMetadataSpecs()
-        private val kotlinPoetVersion = "1.7.2"
+        private val kotlinPoetVersion = "1.8.0"
 
         class KotlinPoet(
             private val name: String = "com.squareup:kotlinpoet:$kotlinPoetVersion"
@@ -73,6 +73,8 @@ object Deps {
     object Kotlin {
         val test = Test()
         const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        const val pluginApi = "org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlinVersion"
+        const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
         const val reflectJvm = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
@@ -85,5 +87,9 @@ object Deps {
 
             override fun toString() = name
         }
+    }
+
+    object Google {
+        const val autoservice = "com.google.auto.service:auto-service:1.0"
     }
 }

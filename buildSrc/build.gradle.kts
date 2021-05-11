@@ -1,5 +1,8 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 plugins {
     `kotlin-dsl`
+    kotlin("kapt") version "1.5.0"
 }
 
 repositories {
@@ -15,8 +18,6 @@ dependencies {
     implementation(Deps.kotlin.reflectJvm)
     implementation(Deps.square.kotlinPoet)
     implementation(Deps.square.kotlinPoetMetadata)
-    implementation(Deps.square.kotlinPoetMetadataSpecs)
-    implementation(Deps.kotlinx.metadata)
 }
 
 kotlin {
