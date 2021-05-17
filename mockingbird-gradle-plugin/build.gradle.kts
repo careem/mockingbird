@@ -13,14 +13,9 @@ buildscript {
 
 }
 
-gradlePlugin {
-    plugins {
-        register("plugin") {
-            id = "com-careem-mockingbird"
-
-            implementationClass = "com.careem.mockingbird.plugin.MockingBirdPlugin"
-        }
-    }
+gradlePlugin.plugins.create("plugin") {
+    id = "com.careem.mockingbird"
+    implementationClass = "com.careem.mockingbird.plugin.MockingBirdPlugin"
 }
 
 repositories {

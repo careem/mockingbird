@@ -10,23 +10,16 @@ import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import java.io.File
 
 @AutoService(ComponentRegistrar::class)
-class TemplateComponentRegistrar(
-  private val sourceGenFolder: String
-) : ComponentRegistrar {
-
-  @Suppress("unused") // Used by service loader
-  constructor() : this(
-    sourceGenFolder = "/home/carlo/IdeaProjects/kotlin-ir-plugin-template/kotlin-ir-plugin/build/generated/mocking"
-  )
+class MockingBirdComponentRegistrar : ComponentRegistrar {
 
   override fun registerProjectComponents(
     project: MockProject,
     configuration: CompilerConfiguration
   ) {
     val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-    val sourceGenFolder = File(configuration.get(TemplateCommandLineProcessor.srcGenDirKey, sourceGenFolder))
+    val sourceGenFolder = File(configuration.getNotNull(MockingBirdCommandLineProcessor.srcGenDirKey))
 
-    AnalysisHandlerExtension.registerExtension(project, TextCodegenExtension(messageCollector, sourceGenFolder))
+    AnalysisHandlerExtension.registerExtension(project, MockingBirdGeneratorExtension(messageCollector, sourceGenFolder))
   }
 }
 

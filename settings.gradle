@@ -1,10 +1,15 @@
+pluginManagement {
+    includeBuild("mockingbird-gradle-plugin")
+}
+
 include ':mockingbird'
 include ':samples'
 include ':mockingbird-compiler'
+include ':untitled'
 
 // Use the local version instead of a remote artifact.
 includeBuild('mockingbird-gradle-plugin') {
     dependencySubstitution {
-        substitute module('com.careem.mockingbird:mocking-bird-plugin') with project(':')
+        substitute module('com.careem.mockingbird:mockingbird-plugin') with project(':efe')
     }
 }

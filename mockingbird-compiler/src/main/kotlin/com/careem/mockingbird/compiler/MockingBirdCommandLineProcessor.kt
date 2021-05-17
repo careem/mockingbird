@@ -8,19 +8,19 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 @AutoService(CommandLineProcessor::class)
-class TemplateCommandLineProcessor : CommandLineProcessor {
+class MockingBirdCommandLineProcessor : CommandLineProcessor {
   companion object {
     const val OPTION_SRC_GEN_DIR = "src-gen-dir"
 
     val srcGenDirKey = CompilerConfigurationKey<String>(OPTION_SRC_GEN_DIR)
   }
 
-  override val pluginId: String = "mocking-bird-plugin"
+  override val pluginId: String = "mocking-bird-plugin-compiler"
 
   override val pluginOptions: Collection<CliOption> = listOf(
     CliOption(
       optionName = OPTION_SRC_GEN_DIR,
-      valueDescription = "src-gen-dir",
+      valueDescription = "src-gen-dir absolute path",
       description = "src-gen-dir path",
       required = true
     )
@@ -31,6 +31,7 @@ class TemplateCommandLineProcessor : CommandLineProcessor {
     value: String,
     configuration: CompilerConfiguration
   ) {
+
     return when (option.optionName) {
       OPTION_SRC_GEN_DIR -> configuration.put(srcGenDirKey, value)
       else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")

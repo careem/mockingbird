@@ -45,29 +45,11 @@ object Deps {
     }
 
     object Square {
-        val kotlinPoet = KotlinPoet()
-        val kotlinPoetMetadata = KotlinPoetMetadata()
-        val kotlinPoetMetadataSpecs = KotlinPoetMetadataSpecs()
-        private val kotlinPoetVersion = "1.8.0"
+        private val version = "1.8.0"
 
-        class KotlinPoet(
-            private val name: String = "com.squareup:kotlinpoet:$kotlinPoetVersion"
-        ) : CharSequence by name {
-            override fun toString(): String = name
-        }
-
-        class KotlinPoetMetadata(
-            private val name: String = "com.squareup:kotlinpoet-metadata:$kotlinPoetVersion"
-        ) : CharSequence by name {
-            override fun toString(): String = name
-        }
-
-        class KotlinPoetMetadataSpecs(
-            private val name: String = "com.squareup:kotlinpoet-metadata-specs:$kotlinPoetVersion"
-        ) : CharSequence by name {
-            override fun toString(): String = name
-        }
-
+        val kotlinPoet = "com.squareup:kotlinpoet:$version"
+        val kotlinPoetMetadata = "com.squareup:kotlinpoet-metadata:$version"
+        val kotlinPoetMetadataSpecs = "com.squareup:kotlinpoet-metadata-specs:$version"
     }
 
     object Kotlin {

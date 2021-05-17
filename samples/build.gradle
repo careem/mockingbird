@@ -1,9 +1,17 @@
-//setupMultiplatformLibrary(project)
-//setupAllTargetsWithDefaultSourceSets(project)
+setupMultiplatformLibrary(project)
+setupAllTargetsWithDefaultSourceSets(project)
 
-plugins {
-    id 'com-careem-mockingbird'
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+//    dependencies {
+//        classpath("com.careem.mockingbird:mocking-bird-plugin")
+//    }
 }
+
+//apply plugin: "com-careem-mockingbird"
 
 kotlin {
     sourceSets {

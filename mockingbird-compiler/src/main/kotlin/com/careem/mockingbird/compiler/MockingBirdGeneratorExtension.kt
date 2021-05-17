@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import java.io.File
 
-class TextCodegenExtension(
+class MockingBirdGeneratorExtension(
   private val messageCollector: MessageCollector,
   private val sourceGenFolder: File
 ) : AnalysisHandlerExtension {
@@ -25,8 +25,7 @@ class TextCodegenExtension(
     bindingTrace: BindingTrace,
     componentProvider: ComponentProvider
   ): AnalysisResult? {
-
-
+    messageCollector.report(CompilerMessageSeverity.ERROR, "mockingbird We are in doAnalysis ${files.size}")
     return null
   }
 
@@ -37,6 +36,8 @@ class TextCodegenExtension(
     bindingTrace: BindingTrace,
     files: Collection<KtFile>
   ): AnalysisResult? {
+
+    messageCollector.report(CompilerMessageSeverity.ERROR, "mockingbird We are in analysisCompleted ${files.size}")
 
     val generator = MockingBirdGenerator(sourceGenFolder, bindingTrace.bindingContext, module, messageCollector)
 

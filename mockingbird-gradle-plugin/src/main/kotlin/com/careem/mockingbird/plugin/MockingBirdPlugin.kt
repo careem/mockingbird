@@ -11,21 +11,23 @@ class MockingBirdPlugin : KotlinCompilerPluginSupportPlugin {
 //    extensions.create("mockingbird", MockingBirdPluginExtension::class.java)
   }
 
-  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
+//  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = kotlinCompilation.target.project.plugins.hasPlugin(MockingBirdPlugin::class.java)
+  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =true
 
   override fun getCompilerPluginId(): String = "mocking-bird-plugin-compiler"
 
   override fun getPluginArtifact(): SubpluginArtifact = SubpluginArtifact(
     groupId = "com.careem.mockingbird",
-    artifactId = "mocking-bird-plugin",
+    artifactId = "mockingbird-plugin",
     version = "1"
   )
 
-  override fun getPluginArtifactForNative(): SubpluginArtifact = SubpluginArtifact(
-    groupId = "com.careem.mockingbird",
-    artifactId = "mocking-bird-plugin-native",
-    version = "1"
-  )
+//  TODO
+//  override fun getPluginArtifactForNative(): SubpluginArtifact = SubpluginArtifact(
+//    groupId = "com.careem.mockingbird",
+//    artifactId = "mocking-bird-plugin-native",
+//    version = "1"
+//  )
 
   override fun applyToCompilation(
     kotlinCompilation: KotlinCompilation<*>
@@ -34,7 +36,7 @@ class MockingBirdPlugin : KotlinCompilerPluginSupportPlugin {
     // TODO run only if running tests?
 
     val project = kotlinCompilation.target.project
-    val extension = project.extensions.getByType(MockingBirdPluginExtension::class.java)
+//    val extension = project.extensions.getByType(MockingBirdPluginExtension::class.java)
 
     // Notice that we use the name of the Kotlin compilation as a directory name. Generated code
     // for this specific compile task will be included in the task output. The output of different
@@ -44,9 +46,10 @@ class MockingBirdPlugin : KotlinCompilerPluginSupportPlugin {
       "mockingbird${File.separator}src-gen-${kotlinCompilation.name}"
     )
 
+
     return project.provider {
       listOf(
-        FilesSubpluginOption(key = "src-gen-dir", files = listOf(srcGenDir)),
+        FilesSubpluginOption(key = "src-gen-dir", files = listOf(srcGenDir))
       )
     }
   }
