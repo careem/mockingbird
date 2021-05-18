@@ -5,9 +5,12 @@ All notable changes to this project will be documented in this file.
 
 ## master
 * Add typed argument getter to Invocation
+* Upgrade Kotlin 1.4.32
+* Upgrade Stately 1.1.6-a1
+* Upgrade AtomicFu 0.15.2
+
 
 ## 1.7.0
-
 * Upgrade Kotlin 1.4.21
 * Included fix done in version (1.4.1)
 

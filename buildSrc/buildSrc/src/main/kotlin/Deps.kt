@@ -1,6 +1,6 @@
 object Deps {
 
-    private const val kotlinVersion = "1.4.21"
+    private const val kotlinVersion = "1.4.32"
 
     val kotlin = Kotlin
     val kotlinx = Kotlinx
@@ -14,7 +14,7 @@ object Deps {
         val stately = Stately
 
         object Stately {
-            private const val statelyVersion = "1.1.0-a1"
+            private const val statelyVersion = "1.1.6-a1"
 
             val isolate = Isolate
 
@@ -28,7 +28,7 @@ object Deps {
         val atomicfu = AtomicFu
 
         object AtomicFu {
-            private const val atomicFuVersion = "0.14.4"
+            private const val atomicFuVersion = "0.15.2"
             const val plugin = "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicFuVersion"
             const val common = "org.jetbrains.kotlinx:atomicfu:$atomicFuVersion"
         }
