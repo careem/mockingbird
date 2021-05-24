@@ -22,7 +22,7 @@ publishing {
             def root = asNode()
 
             root.children().last() + {
-                resolveStrategy = DELEGATE_FIRST
+                resolveStrategy = Closure.DELEGATE_FIRST
 
                 name POM_NAME
                 description POM_DESCRIPTION
