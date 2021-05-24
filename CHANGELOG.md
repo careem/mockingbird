@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.8.0
 * Add typed argument getter to Invocation
 * Upgrade Kotlin 1.4.32
 * Upgrade Stately 1.1.6-a1
