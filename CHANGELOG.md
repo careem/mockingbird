@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.9.0
 * Upgrade Kotlin 1.5.0
 * Support for IR compiler
 * Upgrade Stately 1.1.7-a1
