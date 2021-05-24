@@ -16,10 +16,6 @@ def getRepositoryPassword() {
     return hasProperty('careem_artifactory_api_key') ? careem_artifactory_api_key : System.env.careem_artifactory_api_key
 }
 
-task emptySourcesJar(type: Jar) {
-    classifier = 'sources'
-}
-
 publishing {
     publications.all {
         pom.withXml {
@@ -56,13 +52,6 @@ publishing {
             } else {
                 url getReleaseRepositoryUrl()
             }
-        }
-    }
-
-    afterEvaluate {
-        publications.getByName('kotlinMultiplatform') {
-            // Source jars are only created for platforms, not the common artifact.
-            artifact emptySourcesJar
         }
     }
 }
