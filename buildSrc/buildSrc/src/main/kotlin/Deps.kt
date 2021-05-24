@@ -1,20 +1,20 @@
 object Deps {
 
-    private const val kotlinVersion = "1.4.32"
+    private const val kotlinVersion = "1.5.0"
 
     val kotlin = Kotlin
     val kotlinx = Kotlinx
     val touchlab = TouchLab
 
     // Jacoco
-    private const val jacocoVersion = "0.8.5"
+    private const val jacocoVersion = "0.8.7"
     const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
 
     object TouchLab {
         val stately = Stately
 
         object Stately {
-            private const val statelyVersion = "1.1.6-a1"
+            private const val statelyVersion = "1.1.7-a1"
 
             val isolate = Isolate
 
@@ -28,7 +28,7 @@ object Deps {
         val atomicfu = AtomicFu
 
         object AtomicFu {
-            private const val atomicFuVersion = "0.15.2"
+            private const val atomicFuVersion = "0.16.1"
             const val plugin = "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicFuVersion"
             const val common = "org.jetbrains.kotlinx:atomicfu:$atomicFuVersion"
         }

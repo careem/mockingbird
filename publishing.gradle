@@ -48,8 +48,10 @@ publishing {
             }
 
             if (project.version.endsWith('-SNAPSHOT')) {
+                println("publishing snapshot for $project.name version $project.version")
                 url getSnapshotRepositoryUrl()
             } else {
+                println("publishing for $project.name version $project.version")
                 url getReleaseRepositoryUrl()
             }
         }

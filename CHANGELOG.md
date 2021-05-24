@@ -4,13 +4,16 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Upgrade Kotlin 1.5.0
+* Support for IR compiler
+* Upgrade Stately 1.1.7-a1
+* Upgrade AtomicFu 0.16.1
 
 ## 1.8.0
 * Add typed argument getter to Invocation
 * Upgrade Kotlin 1.4.32
 * Upgrade Stately 1.1.6-a1
 * Upgrade AtomicFu 0.15.2
-
 
 ## 1.7.0
 * Upgrade Kotlin 1.4.21
