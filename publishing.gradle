@@ -22,7 +22,7 @@ publishing {
             def root = asNode()
 
             root.children().last() + {
-                resolveStrategy = Closure.DELEGATE_FIRST
+                resolveStrategy = DELEGATE_FIRST
 
                 name POM_NAME
                 description POM_DESCRIPTION
@@ -48,8 +48,10 @@ publishing {
             }
 
             if (project.version.endsWith('-SNAPSHOT')) {
+                println("publishing snapshot for $project.name version $project.version")
                 url getSnapshotRepositoryUrl()
             } else {
+                println("publishing for $project.name version $project.version")
                 url getReleaseRepositoryUrl()
             }
         }
