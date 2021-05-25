@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.10.0
 * Upgrade Kotlin 1.5.10
 
 ## 1.9.0
