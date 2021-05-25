@@ -1,6 +1,6 @@
 object Deps {
 
-    private const val kotlinVersion = "1.5.0"
+    private const val kotlinVersion = "1.5.10"
 
     val kotlin = Kotlin
     val kotlinx = Kotlinx
