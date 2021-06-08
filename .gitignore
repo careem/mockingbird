@@ -15,6 +15,7 @@ hs_err_pid*
 # User-specific stuff
 .idea/*
 !.idea/codeStyles/
+!.idea/copyright/
 
 local.properties
 

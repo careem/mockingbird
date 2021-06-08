@@ -3,6 +3,9 @@
 
 A Koltin multiplatform library that provides an easier way to mock and write unit tests for a multiplatform project
 
+## Disclaimers
+This project may contain experimental code and may not be ready for general use. Support and/or releases may be limited.
+
 ## Setup
 
 In you multiplatform project include
