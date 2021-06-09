@@ -1,5 +1,6 @@
 # MockingBird
 ![version](https://img.shields.io/badge/version-1.6.0-blue) [![Build Status](https://app.bitrise.io/app/0f4e1b30e3e56dfb/status.svg?token=iHecTZF7GpuyTMqiFj618Q&branch=master)](https://app.bitrise.io/build/c0b2c4e103c222bb) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A Koltin multiplatform library that provides an easier way to mock and write unit tests for a multiplatform project
 
@@ -307,3 +308,18 @@ method and you want to compare some properties of the captured object initialize
 list, a common use case is invocation is invoked multiple times and you want to verify the arguments of
 each separately.
 
+## License
+
+    Copyright Careem, an Uber Technologies Inc. company
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
