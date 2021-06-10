@@ -141,6 +141,7 @@ public fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?>
     return invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(hashCode, recorder, invocation)
+        @Suppress("UNCHECKED_CAST")
         return@access recorder.getResponse(hashCode, invocation) as R
     }
 }
@@ -185,6 +186,7 @@ public fun <T : Spy, R> T.spy(
     return invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(hashCode, recorder, invocation)// TODO change name
+        @Suppress("UNCHECKED_CAST")
         val mockResponse = recorder.getResponse(
             instanceHash = hashCode,
             invocation = invocation,
