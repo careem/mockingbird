@@ -16,4 +16,4 @@
  */
 package com.careem.mockingbird.test
 
-expect fun <T> runOnWorker(body: () -> T): T
+public expect fun <T> runOnWorker(body: () -> T): T

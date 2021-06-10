@@ -18,6 +18,7 @@ setupMultiplatformLibrary(project)
 setupAllTargetsWithDefaultSourceSets(project)
 
 kotlin {
+    explicitApi()
     sourceSets {
         commonMain {
             dependencies {

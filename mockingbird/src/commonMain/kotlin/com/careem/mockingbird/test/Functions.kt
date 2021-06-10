@@ -27,15 +27,15 @@ private val invocationRecorder = IsolateState { InvocationRecorder() }
 @SharedImmutable
 internal const val AWAIT_POOLING_TIME = 10L
 
-interface Mock
-interface Spy : Mock
+public interface Mock
+public interface Spy : Mock
 
 /**
  * Function to specify the return value of an invocation
  * @param methodName name of the method that you want to mock
  * @param arguments map between names and method arguments
  */
-fun <T : Mock, R> T.every(
+public fun <T : Mock, R> T.every(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
@@ -56,7 +56,7 @@ fun <T : Mock, R> T.every(
  * @param methodName name of the method that you want to mock
  * @param arguments map between names and method arguments
  */
-fun <T : Mock, R> T.everyAnswers(
+public fun <T : Mock, R> T.everyAnswers(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
@@ -78,7 +78,7 @@ fun <T : Mock, R> T.everyAnswers(
  * @param arguments map between names and method arguments
  * @param timeoutMillis milliseconds allowed to wait until the condition is considered false
  */
-fun <T : Mock> T.verify(
+public fun <T : Mock> T.verify(
     exactly: Int = 1,
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
@@ -136,7 +136,7 @@ internal fun <T : Mock> T.rawVerify(
  * @param arguments map between names and method arguments
  * @return returns the mocked result for the method call described by arguments above ( it crash if no mock behavior provided )
  */
-fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R {
+public fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R {
     val hashCode = this.hashCode()
     return invocationRecorder.access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
@@ -152,7 +152,7 @@ fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = empt
  * @param arguments map between names and method arguments
  * @param relaxed specify if we want to crash if no mock behavior is provided for the function (relaxed=false => crash)
  */
-fun <T : Mock> T.mockUnit(
+public fun <T : Mock> T.mockUnit(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     relaxed: Boolean = true
@@ -176,7 +176,7 @@ fun <T : Mock> T.mockUnit(
  * @return returns the mocked result for the method call described by arguments above if the method
  * has been mocked, the result of the real invocation otherwise
  */
-fun <T : Spy, R> T.spy(
+public fun <T : Spy, R> T.spy(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     delegate: () -> R
@@ -197,7 +197,7 @@ fun <T : Spy, R> T.spy(
 /**
  * A any() matcher which will matching any object
  */
-fun any(): AnyMatcher {
+public fun any(): AnyMatcher {
     return AnyMatcher()
 }
 

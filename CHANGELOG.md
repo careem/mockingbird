@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Enabled `explictApi()` mode
 
 ## 1.10.0
 * Upgrade Kotlin 1.5.10
