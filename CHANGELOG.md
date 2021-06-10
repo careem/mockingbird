@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Enabled warnings as errors
 * Enabled `explictApi()` mode
 
 ## 1.10.0

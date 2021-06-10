@@ -45,6 +45,7 @@ public fun <T> capture(list: CapturedList<T>): CapturedMatcher<T> {
  * A slot using to fetch the method invocation and compare the property inside invocation arguments
  * Usage example @see [FunctionsTest]
  */
+
 public class Slot<T> : Captureable {
     private val _captured: AtomicRef<T?> = atomic(null)
     public var captured: T?
@@ -55,6 +56,7 @@ public class Slot<T> : Captureable {
             _captured.value = value
         }
 
+    @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
         captured = value as T
     }
@@ -72,6 +74,7 @@ public class CapturedList<T> : Captureable {
             return _captured.access { it.toList() }
         }
 
+    @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
         _captured.access { it.add(value as T) }
     }
