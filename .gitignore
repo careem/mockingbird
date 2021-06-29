@@ -43,7 +43,6 @@ crashlytics-build.properties
 fabric.properties
 
 # Styles
-.idea/codeStyles/Project.xml
 workspace.xml
 
 # VS Code files
