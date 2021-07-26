@@ -11,7 +11,7 @@ This project may contain experimental code and may not be ready for general use.
 
 ## Setup
 
-In you multiplatform project include
+In your multiplatform project include
 
 ```groovy
 implementation "com.careem.mockingbird:mockingbird:1.2.0"
@@ -32,9 +32,9 @@ The library provides 2 functions to help you write your mocks.
 
 These helpers enable you to map your mock invocations to MockingBird environment.
 
-Your mock class must implements `Mock` in addition to extending the real class or implementing an interface
+Your mock class must implement `Mock`, in addition to extending the actual class or implementing an interface
 
-You can find an example on how to create a mock on the code below
+See below for an example on how to create a mock :
 
 ```kotlin
 interface MyDependency {
