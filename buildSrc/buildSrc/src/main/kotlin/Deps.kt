@@ -16,7 +16,7 @@
  */
 object Deps {
 
-    private const val kotlinVersion = "1.5.10"
+    private const val kotlinVersion = "1.5.21"
 
     val kotlin = Kotlin
     val kotlinx = Kotlinx
@@ -44,7 +44,7 @@ object Deps {
         val atomicfu = AtomicFu
 
         object AtomicFu {
-            private const val atomicFuVersion = "0.16.1"
+            private const val atomicFuVersion = "0.16.2"
             const val plugin = "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicFuVersion"
             const val common = "org.jetbrains.kotlinx:atomicfu:$atomicFuVersion"
         }
