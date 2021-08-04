@@ -33,6 +33,10 @@ import kotlin.reflect.KClass
  *
  */
 
+
+// FIXME
+const val mockingBirdPath = "/Users/marcosignoretto/Documents/careem/mockingbird/"
+
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
@@ -45,7 +49,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
             // TODO this requires project build already executed
             val file =
-                File("/Users/marcosignoretto/Documents/careem/mockingbird/samples/build/classes/kotlin/jvm/main")
+                File("${target.buildDir}/classes/kotlin/jvm/main")
 
             // Convert File to a URL
             val url = file.toURI().toURL()          // file:/c:/myclasses/
@@ -137,7 +141,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     private fun loadMockClass(): Class<*> {
         val mockDir =
-            File("/Users/minaeweida/Documents/careem/workspace/mockingbird/mockingbird/build/classes/kotlin/jvm/main")
+            File("${mockingBirdPath}mockingbird/build/classes/kotlin/jvm/main")
 
         // Convert File to a URL
         val url = mockDir.toURI().toURL()          // file:/c:/myclasses/

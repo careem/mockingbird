@@ -63,10 +63,10 @@ object Deps {
     }
 
     object Square {
+        private const val kotlinPoetVersion = "1.9.0"
         val kotlinPoet = KotlinPoet()
         val kotlinPoetMetadata = KotlinPoetMetadata()
         val kotlinPoetMetadataSpecs = KotlinPoetMetadataSpecs()
-        private val kotlinPoetVersion = "1.7.2"
 
         class KotlinPoet(
             private val name: String = "com.squareup:kotlinpoet:$kotlinPoetVersion"
