@@ -43,11 +43,15 @@ kotlin {
     }
 }
 
-apply plugin: MockingbirdTestPlugin
 
+// Part below this needs to be extracted and made generic
+apply plugin: MockingbirdTestPlugin
 task generateMocks() {
     dependsOn tasks.assemble
     doLast{
         apply plugin: MockingbirdPlugin
     }
 }
+
+allTests.dependsOn generateMocks
+
