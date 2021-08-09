@@ -105,8 +105,7 @@ private void setupJvmTarget(Project project) {
 
             jvmTest {
                 dependencies {
-                    implementation Deps.kotlin.test.junit
-                    implementation kotlin('test-junit')
+                    implementation Deps.junit.junit
                 }
             }
         }
