@@ -22,6 +22,19 @@ repositories {
     mavenCentral()
     google()
     gradlePluginPortal()
+    maven {
+        url = uri(project.properties["careem_artifactory_url"] as String? ?: "")
+        credentials {
+            username = project.properties["careem_artifactory_username"] as String? ?: System.getenv("careem_artifactory_username")
+            password = project.properties["careem_artifactory_api_key"] as String? ?: System.getenv("careem_artifactory_api_key")
+        }
+        content {
+            includeGroup("com.careem.mockingbird")
+        }
+        mavenContent {
+            releasesOnly()
+        }
+    }
 }
 
 
@@ -32,6 +45,7 @@ dependencies {
     implementation(Deps.square.kotlinPoetMetadata)
     implementation(Deps.square.kotlinPoetMetadataSpecs)
     implementation(Deps.kotlinx.metadata)
+    implementation(Deps.careem.mockingbird.common) // FIXME avoid this dep but use project dep instead
 }
 
 kotlin {

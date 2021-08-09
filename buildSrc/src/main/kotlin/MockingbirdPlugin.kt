@@ -33,10 +33,6 @@ import kotlin.reflect.KClass
  *
  */
 
-
-// FIXME
-const val mockingBirdPath = "/Users/marcosignoretto/Documents/careem/mockingbird/"
-
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
@@ -129,16 +125,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun loadMockClass(): Class<*> {
-        val mockDir =
-            File("${mockingBirdPath}mockingbird/build/classes/kotlin/jvm/main")
-
-        // Convert File to a URL
-        val url = mockDir.toURI().toURL()          // file:/c:/myclasses/
-        val urls = arrayOf(url)
-        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
-        val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
-        Thread.currentThread().contextClassLoader = cl
-        return cl.loadClass("com.careem.mockingbird.test.Mock")
+        return Thread.currentThread().contextClassLoader.loadClass("com.careem.mockingbird.test.Mock")
     }
 
     private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
