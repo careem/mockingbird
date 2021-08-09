@@ -43,10 +43,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         try {
-            // TODO delete file before build
-            configureSourceSets(target)
-
-
             // TODO this requires project build already executed
             val file =
                 File("${target.buildDir}/classes/kotlin/jvm/main")
@@ -68,14 +64,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         }
     }
 
-    private fun configureSourceSets(target: Project) {
-        // TODO check if kmpProject before this
-        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
-            sourceSets.getByName("commonTest") {
-                kotlin.srcDir("build/generated/mockingbird")
-            }
-        }
-    }
+
 
     private fun generateClasses(project: Project, classNames: List<ImmutableKmClass>) {
         for (kmClass in classNames) {

@@ -43,8 +43,11 @@ kotlin {
     }
 }
 
-//apply plugin: MockCodeGenPlugin
+apply plugin: MockingbirdTestPlugin
 
 task generateMocks() {
-    apply plugin: MockingbirdPlugin
+    dependsOn tasks.assemble
+    doLast{
+        apply plugin: MockingbirdPlugin
+    }
 }
