@@ -17,10 +17,12 @@
 object Deps {
 
     private const val kotlinVersion = "1.5.21"
+    private const val junitVersion = "4.13.1"
 
     val kotlin = Kotlin
     val kotlinx = Kotlinx
     val touchlab = TouchLab
+    val junit = JUnit
 
     // Jacoco
     private const val jacocoVersion = "0.8.7"
@@ -54,16 +56,17 @@ object Deps {
         val test = Test()
         const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
-        const val reflectJvm = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-
         class Test(private val name: String = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion") :
             CharSequence by name {
             val annotationsCommon =
                 "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlinVersion"
             val js = "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
-            val junit = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 
             override fun toString() = name
         }
+    }
+
+    object JUnit {
+        val junit = "junit:junit:$junitVersion"
     }
 }
