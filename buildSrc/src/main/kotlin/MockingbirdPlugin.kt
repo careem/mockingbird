@@ -29,10 +29,15 @@ import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import kotlinx.metadata.KmClassifier
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.add
+import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 import java.net.URLClassLoader
 import kotlin.reflect.KClass
+
+private const val EXTENSION_NAME = "mockingBird"
+
 
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
@@ -41,6 +46,10 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         try {
             configureSourceSets(target)
+
+            target.extensions.add<MockingbirdPluginExtension>(
+                EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
+            )
 
             target.task("generateMocks") {
                 dependsOn(target.tasks.getByName("assemble"))
@@ -62,6 +71,9 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun generateMocks(target: Project) {
+        val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
+        println("MOCKS: ${pluginExtensions.generateMocksFor}")
+
         val file = File("${target.buildDir}/classes/kotlin/jvm/main")
 
         // Convert File to a URL
@@ -70,10 +82,13 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         // Set kotlin class loader as parent in this way kotlin metadata will be loaded
         val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
         Thread.currentThread().contextClassLoader = cl
-        val externalClass = cl.loadClass("com.careem.mockingbird.samples.PippoSample")
 
-        val kmClasses = listOf(externalClass.toImmutableKmClass())
-        generateClasses(target, kmClasses)
+        for(className in pluginExtensions.generateMocksFor){
+            val externalClass = cl.loadClass(className)
+            val kmClasses = listOf(externalClass.toImmutableKmClass())
+            generateClasses(target, kmClasses)
+        }
+
     }
 
     private fun configureSourceSets(target: Project) {
@@ -116,23 +131,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             .addSuperinterface(classToMock) // TODO check if interface or generic open class
             .addSuperinterface(externalClass) // TODO fix this
 
-//                    .primaryConstructor(
-//                        FunSpec.constructorBuilder()
-//                            .addParameter("name", String::class)
-//                            .build()
-//                    )
-//                    .addProperty(
-//                        PropertySpec.builder("name", String::class)
-//                            .initializer("name")
-//                            .build()
-//                    )
-//            .addFunction(
-//                FunSpec.builder("greet")
-//                    .addStatement("println(%P)", "Hello, \$name")
-//                    .build()
-//            )
-//
-//            .build()
         for (function in kmClass.functions) {
             this.mockFunction(mockClassBuilder, function, isUnitFunction(function))
         }
@@ -140,7 +138,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         kmClass.properties.forEach { property ->
             this.mockProperty(mockClassBuilder, property)
         }
-        // TODO support properties
+
         val file = FileSpec.builder(packageName, "${simpleName}Mock")
             .addType(mockClassBuilder.build())
             .build()
