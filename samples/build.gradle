@@ -17,7 +17,7 @@
 
 setupMultiplatformLibrary(project)
 setupAllTargetsWithDefaultSourceSets(project)
-apply plugin: MockingbirdPlugin
+apply plugin: "com.careem.mockingbird"
 
 kotlin {
     sourceSets {
