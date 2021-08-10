@@ -1,19 +1,25 @@
+/*
+ * Copyright Careem, an Uber Technologies Inc. company
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.careem.mockingbird.samples
 
 import com.careem.mockingbird.PippoSampleMock
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
-/**
- * Till we have proper gradle setup and we are able to run `generateMocks` task after building
- *
- * 1- Comment the usage of [PippoSampleMock] class
- * 2- Comment `generateMocks` tasks in build.gradle
- * 3- ./gradlew build
- * 4- ./gradlew generateMocks
- *
- *
- */
 class TestClass {
 
     @Test

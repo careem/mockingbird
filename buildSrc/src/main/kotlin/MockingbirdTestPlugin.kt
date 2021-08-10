@@ -1,7 +1,3 @@
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-
 /*
  * Copyright Careem, an Uber Technologies Inc. company
  *
@@ -17,6 +13,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 // TODO test to add sourceSET ONLY
 abstract class MockingbirdTestPlugin : Plugin<Project> {
