@@ -36,7 +36,7 @@ internal class MockingbirdPluginExtensionImpl(objects: ObjectFactory) : Mockingb
     internal val _printLogs = objects.property<Boolean>().convention(false)
 
     override var generateMocksFor: List<String> by _generateMocksFor
-    override var printLogs: Boolean by _printLogs
+    override var printLogs: Boolean by _printLogs // TODO implement this
 }
 
 internal inline operator fun <T> ListProperty<T>.setValue(scope: Any, property: KProperty<*>, value: List<T>) =
