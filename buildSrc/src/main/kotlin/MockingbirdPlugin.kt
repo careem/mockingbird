@@ -40,20 +40,20 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         try {
-            // TODO this requires project build already executed
-            val file =
-                File("${target.buildDir}/classes/kotlin/jvm/main")
+            configureSourceSets(target)
 
-            // Convert File to a URL
-            val url = file.toURI().toURL()          // file:/c:/myclasses/
-            val urls = arrayOf(url)
-            // Set kotlin class loader as parent in this way kotlin metadata will be loaded
-            val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
-            Thread.currentThread().contextClassLoader = cl
-            val externalClass = cl.loadClass("com.careem.mockingbird.samples.PippoSample")
+            target.task("generateMocks") {
+                dependsOn(target.tasks.getByName("assemble"))
+                doLast {
+                    generateMocks(target)
+                }
+            }
 
-            val kmClasses = listOf(externalClass.toImmutableKmClass())
-            generateClasses(target, kmClasses)
+            target.tasks.getByName("allTests") {
+                dependsOn(target.tasks.getByName("generateMocks"))
+            }
+
+
         } catch (e: Exception) {
             // Useful to debug
             e.printStackTrace()
@@ -61,6 +61,29 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         }
     }
 
+    private fun generateMocks(target: Project) {
+        val file = File("${target.buildDir}/classes/kotlin/jvm/main")
+
+        // Convert File to a URL
+        val url = file.toURI().toURL()
+        val urls = arrayOf(url)
+        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
+        val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
+        Thread.currentThread().contextClassLoader = cl
+        val externalClass = cl.loadClass("com.careem.mockingbird.samples.PippoSample")
+
+        val kmClasses = listOf(externalClass.toImmutableKmClass())
+        generateClasses(target, kmClasses)
+    }
+
+    private fun configureSourceSets(target: Project) {
+        // TODO check if kmpProject before this
+        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
+            sourceSets.getByName("commonTest") {
+                kotlin.srcDir("build/generated/mockingbird")
+            }
+        }
+    }
 
 
     private fun generateClasses(project: Project, classNames: List<ImmutableKmClass>) {
