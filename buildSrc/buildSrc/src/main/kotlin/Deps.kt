@@ -24,6 +24,7 @@ object Deps {
     val touchlab = TouchLab
     val junit = JUnit
     val square = Square
+    val careem = Careem
 
     // Jacoco
     private const val jacocoVersion = "0.8.7"
@@ -63,10 +64,10 @@ object Deps {
     }
 
     object Square {
+        private const val kotlinPoetVersion = "1.9.0"
         val kotlinPoet = KotlinPoet()
         val kotlinPoetMetadata = KotlinPoetMetadata()
         val kotlinPoetMetadataSpecs = KotlinPoetMetadataSpecs()
-        private val kotlinPoetVersion = "1.7.2"
 
         class KotlinPoet(
             private val name: String = "com.squareup:kotlinpoet:$kotlinPoetVersion"
@@ -106,5 +107,14 @@ object Deps {
 
     object JUnit {
         val junit = "junit:junit:$junitVersion"
+    }
+
+    object Careem{
+        val mockingbird = MockingBird
+
+        object MockingBird {
+            private const val mockingBirdVersion = "1.10.0"
+            const val common = "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
+        }
     }
 }

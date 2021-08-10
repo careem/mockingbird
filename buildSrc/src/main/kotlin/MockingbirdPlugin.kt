@@ -39,13 +39,9 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         try {
-            // TODO delete file before build
-            configureSourceSets(target)
-
-
             // TODO this requires project build already executed
             val file =
-                File("/Users/marcosignoretto/Documents/careem/mockingbird/samples/build/classes/kotlin/jvm/main")
+                File("${target.buildDir}/classes/kotlin/jvm/main")
 
             // Convert File to a URL
             val url = file.toURI().toURL()          // file:/c:/myclasses/
@@ -64,14 +60,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         }
     }
 
-    private fun configureSourceSets(target: Project) {
-        // TODO check if kmpProject before this
-        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
-            sourceSets.getByName("commonTest") {
-                kotlin.srcDir("build/generated/mockingbird")
-            }
-        }
-    }
+
 
     private fun generateClasses(project: Project, classNames: List<ImmutableKmClass>) {
         for (kmClass in classNames) {
@@ -136,16 +125,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun loadMockClass(): Class<*> {
-        val mockDir =
-            File("/Users/minaeweida/Documents/careem/workspace/mockingbird/mockingbird/build/classes/kotlin/jvm/main")
-
-        // Convert File to a URL
-        val url = mockDir.toURI().toURL()          // file:/c:/myclasses/
-        val urls = arrayOf(url)
-        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
-        val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
-        Thread.currentThread().contextClassLoader = cl
-        return cl.loadClass("com.careem.mockingbird.test.Mock")
+        return Thread.currentThread().contextClassLoader.loadClass("com.careem.mockingbird.test.Mock")
     }
 
     private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
