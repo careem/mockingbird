@@ -23,7 +23,7 @@ repositories {
     google()
     gradlePluginPortal()
     maven {
-        url = uri(project.properties["careem_artifactory_url"] as String? ?: "")
+        url = uri(project.properties["careem_artifactory_url"] as String? ?: System.getenv("careem_artifactory_url"))
         credentials {
             username = project.properties["careem_artifactory_username"] as String? ?: System.getenv("careem_artifactory_username")
             password = project.properties["careem_artifactory_api_key"] as String? ?: System.getenv("careem_artifactory_api_key")
