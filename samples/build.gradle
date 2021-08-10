@@ -17,6 +17,7 @@
 
 setupMultiplatformLibrary(project)
 setupAllTargetsWithDefaultSourceSets(project)
+apply plugin: MockingbirdPlugin
 
 kotlin {
     sourceSets {
@@ -60,5 +61,12 @@ kotlin {
     }
 }
 
-apply plugin: MockingbirdPlugin
+mockingBird{
+    generateMocksFor = [
+            'com.careem.mockingbird.samples.PippoSample',
+            'com.careem.mockingbird.samples.Mock1'
+    ]
+}
+
+
 
