@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.11.0
 * Enabled warnings as errors
 * Enabled `explictApi()` mode
 * Upgrade kotlin to 1.5.21
