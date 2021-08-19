@@ -40,7 +40,7 @@ internal class MockingbirdPluginExtensionImpl(objects: ObjectFactory) : Mockingb
     override var printLogs: Boolean by _printLogs // TODO implement this
 }
 
-internal inline operator fun <T> ListProperty<T>.setValue(scope: Any, property: KProperty<*>, value: List<T>) =
+internal operator fun <T> ListProperty<T>.setValue(scope: Any, property: KProperty<*>, value: List<T>) =
     set(value)
 
-internal inline operator fun <T> ListProperty<T>.getValue(scope: Any, property: KProperty<*>): List<T> = get()
+internal operator fun <T> ListProperty<T>.getValue(scope: Any, property: KProperty<*>): List<T> = get()

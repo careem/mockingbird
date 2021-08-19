@@ -19,6 +19,7 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     google()
     gradlePluginPortal()
@@ -26,12 +27,5 @@ repositories {
 
 dependencies {
     implementation(libs.kotlin.gradle)
-}
-
-kotlin {
-    // Add Deps to compilation, so it will become available in main project
-    sourceSets.getByName("main").kotlin.srcDirs(
-        "buildSrc/src/main/kotlin"
-    )
-    println("ROOT:${rootProject.allprojects}")
+    implementation("com.careem.mockingbird:mockingbird-compiler:1.12.0-SNAPSHOT")
 }

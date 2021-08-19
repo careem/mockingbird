@@ -32,11 +32,15 @@ gradlePlugin {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     google()
     gradlePluginPortal()
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+}
 
 dependencies {
     implementation(libs.kotlin.gradle)
