@@ -16,6 +16,3 @@ junit-junit = { module = "junit:junit", version.ref = "junit" }
 
 kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicFu" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-
-[plugins]
-jmh = { id = "me.champeau.jmh", version = "0.6.5" }
