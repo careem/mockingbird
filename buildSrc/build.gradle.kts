@@ -37,8 +37,8 @@ repositories {
     }
 }
 
-
 dependencies {
+    implementation(libs.kotlin.gradle)
     implementation(Deps.kotlin.plugin)
     implementation(Deps.kotlin.reflectJvm)
     implementation(Deps.square.kotlinPoet)
