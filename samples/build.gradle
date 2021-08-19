@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
+apply from: '../utils.gradle'
+
 setupMultiplatformLibrary(project)
 setupAllTargetsWithDefaultSourceSets(project)
-apply plugin: "com.careem.mockingbird"
+//apply plugin: "com.careem.mockingbird"
 
 kotlin {
     sourceSets {
@@ -61,12 +63,12 @@ kotlin {
     }
 }
 
-mockingBird{
-    generateMocksFor = [
-            'com.careem.mockingbird.samples.PippoSample',
-            'com.careem.mockingbird.samples.Mock1'
-    ]
-}
+//mockingBird{
+//    generateMocksFor = [
+//            'com.careem.mockingbird.samples.PippoSample',
+//            'com.careem.mockingbird.samples.Mock1'
+//    ]
+//}
 
 
 

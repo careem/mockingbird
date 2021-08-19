@@ -14,34 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-enableFeaturePreview("VERSION_CATALOGS")
-
-include(":mockingbird")
-include(":samples")
-include(":mockingbird-compiler")
-
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("versions.toml"))
-        }
-    }
+plugins {
+    `kotlin-dsl`
 }
 
-//pluginManagement {
-//
-//    includeBuild("library")
-//
-//    repositories {
-//        google()
-//        mavenCentral()
-//        gradlePluginPortal()
-//    }
-//}
-//
-//includeBuild("library") {
-//
-//}
-//
-//include ':samples'
+repositories {
+    mavenCentral()
+}

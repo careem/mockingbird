@@ -21,7 +21,6 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
 
 @Suppress("UnstableApiUsage")
 abstract class JsPlugin : Plugin<Project> {
