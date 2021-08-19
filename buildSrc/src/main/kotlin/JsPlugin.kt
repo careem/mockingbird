@@ -17,6 +17,8 @@
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
@@ -40,7 +42,7 @@ abstract class JsPlugin : Plugin<Project> {
 
             sourceSets.getByName("jsTest") {
                 dependencies {
-                    implementation(Deps.kotlin.test.js)
+                    implementation("org.jetbrains.kotlin:kotlin-test-js:1.5.21") // FIXME to investigate how to use version catalog here as well
                 }
             }
         }

@@ -24,8 +24,8 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath Deps.kotlin.plugin
-        classpath Deps.jacoco
+        classpath libs.kotlinx.atomicfu.gradle
+        classpath libs.jacoco.jacoco
     }
 }
 
@@ -58,8 +58,8 @@ void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
         sourceSets {
             commonTest {
                 dependencies {
-                    implementation Deps.kotlin.test
-                    implementation Deps.kotlin.test.annotationsCommon
+                    implementation libs.kotlin.test
+                    implementation libs.kotlin.test.annotations
                 }
             }
         }
@@ -105,7 +105,7 @@ private void setupJvmTarget(Project project) {
 
             jvmTest {
                 dependencies {
-                    implementation Deps.junit.junit
+                    implementation libs.junit.junit
                 }
             }
         }
