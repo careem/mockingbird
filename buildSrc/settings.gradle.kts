@@ -14,15 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    `kotlin-dsl`
+
+enableFeaturePreview("VERSION_CATALOGS")
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("../versions.toml"))
+        }
+    }
 }
 
-repositories {
-    google()
-    gradlePluginPortal()
-}
 
-dependencies {
-    implementation(libs.kotlin.gradle)
+gradle.rootProject {
+    val accessors = files(serviceOf<DependenciesAccessors>().classes.asFiles)
+
+    // To silent the IDE missing import
+    buildscript { dependencies.classpath(accessors) }
+
+    // To add version catalog as plugin dependency
+    configurations
+        .matching { it.name == "implementation" }
+        .configureEach {
+            val implementation = this
+            dependencies { implementation(accessors) }
+        }
 }

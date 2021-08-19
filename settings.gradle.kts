@@ -14,4 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include ':mockingbird'
+
+enableFeaturePreview("VERSION_CATALOGS")
+
+include(":mockingbird")
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("versions.toml"))
+        }
+    }
+}
