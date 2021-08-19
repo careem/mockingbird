@@ -1,3 +1,6 @@
+import org.gradle.initialization.DependenciesAccessors
+import org.gradle.kotlin.dsl.support.serviceOf
+
 /**
  *
  * Copyright Careem, an Uber Technologies Inc. company
