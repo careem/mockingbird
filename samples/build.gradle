@@ -24,7 +24,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation project(":mockingbird")
-                implementation Deps.touchlab.stately.isolate.common
+                implementation libs.touchlab.stately.isolate
                 implementation kotlin('test')
                 implementation kotlin('test-common')
                 implementation kotlin('test-annotations-common')

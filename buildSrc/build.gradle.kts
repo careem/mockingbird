@@ -37,15 +37,14 @@ repositories {
     }
 }
 
-
 dependencies {
-    implementation(Deps.kotlin.plugin)
-    implementation(Deps.kotlin.reflectJvm)
-    implementation(Deps.square.kotlinPoet)
-    implementation(Deps.square.kotlinPoetMetadata)
-    implementation(Deps.square.kotlinPoetMetadataSpecs)
-    implementation(Deps.kotlinx.metadata)
-    implementation(Deps.careem.mockingbird.common) // FIXME avoid this dep but use project dep instead
+    implementation(libs.kotlin.gradle)
+    implementation(libs.kotlin.reflectjvm)
+    implementation(libs.square.kotlinpoet)
+    implementation(libs.square.kotlinpoet.metadata)
+    implementation(libs.square.kotlinpoet.metadata.specs)
+    implementation(libs.kotlinx.metadatajvm)
+    implementation(libs.careem.mockingbird) // FIXME avoid this dep but use project dep instead
 }
 
 kotlin {

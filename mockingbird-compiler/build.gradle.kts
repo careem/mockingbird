@@ -42,11 +42,11 @@ kotlin {
 }
 
 dependencies {
-    implementation(Deps.kotlin.plugin)
-    implementation(Deps.square.kotlinPoet)
-    implementation(Deps.square.kotlinPoetMetadata)
-    implementation(Deps.square.kotlinPoetMetadataSpecs)
-    implementation(Deps.kotlinx.metadata)
+    implementation(libs.kotlin.gradle)
+    implementation(libs.square.kotlinpoet)
+    implementation(libs.square.kotlinpoet.metadata)
+    implementation(libs.square.kotlinpoet.metadata.specs)
+    implementation(libs.kotlinx.metadatajvm)
 }
 
 //task pluginVersion {
