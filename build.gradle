@@ -21,27 +21,8 @@ buildscript {
         mavenLocal()
         google()
         mavenCentral()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
-        maven { url "https://plugins.gradle.org/m2/" }
-
-        maven {
-            url 'https://artifactory-pro.careem-internal.com/artifactory/mobile-libs-release'
-            credentials {
-                username project.hasProperty('careem_artifactory_username') ?
-                        careem_artifactory_username : System.env.careem_artifactory_username
-                password project.hasProperty('careem_artifactory_api_key') ?
-                        careem_artifactory_api_key : System.env.careem_artifactory_api_key
-            }
-            content {
-                includeGroup "com.careem.mockingbird"
-            }
-            mavenContent {
-                releasesOnly()
-            }
-        }
     }
     dependencies {
-//        classpath "com.careem.mockingbird:mockingbird-compiler:1.12.0-SNAPSHOT"  // FIXME I want to depend on the module directly not on published version
         classpath libs.kotlinx.atomicfu.gradle
         classpath libs.jacoco.jacoco
     }
@@ -54,8 +35,6 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
-        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
