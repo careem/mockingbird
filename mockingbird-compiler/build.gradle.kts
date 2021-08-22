@@ -32,7 +32,6 @@ gradlePlugin {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     google()
     gradlePluginPortal()
