@@ -52,30 +52,6 @@ kotlin {
             }
         }
 
-        commonTest {
-            dependencies {
-                implementation "com.careem.mockingbird:mockingbird"
-                implementation kotlin('test')
-                implementation kotlin('test-common')
-                implementation kotlin('test-annotations-common')
-            }
-        }
-
-        jvmMain {
-            dependencies {
-            }
-        }
-
-        jsMain {
-            dependencies {
-            }
-        }
-
-        iosX64Main {
-            dependencies {
-            }
-        }
-
         iosArm64Main {
             dependsOn iosX64Main
         }
