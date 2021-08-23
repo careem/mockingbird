@@ -34,8 +34,10 @@ allprojects {
     }
 }
 
+apply from: '../utils.gradle'
+
 setupMultiplatformLibrary(project, false)
-setupAllTargetsWithDefaultSourceSets(project)
+setupAllTargetsWithDefaultSourceSets(project, false) // FIXME Js excluded here
 
 apply plugin: "com.careem.mockingbird"
 
@@ -64,72 +66,4 @@ mockingBird {
             'com.careem.mockingbird.samples.Mock1'
     ]
 }
-
-
-void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
-    project.apply plugin: 'org.jetbrains.kotlin.multiplatform'
-    if (shouldPublish) {
-        project.apply from: '../publishing.gradle'
-
-        project.group = GROUP
-        project.version = VERSION
-    }
-    project.kotlin {
-        sourceSets {
-            commonTest {
-                dependencies {
-                    implementation libs.kotlin.test
-                    implementation libs.kotlin.test.annotations
-                }
-            }
-        }
-    }
-}
-
-void setupAllTargetsWithDefaultSourceSets(Project project) {
-    setupIosTargets(project)
-    setupJvmTarget(project)
-//    setupJsTarget(project)
-
-    project.kotlin {
-        sourceSets {
-            jvmJsCommonMain.dependsOn commonMain
-            jvmJsCommonTest.dependsOn commonTest
-
-            jvmMain.dependsOn jvmJsCommonMain
-            jvmTest.dependsOn jvmJsCommonTest
-
-//            jsMain.dependsOn jvmJsCommonMain
-//            jsTest.dependsOn jvmJsCommonTest
-        }
-    }
-}
-
-private void setupIosTargets(Project project) {
-    project.kotlin {
-        targets.fromPreset(presets.iosX64, 'iosX64')
-        targets.fromPreset(presets.iosArm64, 'iosArm64')
-    }
-}
-
-private void setupJvmTarget(Project project) {
-    project.kotlin {
-        targets.fromPreset(presets.jvm, 'jvm')
-
-        sourceSets {
-            jvmMain {
-                dependencies {
-
-                }
-            }
-
-            jvmTest {
-                dependencies {
-                    implementation libs.junit.junit
-                }
-            }
-        }
-    }
-}
-
 

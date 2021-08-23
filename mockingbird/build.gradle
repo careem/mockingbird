@@ -14,8 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-setupMultiplatformLibrary(project)
-setupAllTargetsWithDefaultSourceSets(project)
+
+apply from: '../utils.gradle'
+
+setupMultiplatformLibrary(project, true)
+setupAllTargetsWithDefaultSourceSets(project, true)
 
 kotlin {
     explicitApi()
