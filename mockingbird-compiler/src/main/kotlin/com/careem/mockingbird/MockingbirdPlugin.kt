@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.careem.mockingbird
 
+import com.squareup.kotlinpoet.DelicateKotlinPoetApi
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -107,6 +109,8 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         }
     }
 
+
+    @OptIn(DelicateKotlinPoetApi::class)
     private fun generateMockClassFor(project: Project, kmClass: ImmutableKmClass) {
         val classToMock = Thread.currentThread().contextClassLoader.loadClass(
             kmClass.name.replace(
@@ -124,6 +128,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
         // TODO fix package name
         println("Generating mocks for $simpleName")
+
         val mockClassBuilder = TypeSpec.classBuilder("${simpleName}Mock")
             .addType(kmClass.buildMethodObject())
             .addType(kmClass.buildArgObject())

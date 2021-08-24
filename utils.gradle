@@ -1,0 +1,79 @@
+
+
+void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
+    project.apply plugin: 'org.jetbrains.kotlin.multiplatform'
+    if (shouldPublish) {
+        project.apply from: '../publishing.gradle'
+        project.group = GROUP
+        project.version = VERSION
+    }
+
+    project.kotlin {
+        sourceSets {
+            commonTest {
+                dependencies {
+                    implementation libs.kotlin.test
+                    implementation libs.kotlin.test.annotations
+                }
+            }
+        }
+    }
+}
+
+void setupAllTargetsWithDefaultSourceSets(Project project, Boolean includeJs = true) {
+    setupIosTargets(project)
+    setupJvmTarget(project)
+    if(includeJs){
+        setupJsTarget(project)
+    }
+
+    project.kotlin {
+        sourceSets {
+            jvmJsCommonMain.dependsOn commonMain
+            jvmJsCommonTest.dependsOn commonTest
+
+            jvmMain.dependsOn jvmJsCommonMain
+            jvmTest.dependsOn jvmJsCommonTest
+
+            if(includeJs){
+                jsMain.dependsOn jvmJsCommonMain
+                jsTest.dependsOn jvmJsCommonTest
+            }
+        }
+    }
+}
+
+private void setupIosTargets(Project project) {
+    project.kotlin {
+        targets.fromPreset(presets.iosX64, 'iosX64')
+        targets.fromPreset(presets.iosArm64, 'iosArm64')
+    }
+}
+
+private void setupJvmTarget(Project project) {
+    project.kotlin {
+        targets.fromPreset(presets.jvm, 'jvm')
+
+        sourceSets {
+            jvmMain {
+                dependencies {
+
+                }
+            }
+
+            jvmTest {
+                dependencies {
+                    implementation libs.junit.junit
+                }
+            }
+        }
+    }
+}
+
+private void setupJsTarget(Project project) {
+    project.apply plugin: JsPlugin
+}
+
+ext.setupMultiplatformLibrary = { Project project, Boolean shouldPublish -> setupMultiplatformLibrary(project, shouldPublish) }
+ext.setupAllTargetsWithDefaultSourceSets = { Project project, Boolean includeJs -> setupAllTargetsWithDefaultSourceSets(project, includeJs) }
+

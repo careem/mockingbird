@@ -1,12 +1,3 @@
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.listProperty
-import org.gradle.kotlin.dsl.property
-import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.setValue
-import kotlin.reflect.KProperty
-
 /*
  * Copyright Careem, an Uber Technologies Inc. company
  *
@@ -22,6 +13,16 @@ import kotlin.reflect.KProperty
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.careem.mockingbird
+
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.listProperty
+import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.setValue
+import kotlin.reflect.KProperty
 
 interface MockingbirdPluginExtension {
     var generateMocksFor: List<String>
@@ -39,7 +40,7 @@ internal class MockingbirdPluginExtensionImpl(objects: ObjectFactory) : Mockingb
     override var printLogs: Boolean by _printLogs // TODO implement this
 }
 
-internal inline operator fun <T> ListProperty<T>.setValue(scope: Any, property: KProperty<*>, value: List<T>) =
+internal operator fun <T> ListProperty<T>.setValue(scope: Any, property: KProperty<*>, value: List<T>) =
     set(value)
 
-internal inline operator fun <T> ListProperty<T>.getValue(scope: Any, property: KProperty<*>): List<T> = get()
+internal operator fun <T> ListProperty<T>.getValue(scope: Any, property: KProperty<*>): List<T> = get()

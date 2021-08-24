@@ -1,3 +1,6 @@
+import org.gradle.initialization.DependenciesAccessors
+import org.gradle.kotlin.dsl.support.serviceOf
+
 /**
  *
  * Copyright Careem, an Uber Technologies Inc. company
@@ -17,13 +20,17 @@
 
 enableFeaturePreview("VERSION_CATALOGS")
 
-include(":mockingbird")
-include(":mockingbird-compiler")
-
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            from(files("versions.toml"))
+            from(files("../versions.toml"))
         }
+    }
+}
+
+includeBuild("..") {
+    dependencySubstitution {
+        substitute(module("com.careem.mockingbird:mockingbird")).using(project(":mockingbird"))
+        substitute(module("com.careem.mockingbird:mockingbird-compiler")).using(project(":mockingbird-compiler"))
     }
 }

@@ -22,35 +22,8 @@ repositories {
     mavenCentral()
     google()
     gradlePluginPortal()
-    maven {
-        url = uri(project.properties["careem_artifactory_url"] as String? ?: System.getenv("careem_artifactory_url"))
-        credentials {
-            username = project.properties["careem_artifactory_username"] as String? ?: System.getenv("careem_artifactory_username")
-            password = project.properties["careem_artifactory_api_key"] as String? ?: System.getenv("careem_artifactory_api_key")
-        }
-        content {
-            includeGroup("com.careem.mockingbird")
-        }
-        mavenContent {
-            releasesOnly()
-        }
-    }
 }
 
 dependencies {
     implementation(libs.kotlin.gradle)
-    implementation(libs.kotlin.reflectjvm)
-    implementation(libs.square.kotlinpoet)
-    implementation(libs.square.kotlinpoet.metadata)
-    implementation(libs.square.kotlinpoet.metadata.specs)
-    implementation(libs.kotlinx.metadatajvm)
-    implementation(libs.careem.mockingbird) // FIXME avoid this dep but use project dep instead
-}
-
-kotlin {
-    // Add Deps to compilation, so it will become available in main project
-    sourceSets.getByName("main").kotlin.srcDirs(
-        "buildSrc/src/main/kotlin"
-    )
-    println("ROOT:${rootProject.allprojects}")
 }

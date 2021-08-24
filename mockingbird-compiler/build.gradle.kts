@@ -20,6 +20,8 @@ plugins {
     `kotlin-dsl`
 }
 
+apply(from = "../publishing.gradle")
+
 gradlePlugin {
     plugins {
         register("mockingbird") {
@@ -35,38 +37,17 @@ repositories {
     gradlePluginPortal()
 }
 
-kotlin {
-    // Add Deps to compilation, so it will become available in main project
-    sourceSets.getByName("main").kotlin.srcDirs("buildSrc/src/main/kotlin")
-    println("ROOT:${rootProject.allprojects}")
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
 
 dependencies {
     implementation(libs.kotlin.gradle)
+    implementation(libs.kotlin.reflectjvm)
     implementation(libs.square.kotlinpoet)
     implementation(libs.square.kotlinpoet.metadata)
     implementation(libs.square.kotlinpoet.metadata.specs)
     implementation(libs.kotlinx.metadatajvm)
+    implementation(project(":mockingbird"))
 }
-
-//task pluginVersion {
-//    def outputDir = file("gen")
-//
-//    inputs.property 'version', version
-//    outputs.dir outputDir
-//
-//    doLast {
-//        def versionFile = file("$outputDir/com/squareup/sqldelight/Version.kt")
-//        versionFile.parentFile.mkdirs()
-//        versionFile.text = """// Generated file. Do not edit!
-//package com.squareup.sqldelight
-//
-//val VERSION = "${project.version}"
-//"""
-//    }
-//}
-//
-//tasks.getByName('compileKotlin').dependsOn('pluginVersion')
-//
-//apply from: "$rootDir/gradle/gradle-mvn-push.gradle"
 
