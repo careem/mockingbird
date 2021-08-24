@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.careem.mockingbird.samples
+package com.careem.mockingbird.sample
 
 interface PippoSample {
     val currentSession: Int
