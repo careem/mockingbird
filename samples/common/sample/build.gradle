@@ -15,33 +15,8 @@
  * limitations under the License.
  */
 
-apply from: '../../utils.gradle'
+apply from: '../../../utils.gradle'
 
 setupMultiplatformLibrary(project, false)
 setupAllTargetsWithDefaultSourceSets(project, false) // FIXME Js excluded here
-
-apply plugin: "com.careem.mockingbird"
-
-kotlin {
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation project(":common-sample")
-                implementation project(":common:sample")
-                implementation "com.careem.mockingbird:mockingbird"
-                implementation libs.touchlab.stately.isolate
-
-            }
-        }
-    }
-}
-
-mockingBird {
-    generateMocksFor = [
-            'com.careem.mockingbird.sample.PippoSample',
-            'com.careem.mockingbird.sample.Mock1',
-            'com.careem.mockingbird.sample.MockWithExternalDependencies',
-            'com.careem.mockingbird.common.sample.ExternalContract'
-    ]
-}
 

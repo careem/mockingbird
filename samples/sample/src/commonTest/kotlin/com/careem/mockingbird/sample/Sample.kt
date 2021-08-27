@@ -16,6 +16,8 @@
 
 package com.careem.mockingbird.sample
 
+import com.careem.mockingbird.ExternalContractMock
+import com.careem.mockingbird.MockWithExternalDependenciesMock
 import com.careem.mockingbird.PippoSampleMock
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -23,9 +25,22 @@ import kotlin.test.assertNotNull
 class TestClass {
 
     @Test
-    fun main() {
+    fun testGeneratedTargetProjectMock() {
         val pippoMock: PippoSample = PippoSampleMock()
         assertNotNull(pippoMock)
+    }
+
+
+    @Test
+    fun testGeneratedTargetProjectDependentMock() {
+        val externalMock = MockWithExternalDependenciesMock()
+        assertNotNull(externalMock)
+    }
+
+    @Test
+    fun testGeneratedTargetProjectExternalMock() {
+        val externalContractMock = ExternalContractMock()
+        assertNotNull(externalContractMock)
     }
 
 }

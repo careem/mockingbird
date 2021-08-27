@@ -35,6 +35,7 @@ import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
+import java.net.URL
 import java.net.URLClassLoader
 import kotlin.reflect.KClass
 
@@ -47,6 +48,21 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         try {
+//             Add the runtime dependency.
+//            if (isMultiplatform) {
+//            val sourceSets =
+//                target.extensions.getByType(KotlinMultiplatformExtension::class.java).sourceSets
+//            val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
+//            println(sourceSet)
+//            target.configurations.getByName(sourceSet.apiConfigurationName).dependencies.add(
+//                target.dependencies.create("com.squareup.sqldelight:runtime:$VERSION")
+//            )
+//            } else {
+//                project.configurations.getByName("api").dependencies.add(
+//                    project.dependencies.create("com.squareup.sqldelight:runtime-jvm:$VERSION")
+//                )
+//            }
+
             configureSourceSets(target)
 
             target.extensions.add<MockingbirdPluginExtension>(
@@ -56,6 +72,23 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             target.task("generateMocks") {
                 dependsOn(target.tasks.getByName("assemble"))
                 doLast {
+//                    val sourceSets =
+//                        target.extensions.getByType(KotlinMultiplatformExtension::class.java).sourceSets
+//
+//                    val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
+//                    println(sourceSet)
+//                    // TODO here I got 3 deps
+//                    target.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies.forEach {
+//                        println(it.name)
+//                    }
+//
+//                    val internalDeps =
+//                        target.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies.filter { it is DefaultProjectDependency }
+//                    println(internalDeps)
+//
+//                    // TODO complete external deps
+//                    target.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies.map { it.group to it.name }
+//
                     generateMocks(target)
                 }
             }
@@ -76,21 +109,34 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
         println("MOCKS: ${pluginExtensions.generateMocksFor}")
 
-        val file = File("${target.buildDir}/classes/kotlin/jvm/main")
+        setupClassLoader(target)
 
-        // Convert File to a URL
-        val url = file.toURI().toURL()
-        val urls = arrayOf(url)
-        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
-        val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
-        Thread.currentThread().contextClassLoader = cl
-
-        for(className in pluginExtensions.generateMocksFor){
-            val externalClass = cl.loadClass(className)
+        for (className in pluginExtensions.generateMocksFor) {
+            val externalClass = Thread.currentThread().contextClassLoader.loadClass(className)
             val kmClasses = listOf(externalClass.toImmutableKmClass())
             generateClasses(target, kmClasses)
         }
 
+    }
+
+    private fun setupClassLoader(target: Project){
+        // Add all subproject to classpath TODO this can be optimized, no need to add all of them
+        val urlList = mutableListOf<URL>()
+        traverseDependencyTree(target.rootProject, urlList)
+
+        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
+        val cl = URLClassLoader(urlList.toTypedArray(), Thread.currentThread().contextClassLoader)
+        Thread.currentThread().contextClassLoader = cl
+    }
+
+    private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>){
+        target.subprojects.forEach {
+            val file = File("${it.buildDir}/classes/kotlin/jvm/main")
+            // Convert File to a URL
+            val url = file.toURI().toURL()
+            mutableList.add(url)
+            traverseDependencyTree(it, mutableList)
+        }
     }
 
     private fun configureSourceSets(target: Project) {
@@ -263,9 +309,12 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             "kotlin/Short" -> "java.lang.Short"
             "kotlin/Char" -> "java.lang.Char"
             //TODo complete/ revise
-            else -> rawType.replace("/", ".")
+            else -> {
+                rawType.replace("/", ".")
+            }
         }
-        return Class.forName(javaClass).kotlin
+
+        return Thread.currentThread().contextClassLoader.loadClass(javaClass).kotlin
     }
 
     private fun mockProperty(
