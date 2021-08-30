@@ -46,23 +46,10 @@ private const val EXTENSION_NAME = "mockingBird"
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
 
+    private lateinit var classLoader : ClassLoader
+
     override fun apply(target: Project) {
         try {
-//             Add the runtime dependency.
-//            if (isMultiplatform) {
-//            val sourceSets =
-//                target.extensions.getByType(KotlinMultiplatformExtension::class.java).sourceSets
-//            val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
-//            println(sourceSet)
-//            target.configurations.getByName(sourceSet.apiConfigurationName).dependencies.add(
-//                target.dependencies.create("com.squareup.sqldelight:runtime:$VERSION")
-//            )
-//            } else {
-//                project.configurations.getByName("api").dependencies.add(
-//                    project.dependencies.create("com.squareup.sqldelight:runtime-jvm:$VERSION")
-//                )
-//            }
-
             configureSourceSets(target)
 
             target.extensions.add<MockingbirdPluginExtension>(
@@ -72,23 +59,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             target.task("generateMocks") {
                 dependsOn(target.tasks.getByName("assemble"))
                 doLast {
-//                    val sourceSets =
-//                        target.extensions.getByType(KotlinMultiplatformExtension::class.java).sourceSets
-//
-//                    val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
-//                    println(sourceSet)
-//                    // TODO here I got 3 deps
-//                    target.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies.forEach {
-//                        println(it.name)
-//                    }
-//
-//                    val internalDeps =
-//                        target.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies.filter { it is DefaultProjectDependency }
-//                    println(internalDeps)
-//
-//                    // TODO complete external deps
-//                    target.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies.map { it.group to it.name }
-//
                     generateMocks(target)
                 }
             }
@@ -96,8 +66,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             target.tasks.getByName("allTests") {
                 dependsOn(target.tasks.getByName("generateMocks"))
             }
-
-
         } catch (e: Exception) {
             // Useful to debug
             e.printStackTrace()
@@ -112,7 +80,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         setupClassLoader(target)
 
         for (className in pluginExtensions.generateMocksFor) {
-            val externalClass = Thread.currentThread().contextClassLoader.loadClass(className)
+            val externalClass = classLoader.loadClass(className)
             val kmClasses = listOf(externalClass.toImmutableKmClass())
             generateClasses(target, kmClasses)
         }
@@ -127,10 +95,11 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         // Set kotlin class loader as parent in this way kotlin metadata will be loaded
         val cl = URLClassLoader(urlList.toTypedArray(), Thread.currentThread().contextClassLoader)
         Thread.currentThread().contextClassLoader = cl
+        classLoader = cl
     }
 
     private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>){
-        target.subprojects.forEach {
+        target.subprojects.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
             val file = File("${it.buildDir}/classes/kotlin/jvm/main")
             // Convert File to a URL
             val url = file.toURI().toURL()
@@ -158,7 +127,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     @OptIn(DelicateKotlinPoetApi::class)
     private fun generateMockClassFor(project: Project, kmClass: ImmutableKmClass) {
-        val classToMock = Thread.currentThread().contextClassLoader.loadClass(
+        val classToMock = classLoader.loadClass(
             kmClass.name.replace(
                 "/",
                 "."
@@ -198,7 +167,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun loadMockClass(): Class<*> {
-        return Thread.currentThread().contextClassLoader.loadClass("com.careem.mockingbird.test.Mock")
+        return classLoader.loadClass("com.careem.mockingbird.test.Mock")
     }
 
     private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
@@ -314,7 +283,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             }
         }
 
-        return Thread.currentThread().contextClassLoader.loadClass(javaClass).kotlin
+        return classLoader.loadClass(javaClass).kotlin
     }
 
     private fun mockProperty(
