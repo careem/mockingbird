@@ -93,9 +93,9 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         traverseDependencyTree(target.rootProject, urlList)
 
         // Set kotlin class loader as parent in this way kotlin metadata will be loaded
-        val cl = URLClassLoader(urlList.toTypedArray(), Thread.currentThread().contextClassLoader)
-        Thread.currentThread().contextClassLoader = cl
-        classLoader = cl
+        val extendedClassLoader = URLClassLoader(urlList.toTypedArray(), Thread.currentThread().contextClassLoader)
+        Thread.currentThread().contextClassLoader = extendedClassLoader
+        classLoader = extendedClassLoader
     }
 
     private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>){
