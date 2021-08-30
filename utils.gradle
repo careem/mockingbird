@@ -13,6 +13,7 @@ void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
             commonTest {
                 dependencies {
                     implementation libs.kotlin.test
+                    implementation libs.kotlin.test.common
                     implementation libs.kotlin.test.annotations
                 }
             }
@@ -47,6 +48,12 @@ private void setupIosTargets(Project project) {
     project.kotlin {
         targets.fromPreset(presets.iosX64, 'iosX64')
         targets.fromPreset(presets.iosArm64, 'iosArm64')
+
+        sourceSets {
+            iosArm64Main {
+                dependsOn iosX64Main
+            }
+        }
     }
 }
 

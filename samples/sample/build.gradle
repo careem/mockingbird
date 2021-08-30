@@ -15,55 +15,31 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath libs.kotlin.gradle
-        classpath "com.careem.mockingbird:mockingbird-compiler"
-    }
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-        google()
-    }
-}
-
-apply from: '../utils.gradle'
+apply from: '../../utils.gradle'
 
 setupMultiplatformLibrary(project, false)
 setupAllTargetsWithDefaultSourceSets(project, false) // FIXME Js excluded here
 
 apply plugin: "com.careem.mockingbird"
 
-
 kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation project(":common-sample")
                 implementation "com.careem.mockingbird:mockingbird"
                 implementation libs.touchlab.stately.isolate
-                implementation kotlin('test')
-                implementation kotlin('test-common')
-                implementation kotlin('test-annotations-common')
-            }
-        }
 
-        iosArm64Main {
-            dependsOn iosX64Main
+            }
         }
     }
 }
 
 mockingBird {
     generateMocksFor = [
-            'com.careem.mockingbird.samples.PippoSample',
-            'com.careem.mockingbird.samples.Mock1'
+            'com.careem.mockingbird.sample.PippoSample',
+            'com.careem.mockingbird.sample.Mock1'
+//            'com.careem.mockingbird.sample.MockWithExternalDependencies' FIXME this is the current state next PR will move forward form this
     ]
 }
 

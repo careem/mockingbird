@@ -28,6 +28,9 @@ dependencyResolutionManagement {
     }
 }
 
+include(":sample")
+include(":common-sample")
+
 includeBuild("..") {
     dependencySubstitution {
         substitute(module("com.careem.mockingbird:mockingbird")).using(project(":mockingbird"))

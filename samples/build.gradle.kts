@@ -15,20 +15,22 @@
  * limitations under the License.
  */
 
-apply from: '../utils.gradle'
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
 
-setupMultiplatformLibrary(project, true)
-setupAllTargetsWithDefaultSourceSets(project, true)
-
-kotlin {
-    explicitApi()
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation libs.kotlinx.atomicfu
-                implementation libs.touchlab.stately.isolate
-                implementation libs.kotlin.test
-            }
-        }
+    dependencies {
+        classpath(libs.kotlin.gradle)
+        classpath("com.careem.mockingbird:mockingbird-compiler")
     }
 }
+
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
