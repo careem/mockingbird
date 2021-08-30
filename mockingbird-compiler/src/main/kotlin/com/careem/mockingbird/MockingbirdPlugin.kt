@@ -35,6 +35,7 @@ import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
+import java.net.URL
 import java.net.URLClassLoader
 import kotlin.reflect.KClass
 
@@ -44,6 +45,8 @@ private const val EXTENSION_NAME = "mockingBird"
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
+
+    private lateinit var classLoader : ClassLoader
 
     override fun apply(target: Project) {
         try {
@@ -63,8 +66,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             target.tasks.getByName("allTests") {
                 dependsOn(target.tasks.getByName("generateMocks"))
             }
-
-
         } catch (e: Exception) {
             // Useful to debug
             e.printStackTrace()
@@ -76,21 +77,35 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
         println("MOCKS: ${pluginExtensions.generateMocksFor}")
 
-        val file = File("${target.buildDir}/classes/kotlin/jvm/main")
+        setupClassLoader(target)
 
-        // Convert File to a URL
-        val url = file.toURI().toURL()
-        val urls = arrayOf(url)
-        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
-        val cl = URLClassLoader(urls, Thread.currentThread().contextClassLoader)
-        Thread.currentThread().contextClassLoader = cl
-
-        for(className in pluginExtensions.generateMocksFor){
-            val externalClass = cl.loadClass(className)
+        for (className in pluginExtensions.generateMocksFor) {
+            val externalClass = classLoader.loadClass(className)
             val kmClasses = listOf(externalClass.toImmutableKmClass())
             generateClasses(target, kmClasses)
         }
 
+    }
+
+    private fun setupClassLoader(target: Project){
+        // Add all subproject to classpath TODO this can be optimized, no need to add all of them
+        val urlList = mutableListOf<URL>()
+        traverseDependencyTree(target.rootProject, urlList)
+
+        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
+        val extendedClassLoader = URLClassLoader(urlList.toTypedArray(), Thread.currentThread().contextClassLoader)
+        Thread.currentThread().contextClassLoader = extendedClassLoader
+        classLoader = extendedClassLoader
+    }
+
+    private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>){
+        target.subprojects.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
+            val file = File("${it.buildDir}/classes/kotlin/jvm/main")
+            // Convert File to a URL
+            val url = file.toURI().toURL()
+            mutableList.add(url)
+            traverseDependencyTree(it, mutableList)
+        }
     }
 
     private fun configureSourceSets(target: Project) {
@@ -112,7 +127,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     @OptIn(DelicateKotlinPoetApi::class)
     private fun generateMockClassFor(project: Project, kmClass: ImmutableKmClass) {
-        val classToMock = Thread.currentThread().contextClassLoader.loadClass(
+        val classToMock = classLoader.loadClass(
             kmClass.name.replace(
                 "/",
                 "."
@@ -152,7 +167,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun loadMockClass(): Class<*> {
-        return Thread.currentThread().contextClassLoader.loadClass("com.careem.mockingbird.test.Mock")
+        return classLoader.loadClass("com.careem.mockingbird.test.Mock")
     }
 
     private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
@@ -263,9 +278,12 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             "kotlin/Short" -> "java.lang.Short"
             "kotlin/Char" -> "java.lang.Char"
             //TODo complete/ revise
-            else -> rawType.replace("/", ".")
+            else -> {
+                rawType.replace("/", ".")
+            }
         }
-        return Class.forName(javaClass).kotlin
+
+        return classLoader.loadClass(javaClass).kotlin
     }
 
     private fun mockProperty(

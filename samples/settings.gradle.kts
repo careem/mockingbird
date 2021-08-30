@@ -30,6 +30,7 @@ dependencyResolutionManagement {
 
 include(":sample")
 include(":common-sample")
+include(":common:sample")
 
 includeBuild("..") {
     dependencySubstitution {
