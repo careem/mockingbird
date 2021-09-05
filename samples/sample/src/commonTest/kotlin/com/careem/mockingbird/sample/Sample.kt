@@ -18,6 +18,7 @@ package com.careem.mockingbird.sample
 
 import com.careem.mockingbird.ExternalContractMock
 import com.careem.mockingbird.MockWithExternalDependenciesMock
+import com.careem.mockingbird.OuterInterfaceMock
 import com.careem.mockingbird.PippoSampleMock
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -41,6 +42,12 @@ class TestClass {
     fun testGeneratedTargetProjectExternalMock() {
         val externalContractMock = ExternalContractMock()
         assertNotNull(externalContractMock)
+    }
+
+    @Test
+    fun testGeneratedTargetProjectHierarchyInterface() {
+        val outerInterfaceMock = OuterInterfaceMock()
+        assertNotNull(outerInterfaceMock)
     }
 
 }
