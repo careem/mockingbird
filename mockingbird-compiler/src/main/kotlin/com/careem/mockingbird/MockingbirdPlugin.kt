@@ -31,6 +31,8 @@ import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import kotlinx.metadata.KmClassifier
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -46,7 +48,8 @@ private const val EXTENSION_NAME = "mockingBird"
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
 
-    private lateinit var classLoader : ClassLoader
+    private lateinit var classLoader: ClassLoader
+    private val logger: Logger = Logging.getLogger(this::class.java)
 
     override fun apply(target: Project) {
         try {
@@ -75,7 +78,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     private fun generateMocks(target: Project) {
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
-        println("MOCKS: ${pluginExtensions.generateMocksFor}")
+        logger.info("Mocking: ${pluginExtensions.generateMocksFor}")
 
         setupClassLoader(target)
 
@@ -87,7 +90,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     }
 
-    private fun setupClassLoader(target: Project){
+    private fun setupClassLoader(target: Project) {
         // Add all subproject to classpath TODO this can be optimized, no need to add all of them
         val urlList = mutableListOf<URL>()
         traverseDependencyTree(target.rootProject, urlList)
@@ -98,7 +101,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         classLoader = extendedClassLoader
     }
 
-    private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>){
+    private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>) {
         target.subprojects.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
             val file = File("${it.buildDir}/classes/kotlin/jvm/main")
             // Convert File to a URL
@@ -138,11 +141,12 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             File(project.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
         outputDir.mkdirs()
 
+        // TODO fix package name
         val packageName = "com.careem.mockingbird"
         val externalClass = loadMockClass()
 
-        // TODO fix package name
-        println("Generating mocks for $simpleName")
+
+        logger.debug("Generating mocks for $simpleName")
 
         val mockClassBuilder = TypeSpec.classBuilder("${simpleName}Mock")
             .addType(kmClass.buildMethodObject())
@@ -171,7 +175,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
-        println("===> Methods")
+        logger.info("Generating methods")
         val methodObjectBuilder = TypeSpec.objectBuilder(METHOD)
         val visitedFunctionSet = mutableSetOf<String>()
         for (function in this.functions) {
@@ -190,13 +194,13 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun ImmutableKmClass.buildArgObject(): TypeSpec {
-        println("===> Arg")
+        logger.info("Generating arguments")
         val argObjectBuilder = TypeSpec.objectBuilder(ARG)
         val visitedPropertySet = mutableSetOf<String>()
         for (function in this.functions) {
             for (arg in function.valueParameters) {
                 val argName = arg.name
-                println("ARG $argName")
+                logger.info("Argument: $argName")
                 if (!visitedPropertySet.contains(argName)) {
                     visitedPropertySet.add(argName)
                     argObjectBuilder.addProperty(
@@ -213,12 +217,12 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun ImmutableKmClass.buildPropertyObject(): TypeSpec {
-        println("===> Prop")
+        logger.info("Generating properties")
         val propertyObjectBuilder = TypeSpec.objectBuilder(PROPERTY)
         var haveMutableProps = false
         val visitedPropertySet = mutableSetOf<String>()
         this.properties.forEach { property ->
-            println("===> Prop $property")
+            logger.info("Property: $property")
             property.getterSignature?.let {
                 handleProperty(it.name, visitedPropertySet, propertyObjectBuilder)
             }
@@ -290,7 +294,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         mockClassBuilder: TypeSpec.Builder,
         property: ImmutableKmProperty
     ) {
-        println("===> Mocking Property ${property.getterSignature?.name} and ${property.setterSignature?.name} and ${property.setterSignature}")
+        logger.debug("===> Mocking Property ${property.getterSignature?.name} and ${property.setterSignature?.name} and ${property.setterSignature}")
         val type = extractType(property.returnType)
 
         val propertyBuilder = PropertySpec
@@ -358,11 +362,11 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         function: ImmutableKmFunction,
         isUnit: Boolean
     ) {
-        println("===> Mocking")
+        logger.info("Mocking function")
         val funBuilder = FunSpec.builder(function.name)
             .addModifiers(KModifier.OVERRIDE)
         for (valueParam in function.valueParameters) {
-            println(valueParam.type)
+            logger.info(valueParam.type.toString())
             funBuilder.addParameter(valueParam.name, extractType(valueParam.type!!))// TODO fix this
         }
         if (!isUnit) {
@@ -392,7 +396,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             argsValue.add(MemberName("", vp.name))
             argsValue.add(vp.name)
         }
-        println(argsValue)
+        logger.debug(argsValue.toString())
         val codeBlocks = mutableListOf("methodName = Method.%M")
         if (args.isNotEmpty()) {
             codeBlocks.add("arguments = mapOf($args)")
