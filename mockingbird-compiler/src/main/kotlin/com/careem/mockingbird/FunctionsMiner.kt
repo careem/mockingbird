@@ -26,8 +26,8 @@ class FunctionsMiner(
         val properties: MutableList<ImmutableKmProperty> = mutableListOf()
         rawExtractFunctionsAndProperties(kmClass, functions, properties)
         return functions.distinctBy { it.signature } to properties
-            .distinctBy { it.getterSignature }
-            .distinctBy { it.setterSignature }// Remove duplicated functions and properties
+            .filter { it.getterSignature != null || it.setterSignature != null }
+            .distinctBy { it.getterSignature ?: it.getterSignature }
     }
 
     private fun rawExtractFunctionsAndProperties(

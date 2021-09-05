@@ -18,6 +18,7 @@ package com.careem.mockingbird.sample
 
 import com.careem.mockingbird.ExternalContractMock
 import com.careem.mockingbird.MockWithExternalDependenciesMock
+import com.careem.mockingbird.MultipleGetterPropertiesMock
 import com.careem.mockingbird.OuterInterfaceMock
 import com.careem.mockingbird.PippoSampleMock
 import kotlin.test.Test
@@ -48,6 +49,12 @@ class TestClass {
     fun testGeneratedTargetProjectHierarchyInterface() {
         val outerInterfaceMock = OuterInterfaceMock()
         assertNotNull(outerInterfaceMock)
+    }
+
+    @Test
+    fun testGeneratedMulipleGetterProperties() {
+        val mock = MultipleGetterPropertiesMock()
+        assertNotNull(mock)
     }
 
 }
