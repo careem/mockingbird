@@ -27,7 +27,7 @@ class FunctionsMiner(
         rawExtractFunctionsAndProperties(kmClass, functions, properties)
         return functions.distinctBy { it.signature } to properties
             .filter { it.getterSignature != null || it.setterSignature != null }
-            .distinctBy { it.getterSignature ?: it.getterSignature }
+            .distinctBy { it.getterSignature ?: it.setterSignature }
     }
 
     private fun rawExtractFunctionsAndProperties(
