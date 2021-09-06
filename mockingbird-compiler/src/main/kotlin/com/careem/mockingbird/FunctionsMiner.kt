@@ -41,11 +41,11 @@ class FunctionsMiner(
             .filter { it.name != "kotlin/Any" }
             .map { classLoader.loadClassFromDirectory(it.name).toImmutableKmClass() }
         // Functions
-        val kmFunctions = kmSuperTypes.flatMap { it.functions }
-        functions.addAll(kmClass.functions + kmFunctions)
+        kmSuperTypes.flatMapTo(functions) { it.functions }
+        functions.addAll(kmClass.functions)
         // Properties
-        val kmProperties = kmSuperTypes.flatMap { it.properties }
-        properties.addAll(kmClass.properties + kmProperties)
+        kmSuperTypes.flatMapTo(properties) { it.properties }
+        properties.addAll(kmClass.properties)
 
         kmSuperTypes.forEach { rawExtractFunctionsAndProperties(it, functions, properties) }
     }
