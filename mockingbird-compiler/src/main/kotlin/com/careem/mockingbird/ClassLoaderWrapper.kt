@@ -18,7 +18,7 @@ class ClassLoaderWrapper(target: Project) {
     init {
         // Add all subproject to classpath TODO this can be optimized, no need to add all of them
         val urlList = mutableListOf<URL>()
-        traverseDependencyTree(target.rootProject, urlList)
+        target.rootProject.traverseDependencyTree(urlList)
 
         // Set kotlin class loader as parent in this way kotlin metadata will be loaded
         val extendedClassLoader = URLClassLoader(urlList.toTypedArray(), Thread.currentThread().contextClassLoader)
@@ -33,20 +33,20 @@ class ClassLoaderWrapper(target: Project) {
     fun loadClass(kmClass: ImmutableKmClass): KClass<*> = loadClassFromDirectory(kmClass.name)
 
     fun loadClassFromDirectory(path: String): KClass<*> {
-        return loadClass(path.toPackage())
+        return loadClass(path.toJavaFullyQualifiedName())
     }
 
-    private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>) {
-        target.subprojects.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
+    private fun Project.traverseDependencyTree(mutableList: MutableList<URL>) {
+        this.subprojects.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
             val file = File("${it.buildDir}/classes/kotlin/jvm/main")
             // Convert File to a URL
             val url = file.toURI().toURL()
             mutableList.add(url)
-            traverseDependencyTree(it, mutableList)
+            it.traverseDependencyTree(mutableList)
         }
     }
 
-    private fun String.toPackage(): String {
+    private fun String.toJavaFullyQualifiedName(): String {
         return when (this) {
             "kotlin/String" -> "java.lang.String"
             "kotlin/Int" -> "java.lang.Integer"
