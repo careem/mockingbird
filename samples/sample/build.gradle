@@ -41,7 +41,9 @@ mockingBird {
             'com.careem.mockingbird.sample.PippoSample',
             'com.careem.mockingbird.sample.Mock1',
             'com.careem.mockingbird.sample.MockWithExternalDependencies',
-            'com.careem.mockingbird.common.sample.ExternalContract'
+            'com.careem.mockingbird.common.sample.ExternalContract',
+            'com.careem.mockingbird.sample.OuterInterface',
+            'com.careem.mockingbird.sample.MultipleGetterProperties'
     ]
 }
 

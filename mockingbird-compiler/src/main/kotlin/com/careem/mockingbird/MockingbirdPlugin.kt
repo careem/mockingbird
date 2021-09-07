@@ -25,7 +25,6 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.metadata.ImmutableKmClass
 import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
 import com.squareup.kotlinpoet.metadata.ImmutableKmProperty
-import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import kotlinx.metadata.KmClassifier
@@ -37,8 +36,6 @@ import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
-import java.net.URL
-import java.net.URLClassLoader
 import kotlin.reflect.KClass
 
 private const val EXTENSION_NAME = "mockingBird"
@@ -48,8 +45,14 @@ private const val EXTENSION_NAME = "mockingBird"
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
 
-    private lateinit var classLoader: ClassLoader
+    private lateinit var classLoader: ClassLoaderWrapper
+    private lateinit var functionsMiner: FunctionsMiner
     private val logger: Logger = Logging.getLogger(this::class.java)
+
+    private fun setupDependencies(target: Project) {
+        classLoader = ClassLoaderWrapper(target)
+        functionsMiner = FunctionsMiner(classLoader)
+    }
 
     override fun apply(target: Project) {
         try {
@@ -77,10 +80,10 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     private fun generateMocks(target: Project) {
+        setupDependencies(target)
+
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
         logger.info("Mocking: ${pluginExtensions.generateMocksFor}")
-
-        setupClassLoader(target)
 
         for (className in pluginExtensions.generateMocksFor) {
             val externalClass = classLoader.loadClass(className)
@@ -88,27 +91,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             generateClasses(target, kmClasses)
         }
 
-    }
-
-    private fun setupClassLoader(target: Project) {
-        // Add all subproject to classpath TODO this can be optimized, no need to add all of them
-        val urlList = mutableListOf<URL>()
-        traverseDependencyTree(target.rootProject, urlList)
-
-        // Set kotlin class loader as parent in this way kotlin metadata will be loaded
-        val extendedClassLoader = URLClassLoader(urlList.toTypedArray(), Thread.currentThread().contextClassLoader)
-        Thread.currentThread().contextClassLoader = extendedClassLoader
-        classLoader = extendedClassLoader
-    }
-
-    private fun traverseDependencyTree(target: Project, mutableList: MutableList<URL>) {
-        target.subprojects.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
-            val file = File("${it.buildDir}/classes/kotlin/jvm/main")
-            // Convert File to a URL
-            val url = file.toURI().toURL()
-            mutableList.add(url)
-            traverseDependencyTree(it, mutableList)
-        }
     }
 
     private fun configureSourceSets(target: Project) {
@@ -130,12 +112,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     @OptIn(DelicateKotlinPoetApi::class)
     private fun generateMockClassFor(project: Project, kmClass: ImmutableKmClass) {
-        val classToMock = classLoader.loadClass(
-            kmClass.name.replace(
-                "/",
-                "."
-            )
-        )
+        val classToMock = classLoader.loadClass(kmClass)
         val simpleName = kmClass.name.substringAfterLast("/")
         val outputDir =
             File(project.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
@@ -148,19 +125,22 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
         logger.debug("Generating mocks for $simpleName")
 
+        val (functionsToMock, propertiesToMock) = functionsMiner.extractFunctionsAndProperties(kmClass)
+
         val mockClassBuilder = TypeSpec.classBuilder("${simpleName}Mock")
-            .addType(kmClass.buildMethodObject())
-            .addType(kmClass.buildArgObject())
-            .addType(kmClass.buildPropertyObject())
+            .addType(functionsToMock.buildMethodObject())
+            .addType(functionsToMock.buildArgObject())
+            .addType(propertiesToMock.buildPropertyObject())
             .addSuperinterface(classToMock) // TODO check if interface or generic open class
             .addSuperinterface(externalClass) // TODO fix this
 
-        for (function in kmClass.functions) {
-            this.mockFunction(mockClassBuilder, function, isUnitFunction(function))
+
+        functionsToMock.forEach { function ->
+            mockFunction(mockClassBuilder, function, isUnitFunction(function))
         }
 
-        kmClass.properties.forEach { property ->
-            this.mockProperty(mockClassBuilder, property)
+        propertiesToMock.forEach { property ->
+            mockProperty(mockClassBuilder, property)
         }
 
         val file = FileSpec.builder(packageName, "${simpleName}Mock")
@@ -170,15 +150,15 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         file.writeTo(outputDir)
     }
 
-    private fun loadMockClass(): Class<*> {
+    private fun loadMockClass(): KClass<*> {
         return classLoader.loadClass("com.careem.mockingbird.test.Mock")
     }
 
-    private fun ImmutableKmClass.buildMethodObject(): TypeSpec {
+    private fun List<ImmutableKmFunction>.buildMethodObject(): TypeSpec {
         logger.info("Generating methods")
         val methodObjectBuilder = TypeSpec.objectBuilder(METHOD)
         val visitedFunctionSet = mutableSetOf<String>()
-        for (function in this.functions) {
+        for (function in this) {
             val functionName = function.name
             if (!visitedFunctionSet.contains(functionName)) {
                 visitedFunctionSet.add(functionName)
@@ -193,11 +173,11 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         return methodObjectBuilder.build()
     }
 
-    private fun ImmutableKmClass.buildArgObject(): TypeSpec {
+    private fun List<ImmutableKmFunction>.buildArgObject(): TypeSpec {
         logger.info("Generating arguments")
         val argObjectBuilder = TypeSpec.objectBuilder(ARG)
         val visitedPropertySet = mutableSetOf<String>()
-        for (function in this.functions) {
+        for (function in this) {
             for (arg in function.valueParameters) {
                 val argName = arg.name
                 logger.info("Argument: $argName")
@@ -216,12 +196,12 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         return argObjectBuilder.build()
     }
 
-    private fun ImmutableKmClass.buildPropertyObject(): TypeSpec {
+    private fun List<ImmutableKmProperty>.buildPropertyObject(): TypeSpec {
         logger.info("Generating properties")
         val propertyObjectBuilder = TypeSpec.objectBuilder(PROPERTY)
         var haveMutableProps = false
         val visitedPropertySet = mutableSetOf<String>()
-        this.properties.forEach { property ->
+        this.forEach { property ->
             logger.info("Property: $property")
             property.getterSignature?.let {
                 handleProperty(it.name, visitedPropertySet, propertyObjectBuilder)
@@ -263,39 +243,12 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         return classifier is KmClassifier.Class && classifier.name == "kotlin/Unit"
     }
 
-    private fun extractTypeString(type: ImmutableKmType): String {
-        return if (type.classifier is KmClassifier.Class) {
-            (type.classifier as KmClassifier.Class).name
-        } else {
-            throw IllegalArgumentException("I can't mock this type: ${type.classifier}")
-        }
-    }
-
-    private fun extractType(type: ImmutableKmType): KClass<*> {
-        val javaClass = when (val rawType = extractTypeString(type)) {
-            "kotlin/String" -> "java.lang.String"
-            "kotlin/Int" -> "java.lang.Integer"
-            "kotlin/Long" -> "java.lang.Long"
-            "kotlin/Boolean" -> "java.lang.Boolean"
-            "kotlin/Double" -> "java.lang.Double"
-            "kotlin/Float" -> "java.lang.Float"
-            "kotlin/Short" -> "java.lang.Short"
-            "kotlin/Char" -> "java.lang.Char"
-            //TODo complete/ revise
-            else -> {
-                rawType.replace("/", ".")
-            }
-        }
-
-        return classLoader.loadClass(javaClass).kotlin
-    }
-
     private fun mockProperty(
         mockClassBuilder: TypeSpec.Builder,
         property: ImmutableKmProperty
     ) {
         logger.debug("===> Mocking Property ${property.getterSignature?.name} and ${property.setterSignature?.name} and ${property.setterSignature}")
-        val type = extractType(property.returnType)
+        val type = classLoader.loadClass(property.returnType)
 
         val propertyBuilder = PropertySpec
             .builder(property.name, type, KModifier.OVERRIDE)
@@ -367,10 +320,10 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             .addModifiers(KModifier.OVERRIDE)
         for (valueParam in function.valueParameters) {
             logger.info(valueParam.type.toString())
-            funBuilder.addParameter(valueParam.name, extractType(valueParam.type!!))// TODO fix this
+            funBuilder.addParameter(valueParam.name, classLoader.loadClass(valueParam.type!!))// TODO fix this
         }
         if (!isUnit) {
-            funBuilder.returns(extractType(function.returnType))
+            funBuilder.returns(classLoader.loadClass(function.returnType))
         }
         funBuilder.addMockStatement(function, isUnit)
         mockClassBuilder.addFunction(
