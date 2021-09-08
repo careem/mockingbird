@@ -16,11 +16,7 @@
 
 package com.careem.mockingbird.sample
 
-import com.careem.mockingbird.ExternalContractMock
-import com.careem.mockingbird.MockWithExternalDependenciesMock
-import com.careem.mockingbird.MultipleGetterPropertiesMock
-import com.careem.mockingbird.OuterInterfaceMock
-import com.careem.mockingbird.PippoSampleMock
+import com.careem.mockingbird.common.sample.ExternalContractMock
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
