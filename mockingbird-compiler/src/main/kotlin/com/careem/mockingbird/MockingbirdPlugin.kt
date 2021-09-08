@@ -118,10 +118,8 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             File(project.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
         outputDir.mkdirs()
 
-        // TODO fix package name
-        val packageName = "com.careem.mockingbird"
+        val packageName = classToMock.qualifiedName!!.substringBeforeLast(".")
         val externalClass = loadMockClass()
-
 
         logger.debug("Generating mocks for $simpleName")
 
