@@ -30,7 +30,6 @@ kotlin {
                 implementation project(":common:sample")
                 implementation "com.careem.mockingbird:mockingbird"
                 implementation libs.touchlab.stately.isolate
-
             }
         }
     }
@@ -43,7 +42,8 @@ mockingBird {
             'com.careem.mockingbird.sample.MockWithExternalDependencies',
             'com.careem.mockingbird.common.sample.ExternalContract',
             'com.careem.mockingbird.sample.OuterInterface',
-            'com.careem.mockingbird.sample.MultipleGetterProperties'
+            'com.careem.mockingbird.sample.MultipleGetterProperties',
+            'com.careem.mockingbird.common.sample.ExternalDep'
     ]
 }
 
