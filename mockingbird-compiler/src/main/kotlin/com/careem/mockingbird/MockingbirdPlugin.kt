@@ -63,56 +63,29 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             target.extensions.add<MockingbirdPluginExtension>(
                 EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
             )
-//
-//            val explore = target.task("explore") {
-//                dependsOn(target.tasks.getByName("assemble"))
-//                doLast {
-//                    // FIXME not workign because: Cannot change dependencies of dependency configuration ':sample:commonTestImplementation' after it has been included in dependency resolution.
-//                    projectExplorer.exploreProject(target.rootProject)
-//                    val dependencySet = projectExplorer.explore(target)
-//                    target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
-//                        // FIXME here commontTest is not enought I need to add also to other KMP target if library have one
-//                        sourceSets.getByName("commonTest") {
-//                            dependencies {
-//                                dependencySet.forEach { implementation(it) }
-//                                //implementation("org.jetbrains.kotlinx:atomicfu:0.16.2")
-//                            }
-//                        }
-//                    }
-//                }
-//            }
 
-            target.task("generateMocks") {
-                dependsOn(target.tasks.getByName("assemble"))
+            target.task(GradleTasks.GENERATE_MOCKS) {
+                dependsOn(target.tasks.getByName(GradleTasks.ASSEMBLE))
                 doLast {
                     generateMocks(target)
                 }
             }
 
+            target.tasks.getByName(GradleTasks.ALL_TESTS) {
+                dependsOn(target.tasks.getByName(GradleTasks.GENERATE_MOCKS))
+            }
+
+            projectExplorer.exploreProject(target.rootProject)
             // Add test dependencies for classes that need to be mocked
             target.afterEvaluate {
-                projectExplorer.exploreProject(target.rootProject)
                 val dependencySet = projectExplorer.explore(target)
                 target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
-                    // FIXME here commontTest is not enought I need to add also to other KMP target if library have one
                     sourceSets.getByName("commonTest") {
                         dependencies {
                             dependencySet.forEach { implementation(it) }
-                            //implementation("org.jetbrains.kotlinx:atomicfu:0.16.2")
                         }
                     }
                 }
-//                target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
-//                    sourceSets.getByName("commonTest") {
-//                        dependencies {
-//                            implementation("org.jetbrains.kotlinx:atomicfu:0.16.2")
-//                        }
-//                    }
-//                }
-            }
-
-            target.tasks.getByName("allTests") {
-                dependsOn(target.tasks.getByName("generateMocks"))
             }
 
         } catch (e: Exception) {
@@ -125,7 +98,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     private fun generateMocks(target: Project) {
         setupDependencies(target)
 
-        projectExplorer.explore(target)
 
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
         logger.info("Mocking: ${pluginExtensions.generateMocksFor}")
