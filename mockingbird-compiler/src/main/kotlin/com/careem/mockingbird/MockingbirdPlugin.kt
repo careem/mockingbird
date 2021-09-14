@@ -77,7 +77,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
             projectExplorer.exploreProject(target.rootProject)
             // Add test dependencies for classes that need to be mocked
-            target.afterEvaluate {
+            target.gradle.projectsEvaluated{
                 val dependencySet = projectExplorer.explore(target)
                 target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
                     sourceSets.getByName("commonTest") {
