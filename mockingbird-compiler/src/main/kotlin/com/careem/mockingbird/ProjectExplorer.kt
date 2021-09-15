@@ -14,17 +14,13 @@ class ProjectExplorer {
 
 
     fun exploreProject(rootProject: Project) {
-        // TODO check sample not included here
         rootProject.traverseProjectTree()
-        moduleMap.forEach { (_, it) -> println("${it.name} ${it.group} ${it::class.simpleName}") }
-        println("++SubProjects++")
     }
 
     fun explore(project: Project): Set<Dependency> {
         val dependencySet = mutableSetOf<Dependency>()
         // TODO fix this eventually I do not want root project
         project.traverseDependencyTree(dependencySet)
-        dependencySet.forEach { println("${it.name} ${it.group} ${it::class.simpleName}") }
         return dependencySet
     }
 
@@ -34,13 +30,11 @@ class ProjectExplorer {
         if (kmpExtension != null) {
             val sourceSets = kmpExtension.sourceSets
             val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
-            println("${this.name} ${this.group}")
 
             val configurations =
                 this.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies
             dependencySet.addAll(configurations)
 
-            // FIX me explore project and keep map so I can lookup later
             configurations.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
                 moduleMap[it.name]?.traverseDependencyTree(dependencySet)
             }
@@ -56,7 +50,6 @@ class ProjectExplorer {
     private fun Project.traverseProjectTree() {
         subprojects.forEach {
             try {
-                // Make it cleaner and better
                 moduleMap[it.name] = it
                 it.traverseProjectTree()
             } catch (udo: org.gradle.api.UnknownDomainObjectException) {
