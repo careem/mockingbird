@@ -333,7 +333,6 @@ NOTE: the plugin doesn't discover which class to mock, but it depends on you to 
 
 * You can use the plugin only on a module containing a `jvm` target
 * You can mock interfaces only
-* You cannot mock interfaces that have dependencies on third party libraries
 * You cannot mock interfaces that have generic types
 
 ## License
