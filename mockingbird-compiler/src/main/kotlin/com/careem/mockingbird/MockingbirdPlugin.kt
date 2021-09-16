@@ -51,7 +51,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     private val logger: Logger = Logging.getLogger(this::class.java)
 
     private fun setupDependencies(target: Project) {
-        classLoader = ClassLoaderWrapper(target)
+        classLoader = ClassLoaderWrapper(projectExplorer, target)
         functionsMiner = FunctionsMiner(classLoader)
     }
 
