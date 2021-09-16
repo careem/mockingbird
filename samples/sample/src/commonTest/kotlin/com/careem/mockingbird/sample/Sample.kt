@@ -17,6 +17,7 @@
 package com.careem.mockingbird.sample
 
 import com.careem.mockingbird.common.sample.ExternalContractMock
+import com.careem.mockingbird.common.sample.ExternalDepMock
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -50,6 +51,12 @@ class TestClass {
     @Test
     fun testGeneratedMulipleGetterProperties() {
         val mock = MultipleGetterPropertiesMock()
+        assertNotNull(mock)
+    }
+
+    @Test
+    fun testGeneratedExternalDep() {
+        val mock = ExternalDepMock()
         assertNotNull(mock)
     }
 

@@ -47,6 +47,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     private lateinit var classLoader: ClassLoaderWrapper
     private lateinit var functionsMiner: FunctionsMiner
+    private lateinit var projectExplorer: ProjectExplorer
     private val logger: Logger = Logging.getLogger(this::class.java)
 
     private fun setupDependencies(target: Project) {
@@ -55,6 +56,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     override fun apply(target: Project) {
+        projectExplorer = ProjectExplorer()
         try {
             configureSourceSets(target)
 
@@ -62,16 +64,30 @@ abstract class MockingbirdPlugin : Plugin<Project> {
                 EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
             )
 
-            target.task("generateMocks") {
-                dependsOn(target.tasks.getByName("assemble"))
+            target.task(GradleTasks.GENERATE_MOCKS) {
+                dependsOn(target.tasks.getByName(GradleTasks.ASSEMBLE))
                 doLast {
                     generateMocks(target)
                 }
             }
 
-            target.tasks.getByName("allTests") {
-                dependsOn(target.tasks.getByName("generateMocks"))
+            target.tasks.getByName(GradleTasks.ALL_TESTS) {
+                dependsOn(target.tasks.getByName(GradleTasks.GENERATE_MOCKS))
             }
+
+            projectExplorer.visitRootProject(target.rootProject)
+            // Add test dependencies for classes that need to be mocked
+            target.gradle.projectsEvaluated{
+                val dependencySet = projectExplorer.explore(target)
+                target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
+                    sourceSets.getByName("commonTest") {
+                        dependencies {
+                            dependencySet.forEach { implementation(it) }
+                        }
+                    }
+                }
+            }
+
         } catch (e: Exception) {
             // Useful to debug
             e.printStackTrace()
@@ -81,6 +97,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     private fun generateMocks(target: Project) {
         setupDependencies(target)
+
 
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
         logger.info("Mocking: ${pluginExtensions.generateMocksFor}")
