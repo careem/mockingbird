@@ -15,6 +15,7 @@ class ProjectExplorer {
 
     private val moduleMap: MutableMap<String, Project> = mutableMapOf()
     private val isExplored: HashSet<String> = hashSetOf()
+    private val dependencySet = mutableSetOf<Dependency>()
     private val logger: Logger = Logging.getLogger(this::class.java)
 
     fun visitRootProject(rootProject: Project) {
@@ -22,14 +23,13 @@ class ProjectExplorer {
     }
 
     fun explore(project: Project): Set<Dependency> {
-        val dependencySet = mutableSetOf<Dependency>()
         // TODO fix this eventually I do not want root project
         project.traverseDependencyTree(dependencySet)
         return dependencySet
     }
 
     private fun Project.traverseDependencyTree(dependencySet: MutableSet<Dependency>) {
-        if (!isExplored.contains(this.name)) {
+        if (!isExplored.contains(this.fullQualifier())) {
             val kmpExtension = this.extensions.findByType(KotlinMultiplatformExtension::class.java)
             if (kmpExtension != null) {
                 val sourceSets = kmpExtension.sourceSets
@@ -49,16 +49,16 @@ class ProjectExplorer {
                 }
             }
         }
-        isExplored.add(this.name)
+        isExplored.add(this.fullQualifier())
     }
 
     private fun Project.traverseProjectTree() {
-        subprojects.forEach {
+        this.subprojects.forEach {
             try {
                 moduleMap[it.name] = it
                 it.traverseProjectTree()
             } catch (udo: org.gradle.api.UnknownDomainObjectException) {
-                logger.warn("${it.name} -> SKIPPED")
+                this@ProjectExplorer.logger.warn("${it.name} -> SKIPPED")
             }
         }
     }
