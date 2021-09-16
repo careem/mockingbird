@@ -7,13 +7,17 @@ import org.gradle.api.logging.Logging
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.sources.DefaultKotlinSourceSet
 
+/**
+ * Project explorer, this class will perform all the exploration logic to determine the project structure and its dependencies
+ * NOTE: for project here we mean the target project of the plugin not the root one, we refer to the root one with the name rootProject
+ */
 class ProjectExplorer {
 
     private val moduleMap: MutableMap<String, Project> = mutableMapOf()
+    private val isExplored: HashSet<String> = hashSetOf()
     private val logger: Logger = Logging.getLogger(this::class.java)
 
-
-    fun exploreProject(rootProject: Project) {
+    fun visitRootProject(rootProject: Project) {
         rootProject.traverseProjectTree()
     }
 
@@ -25,26 +29,27 @@ class ProjectExplorer {
     }
 
     private fun Project.traverseDependencyTree(dependencySet: MutableSet<Dependency>) {
+        if (!isExplored.contains(this.name)) {
+            val kmpExtension = this.extensions.findByType(KotlinMultiplatformExtension::class.java)
+            if (kmpExtension != null) {
+                val sourceSets = kmpExtension.sourceSets
+                val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
 
-        val kmpExtension = this.extensions.findByType(KotlinMultiplatformExtension::class.java)
-        if (kmpExtension != null) {
-            val sourceSets = kmpExtension.sourceSets
-            val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
+                val configurations =
+                    this.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies
+                dependencySet.addAll(configurations)
 
-            val configurations =
-                this.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies
-            dependencySet.addAll(configurations)
-
-            configurations.forEach {  // TODO improve performance skipping to traverse duplicated dependencies ( eg A -> B -> C and D -> B -> C do not need to explore B-> C again since I did earlier )
-                moduleMap[it.name]?.traverseDependencyTree(dependencySet)
-            }
-        } else {
-            // Container module traverse all subprojects
-            this.subprojects.forEach {
-                it.traverseDependencyTree(dependencySet)
+                configurations.forEach {
+                    moduleMap[it.name]?.traverseDependencyTree(dependencySet)
+                }
+            } else {
+                // Container module traverse all subprojects
+                this.subprojects.forEach {
+                    it.traverseDependencyTree(dependencySet)
+                }
             }
         }
-
+        isExplored.add(this.name)
     }
 
     private fun Project.traverseProjectTree() {

@@ -75,7 +75,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
                 dependsOn(target.tasks.getByName(GradleTasks.GENERATE_MOCKS))
             }
 
-            projectExplorer.exploreProject(target.rootProject)
+            projectExplorer.visitRootProject(target.rootProject)
             // Add test dependencies for classes that need to be mocked
             target.gradle.projectsEvaluated{
                 val dependencySet = projectExplorer.explore(target)
