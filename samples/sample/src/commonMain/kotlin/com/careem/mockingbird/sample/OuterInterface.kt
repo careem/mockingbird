@@ -6,4 +6,5 @@ interface OuterInterface : InnerInterface {
     override fun foo(fooArg: String)
     fun foo1(fooArg1: String)
     fun foo2(fooArg12: String, fooArg22: String)
+    fun thr(throwable: Throwable)
 }
