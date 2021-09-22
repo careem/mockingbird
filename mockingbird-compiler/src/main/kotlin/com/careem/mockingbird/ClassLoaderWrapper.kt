@@ -91,6 +91,7 @@ class ClassLoaderWrapper(
             "kotlin/Float" -> "java.lang.Float"
             "kotlin/Short" -> "java.lang.Short"
             "kotlin/Char" -> "java.lang.Char"
+            "kotlin/Throwable" -> "java.lang.Throwable"
             //TODo complete/ revise
             else -> {
                 this.replace("/", ".")
