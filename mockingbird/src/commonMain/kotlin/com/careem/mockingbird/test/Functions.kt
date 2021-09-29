@@ -16,19 +16,29 @@
  */
 package com.careem.mockingbird.test
 
-import co.touchlab.stately.isolate.IsolateState
 import kotlinx.atomicfu.atomic
 import kotlin.native.concurrent.SharedImmutable
 import kotlin.test.assertEquals
 
-@SharedImmutable
-private val invocationRecorder = IsolateState { InvocationRecorder() }
 
 @SharedImmutable
 internal const val AWAIT_POOLING_TIME = 10L
 
 public interface Mock
 public interface Spy : Mock
+
+
+/**
+ * Utility function to execute a specific test in a specific testMode, test mode will be reset at the end of the
+ * test allowing you to run a test in a specific mode in isolation.
+ * @see README section [Test Mode]
+ */
+public fun runWithTestMode(testMode: TestMode, testBlock: () -> Unit){
+    MockingBird.reset() // Reset in case of test not running using runWithTestMode
+    MockingBird.mode = testMode
+    testBlock()
+    MockingBird.reset()
+}
 
 /**
  * Function to specify the return value of an invocation
@@ -42,7 +52,7 @@ public fun <T : Mock, R> T.every(
 ) {
     val hashCode = this.hashCode()
     val value = returns()
-    invocationRecorder.access { recorder ->
+    MockingBird.invocationRecorder().access { recorder ->
         recorder.storeResponse(
             hashCode,
             Invocation(methodName = methodName, arguments = arguments),
@@ -62,7 +72,7 @@ public fun <T : Mock, R> T.everyAnswers(
     answer: (Invocation) -> R
 ) {
     val hashCode = this.hashCode()
-    invocationRecorder.access { recorder ->
+    MockingBird.invocationRecorder().access { recorder ->
         recorder.storeAnswer(
             hashCode,
             Invocation(methodName = methodName, arguments = arguments),
@@ -112,7 +122,7 @@ internal fun <T : Mock> T.rawVerify(
     arguments: Map<String, Any?>
 ) {
     val hashCode = this.hashCode()
-    invocationRecorder.access { recorder ->
+    MockingBird.invocationRecorder().access { recorder ->
         val methodInvocations = recorder.getInvocations(hashCode)
             .filter { it.methodName == methodName }
         val argumentsInvocations = methodInvocations
@@ -138,7 +148,7 @@ internal fun <T : Mock> T.rawVerify(
  */
 public fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R {
     val hashCode = this.hashCode()
-    return invocationRecorder.access { recorder ->
+    return MockingBird.invocationRecorder().access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(hashCode, recorder, invocation)
         @Suppress("UNCHECKED_CAST")
@@ -159,7 +169,7 @@ public fun <T : Mock> T.mockUnit(
     relaxed: Boolean = true
 ) {
     val hashCode = this.hashCode()
-    invocationRecorder.access { recorder ->
+    MockingBird.invocationRecorder().access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(hashCode, recorder, invocation)
         recorder.getResponse(
@@ -183,7 +193,7 @@ public fun <T : Spy, R> T.spy(
     delegate: () -> R
 ): R {
     val hashCode = this.hashCode()
-    return invocationRecorder.access { recorder ->
+    return MockingBird.invocationRecorder().access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(hashCode, recorder, invocation)// TODO change name
         @Suppress("UNCHECKED_CAST")
