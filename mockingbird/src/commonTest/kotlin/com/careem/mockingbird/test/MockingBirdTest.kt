@@ -48,7 +48,7 @@ class MockingBirdTest {
 
     @Test
     fun testDefaultTestModeWhenNoSet() {
-        assertEquals(TestMode.LOCAL_THREAD, MockingBird.mode)
+        assertEquals(TestMode.MULTI_THREAD, MockingBird.mode)
         assertTrue(MockingBird.invocationRecorder() is SimpleInvocationRecorderProvider)
     }
 
@@ -74,11 +74,11 @@ class MockingBirdTest {
         ) { Mocks.TEST_INT }
 
         try {
-            MockingBird.mode = TestMode.MULTI_THREAD
+            MockingBird.mode = TestMode.LOCAL_THREAD
         } catch (error: UnsupportedOperationException) {
             assertNotNull(error)
         } finally {
-            assertEquals(TestMode.LOCAL_THREAD, MockingBird.mode)
+            assertEquals(TestMode.MULTI_THREAD, MockingBird.mode)
         }
     }
 
