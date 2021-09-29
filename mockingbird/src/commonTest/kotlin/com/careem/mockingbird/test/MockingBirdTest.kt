@@ -49,7 +49,7 @@ class MockingBirdTest {
     @Test
     fun testDefaultTestModeWhenNoSet() {
         assertEquals(TestMode.MULTI_THREAD, MockingBird.mode)
-        assertTrue(MockingBird.invocationRecorder() is SimpleInvocationRecorderProvider)
+        assertTrue(MockingBird.invocationRecorder() is IsolateStateInvocationRecorderProvider)
     }
 
 
