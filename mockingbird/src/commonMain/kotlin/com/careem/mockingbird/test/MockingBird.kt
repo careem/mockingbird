@@ -31,7 +31,7 @@ public enum class TestMode {
     MULTI_THREAD, LOCAL_THREAD
 }
 
-public object MockingBird {
+internal object MockingBird {
     private val DEFAULT_TEST_MODE = TestMode.MULTI_THREAD
 
     private val _mode = atomic(DEFAULT_TEST_MODE)
@@ -39,14 +39,14 @@ public object MockingBird {
     internal var mode: TestMode
         get() = _mode.value
         set(value) {
-            if(!canChangeMode.value) throw UnsupportedOperationException("Test mode cannot be changed after mock interaction")
+            if (!canChangeMode.value) throw UnsupportedOperationException("Test mode cannot be changed after mock interaction")
             _mode.value = value
         }
 
     /**
      * Reset the test mode configuration, this function should be called on the @After function
      */
-    internal fun reset(){
+    internal fun reset() {
         _mode.value = DEFAULT_TEST_MODE
         canChangeMode.value = true
     }
