@@ -21,4 +21,5 @@ interface Mock1 {
     fun foo1()
     fun foo2(string: String)
     fun foo3(string2: String, someOtherParam: Boolean)
+    fun nullableFoo(nullString: String?): String?
 }
