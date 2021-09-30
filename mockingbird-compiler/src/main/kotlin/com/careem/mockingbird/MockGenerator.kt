@@ -176,7 +176,7 @@ class MockGenerator constructor(
         val type = classLoader.loadClass(property.returnType)
 
         val propertyBuilder = PropertySpec
-            .builder(property.name, type, KModifier.OVERRIDE)
+            .builder(property.name, type.asTypeName().copy(nullable = property.returnType.isNullable()), KModifier.OVERRIDE)
 
         if (property.getterSignature != null) {
             val getterBuilder = FunSpec.getterBuilder()
@@ -225,7 +225,7 @@ class MockGenerator constructor(
             )
         """.trimIndent()
             setterBuilder
-                .addParameter("value", type)
+                .addParameter("value", type.asTypeName().copy(nullable = property.returnType.isNullable()))
                 .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
             propertyBuilder
                 .mutable()
