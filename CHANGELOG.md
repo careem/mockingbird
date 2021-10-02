@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ## master
 * Migrating to Gradle Version Catalog and removed Deps
 * Bump gradle to 7.2
+* Upgrade kotlin to 1.5.31
+* Upgrade AtomicFu to 0.16.3
+* Upgrade Stately to 1.1.10-a1
 
 ## 1.11.0
 * Enabled warnings as errors
