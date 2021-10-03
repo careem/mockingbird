@@ -33,32 +33,39 @@ public enum class TestMode {
 
 internal object MockingBird {
     private val DEFAULT_TEST_MODE = TestMode.MULTI_THREAD
+    private val DEFAULT_STATE = State(
+        mode = DEFAULT_TEST_MODE,
+        canChangeMode = true
+    )
 
-    private val _mode = atomic(DEFAULT_TEST_MODE)
-    private val canChangeMode = atomic(true)
+    private val state = atomic(DEFAULT_STATE)
     internal var mode: TestMode
-        get() = _mode.value
-        set(value) {
-            if (!canChangeMode.value) throw UnsupportedOperationException("Test mode cannot be changed after mock interaction")
-            _mode.value = value
-        }
+        get() = state.value.mode
+        set(value) =
+            state.value.let {
+                if (!it.canChangeMode) throw UnsupportedOperationException("Test mode cannot be changed after mock interaction")
+                state.value = it.copy(mode = value)
+            }
 
     /**
      * Reset the test mode configuration, this function should be called on the @After function
      */
     internal fun reset() {
-        _mode.value = DEFAULT_TEST_MODE
-        canChangeMode.value = true
+        state.value = DEFAULT_STATE
     }
 
     internal fun invocationRecorder(): InvocationRecorderProvider {
         // the mode must be chosen before any mock once the mode has been chosen and any operation on the mock is executed
         // you cannot change the mode anymore
-        canChangeMode.value = false
+        state.value = state.value.copy(canChangeMode = false)
         return when (mode) {
             TestMode.LOCAL_THREAD -> localInvocationRecorder
             TestMode.MULTI_THREAD -> mtInvocationRecorder
         }
     }
 
+    private data class State(
+        val mode: TestMode,
+        val canChangeMode: Boolean
+    )
 }
