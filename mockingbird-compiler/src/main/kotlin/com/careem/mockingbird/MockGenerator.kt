@@ -20,7 +20,9 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.metadata.ImmutableKmClass
@@ -28,7 +30,7 @@ import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
 import com.squareup.kotlinpoet.metadata.ImmutableKmProperty
 import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
-import kotlinx.metadata.Flag
+import com.squareup.kotlinpoet.metadata.isNullable
 import kotlinx.metadata.KmClassifier
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
@@ -45,6 +47,7 @@ class MockGenerator constructor(
 
     fun createClass(kmClass: ImmutableKmClass): FileSpec {
         val classToMock = classLoader.loadClass(kmClass)
+//        val kmClassToMock = classToMock.toImmutableKmClass() // TODO complete
         val simpleName = kmClass.name.substringAfterLast("/")
 
         val packageName = classToMock.qualifiedName!!.substringBeforeLast(".")
@@ -173,10 +176,12 @@ class MockGenerator constructor(
         property: ImmutableKmProperty
     ) {
         logger.debug("===> Mocking Property ${property.getterSignature?.name} and ${property.setterSignature?.name} and ${property.setterSignature}")
-        val type = classLoader.loadClass(property.returnType)
-
         val propertyBuilder = PropertySpec
-            .builder(property.name, type.asTypeName().copy(nullable = property.returnType.isNullable()), KModifier.OVERRIDE)
+            .builder(
+                property.name,
+                property.returnType.buildType(),
+                KModifier.OVERRIDE
+            )
 
         if (property.getterSignature != null) {
             val getterBuilder = FunSpec.getterBuilder()
@@ -225,7 +230,7 @@ class MockGenerator constructor(
             )
         """.trimIndent()
             setterBuilder
-                .addParameter("value", type.asTypeName().copy(nullable = property.returnType.isNullable()))
+                .addParameter("value", property.returnType.buildType())
                 .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
             propertyBuilder
                 .mutable()
@@ -245,16 +250,34 @@ class MockGenerator constructor(
             .addModifiers(KModifier.OVERRIDE)
         for (valueParam in function.valueParameters) {
             logger.info(valueParam.type.toString())
-            val kmType = valueParam.type!! // TODO support suspend fun ?
-            funBuilder.addParameter(valueParam.name, classLoader.loadClass(kmType).asTypeName().copy(nullable = kmType.isNullable()))
+            val kmType = valueParam.type!!
+            funBuilder.addParameter(valueParam.name, kmType.buildType())
         }
         if (!isUnit) {
-            funBuilder.returns(classLoader.loadClass(function.returnType).asTypeName().copy(nullable = function.returnType.isNullable()))
+            funBuilder.returns(function.returnType.buildType())
         }
         funBuilder.addMockStatement(function, isUnit)
         mockClassBuilder.addFunction(
             funBuilder.build()
         )
+    }
+
+    private fun ImmutableKmType.buildType(): TypeName {
+        val arguments = this.arguments
+            .map { classLoader.loadClass(it.type!!).asTypeName() }// TODO support suspend fun ?
+        val result = classLoader.loadClass(this)
+            .asTypeName()
+            .let {
+                if (arguments.isNotEmpty()) {
+                    it.parameterizedBy(arguments)
+                } else {
+                    it
+                }
+            }.copy(
+                nullable = this.isNullable
+            )
+        println(result)
+        return result
     }
 
     private fun FunSpec.Builder.addMockStatement(function: ImmutableKmFunction, isUnit: Boolean) {
@@ -288,8 +311,6 @@ class MockGenerator constructor(
 
         this.addStatement(statementString, *(argsValue.toTypedArray()))
     }
-
-    private fun ImmutableKmType.isNullable(): Boolean = Flag.Type.IS_NULLABLE.invoke(this.flags)
 
     companion object {
         private const val METHOD = "Method"
