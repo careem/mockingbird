@@ -17,6 +17,7 @@
 package com.careem.mockingbird.test
 
 import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlin.native.concurrent.SharedImmutable
 import kotlin.native.concurrent.ThreadLocal
 
@@ -42,9 +43,9 @@ internal object MockingBird {
     internal var mode: TestMode
         get() = state.value.mode
         set(value) =
-            state.value.let {
+            state.update {
                 if (!it.canChangeMode) throw UnsupportedOperationException("Test mode cannot be changed after mock interaction")
-                state.value = it.copy(mode = value)
+                it.copy(mode = value)
             }
 
     /**
@@ -57,7 +58,7 @@ internal object MockingBird {
     internal fun invocationRecorder(): InvocationRecorderProvider {
         // the mode must be chosen before any mock once the mode has been chosen and any operation on the mock is executed
         // you cannot change the mode anymore
-        state.value = state.value.copy(canChangeMode = false)
+        state.update { it.copy(canChangeMode = false) }
         return when (mode) {
             TestMode.LOCAL_THREAD -> localInvocationRecorder
             TestMode.MULTI_THREAD -> mtInvocationRecorder
