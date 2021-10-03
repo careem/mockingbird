@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.12.0
 * Migrating to Gradle Version Catalog and removed Deps
 * Bump gradle to 7.2
 * Upgrade kotlin to 1.5.31
