@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Introduced testing mode, before the behavior was always MULTI_THREAD now it is possible to set LOCAL_THREAD mode to avoid argument freeze on mock invocation
 
 ## 1.12.0
 * Migrating to Gradle Version Catalog and removed Deps

@@ -29,6 +29,7 @@ object Mocks {
         fun method3(value1: Int, value2: Int): Int
         fun method4(): Int
         fun method5()
+        fun method6(callback: () -> Unit)
     }
 
     class MyDependencyMock : MyDependency, Mock {
@@ -38,6 +39,7 @@ object Mocks {
             const val method3 = "method3"
             const val method4 = "method4"
             const val method5 = "method5"
+            const val method6 = "method6"
         }
 
         object Arg {
@@ -45,6 +47,7 @@ object Mocks {
             const val value = "value"
             const val value1 = "value1"
             const val value2 = "value2"
+            const val callback = "callback"
         }
 
         override fun method1(str: String) = mockUnit(
@@ -77,6 +80,13 @@ object Mocks {
         override fun method5() = mockUnit(
             methodName = Method.method5
         )
+
+        override fun method6(callback: () -> Unit) = mockUnit(
+            methodName = Method.method6,
+            arguments = mapOf(
+                Arg.callback to callback
+            )
+        )
     }
 
     class MyDependencySpy(private val delegate: MyDependency) : MyDependency, Spy {
@@ -87,6 +97,7 @@ object Mocks {
             const val method3 = "method3"
             const val method4 = "method4"
             const val method5 = "method5"
+            const val method6 = "method6"
         }
 
         object Arg {
@@ -94,6 +105,7 @@ object Mocks {
             const val value = "value"
             const val value1 = "value1"
             const val value2 = "value2"
+            const val callback = "callback"
         }
 
         override fun method1(str: String) = spy(
@@ -131,6 +143,14 @@ object Mocks {
             methodName = Method.method5,
             delegate = { delegate.method5() }
         )
+
+        override fun method6(callback: () -> Unit) = spy(
+            methodName = Method.method6,
+            delegate = { delegate.method6(callback) },
+            arguments = mapOf(
+                Arg.callback to callback
+            )
+        )
     }
 
     class MyDependencyImpl : MyDependency {
@@ -154,6 +174,10 @@ object Mocks {
 
         override fun method5() {
             // no-ops
+        }
+
+        override fun method6(callback: () -> Unit) {
+            callback()
         }
     }
 }

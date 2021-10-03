@@ -1,12 +1,14 @@
 # MockingBird
+
 <img src="https://github.com/careem/mockingbird/blob/assets/logo.png" width="40%" height="40%" alt="MockingBird Logo"/>
 
-![version](https://img.shields.io/badge/version-1.6.0-blue) [![Build Status](https://app.bitrise.io/app/0f4e1b30e3e56dfb/status.svg?token=iHecTZF7GpuyTMqiFj618Q&branch=master)](https://app.bitrise.io/build/c0b2c4e103c222bb) 
+![version](https://img.shields.io/badge/version-1.6.0-blue) [![Build Status](https://app.bitrise.io/app/0f4e1b30e3e56dfb/status.svg?token=iHecTZF7GpuyTMqiFj618Q&branch=master)](https://app.bitrise.io/build/c0b2c4e103c222bb)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A Koltin multiplatform library that provides an easier way to mock and write unit tests for a multiplatform project
 
 ## Disclaimers
+
 This project may contain experimental code and may not be ready for general use. Support and/or releases may be limited.
 
 ## Setup
@@ -19,16 +21,18 @@ implementation "com.careem.mockingbird:mockingbird:1.2.0"
 
 ## Usage
 
-MockingBird doesn't use any annotation processor or reflection. This means that it is a bit more verbose
-with respect to libraries like `Mockito` or `Mockk`
+MockingBird doesn't use any annotation processor or reflection. This means that it is a bit more verbose with respect to
+libraries like `Mockito` or `Mockk`
 
 ### Mocks
-The first step you need to do is create a mock class for the object you want to mock, 
-you need a mock for each dependency type you want to mock
+
+The first step you need to do is create a mock class for the object you want to mock, you need a mock for each
+dependency type you want to mock
 
 The library provides 2 functions to help you write your mocks.
-1. `mock` this function allows you to mock non-Unit methods 
-1. `mockUnit` this function allows you to mock Unit methods 
+
+1. `mock` this function allows you to mock non-Unit methods
+1. `mockUnit` this function allows you to mock Unit methods
 
 These helpers enable you to map your mock invocations to MockingBird environment.
 
@@ -93,12 +97,13 @@ class MyDependencyMock : MyDependency, Mock {
 
 ### Spies
 
-When you need a combination of real behavior and mocked behavior you can use `spy` with spy you wrap
-wrap a real implementation. Doing so Mocking Bird will record the interactions with the spied object.
+When you need a combination of real behavior and mocked behavior you can use `spy` with spy you wrap wrap a real
+implementation. Doing so Mocking Bird will record the interactions with the spied object.
 
 To mock a specific invocation you can use the spied object like a normal mock, see sections below for further details.
 
 A Spy sample object is reported here
+
 ```kotlin
 interface MyDependency {
     fun method1(str: String)
@@ -176,21 +181,23 @@ class MyDependencyImpl : MyDependency {
 }
 ```
 
-
 ### Mocking
 
-When your mocks are ready you can write your tests and specify the behavior you want when a method 
-on your mock is called, and verify the method is called your mock.
+When your mocks are ready you can write your tests and specify the behavior you want when a method on your mock is
+called, and verify the method is called your mock.
 
 To do that you will use:
+
 1. `every`
 2. `everyAnswer`
 3. `verify`
 
 #### every
+
 `every` allows you to specify the value you want to return for a specific invocation
 
 If you want to return 3 when `myDependencyMock.method3(4, 5)` is called, your `every` will look like
+
 ```kotlin
 testMock.every(
     methodName = MyDependencyMock.Method.method3,
@@ -200,9 +207,9 @@ testMock.every(
 
 #### everyAnswers
 
-If you wish to perform specific logic when you mock is called you can use `everyAnswer`, here you can 
-specify the behavior you want for your mock. A typical use case is when you want to invoke a callback 
-that was passed as parameter to the mocked function.
+If you wish to perform specific logic when you mock is called you can use `everyAnswer`, here you can specify the
+behavior you want for your mock. A typical use case is when you want to invoke a callback that was passed as parameter
+to the mocked function.
 
 The code for a callback invocation will look like
 
@@ -220,9 +227,9 @@ myMock.everyAnswers(
 
 #### Verify
 
-After the invocation of your mock is defined, you need to verify it is invoked to make your unit test
-valid. For example if you want to verify `myDependencyMock.method3(4, 5)` is invoked, you should do
-something like:
+After the invocation of your mock is defined, you need to verify it is invoked to make your unit test valid. For example
+if you want to verify `myDependencyMock.method3(4, 5)` is invoked, you should do something like:
+
 ```kotlin
 testMock.verify(
     exactly = 1,
@@ -231,39 +238,42 @@ testMock.verify(
     timeoutMillis = 5000L
 )
 ```
-Note: `exactly` is how many times you want to verify invocation of your mock is invoked, by default
-it will be 1, so no need to set it up if you want to verify exactly 1 time invocation.
 
-Note: when `timeoutMillis` is set with a value greater than 0 the test condition will be evaluated multiple
-times up to `timeoutMillis`. If the condition is not satisfied within the given timeout the verify will fail.
+Note: `exactly` is how many times you want to verify invocation of your mock is invoked, by default it will be 1, so no
+need to set it up if you want to verify exactly 1 time invocation.
+
+Note: when `timeoutMillis` is set with a value greater than 0 the test condition will be evaluated multiple times up
+to `timeoutMillis`. If the condition is not satisfied within the given timeout the verify will fail.
 
 ### Matching
 
-When your mocks are ready you can write your tests and specify the behavior you want when a method 
-on your mock is called, and verify the method is called your mock.
-Sometimes besides mocking, we want to verify the equality of argument that passed to the mock's
-invocation, sometimes we don't care about the argument value or sometimes we want to strongly verify 
-that the invocation is **not** invoked no matter what arguments is passed. In all these cases, we need
-matching arguments. 
+When your mocks are ready you can write your tests and specify the behavior you want when a method on your mock is
+called, and verify the method is called your mock. Sometimes besides mocking, we want to verify the equality of argument
+that passed to the mock's invocation, sometimes we don't care about the argument value or sometimes we want to strongly
+verify that the invocation is **not** invoked no matter what arguments is passed. In all these cases, we need matching
+arguments.
 
 To do matching, you will use:
+
 1. `any()`
 2. `Slot` and `capture`
 
 #### Any
 
-As it looks like, `any()` matcher will give you ability to ignore the compare of argument when mocking
-invocation or verify it. For example, if you want to return 3 when `myDependencyMock.method3` is 
-called no matter what two arguments is passed in, your `every` will look like:
+As it looks like, `any()` matcher will give you ability to ignore the compare of argument when mocking invocation or
+verify it. For example, if you want to return 3 when `myDependencyMock.method3` is called no matter what two arguments
+is passed in, your `every` will look like:
+
 ```kotlin
 testMock.every(
     methodName = MyDependencyMock.Method.method3,
     arguments = mapOf(MyDependencyMock.Arg.value1 to any(), MyDependencyMock.Arg.value2 to any())
 ) { 3 }
 ```
-By doing this, both `myDependencyMock.method3(1,2)` or `myDependencyMock.method3(3,4)` will all 
-returns 3. Similar to this `every`, you can easily verify `myDependencyMock.method3` is invoked and
-ignore the argument comparing by:
+
+By doing this, both `myDependencyMock.method3(1,2)` or `myDependencyMock.method3(3,4)` will all returns 3. Similar to
+this `every`, you can easily verify `myDependencyMock.method3` is invoked and ignore the argument comparing by:
+
 ```kotlin
 testMock.verify(
     exactly = 1,
@@ -271,15 +281,17 @@ testMock.verify(
     arguments = mapOf(MyDependencyMock.Arg.value1 to any(), MyDependencyMock.Arg.value2 to any())
 )
 ```
+
 A normal use case on verify with `any()` matcher is verify invocation is invoked `exactly = 0` with
 `any()` arguments which means it is never invoked completely.
 
 #### Arguments Capturing
 
 Another use case for matching is: for example you want to verify `myDependencyMock.method4(object1)`
-is invoked, but the reference of object1 is not mocked or initiated inside the test case, In this case,
-an easy way to verify, or say matching arguments, is create a object `Slot` or `CapturedList` and then
+is invoked, but the reference of object1 is not mocked or initiated inside the test case, In this case, an easy way to
+verify, or say matching arguments, is create a object `Slot` or `CapturedList` and then
 `capture` this object when verify the invocation, something like:
+
 ```kotlin
 val objectSlot = Slot<Object>()
 val objectCapturedList = CapturedList<Object>()
@@ -305,10 +317,46 @@ assertTrue { objectCapturedList.assertSize(2) }
 assertTrue { capturedList.assertItem(0, expectedProperty) }
 assertTrue { capturedList.assertItem(1, expectedProperty) }
 ```
-For capturing slot, a common use case for this capturing is when a new instance is created inside testing
-method and you want to compare some properties of the captured object initialized correctly. For capturing
-list, a common use case is invocation is invoked multiple times and you want to verify the arguments of
-each separately.
+
+For capturing slot, a common use case for this capturing is when a new instance is created inside testing method and you
+want to compare some properties of the captured object initialized correctly. For capturing list, a common use case is
+invocation is invoked multiple times and you want to verify the arguments of each separately.
+
+### Test Mode
+
+Changing the test mode will allow you to mock objects for different test scenarios, for example integration tests or
+unit tests.
+
+By default mockingbirds handles mocks in a way that they can be shared across multiple threads, sometimes this will
+introduce some limitations when you want to test classes that cannot be shared across threads and that for this reason
+they might have something like `ensureNeverFrozen` in their constructor.
+
+For those cases you might want to use the `LOCAL_THREAD` test mode where the arguments you pass to the mock do not need
+to be frozen because you know that your class is a single threaded class.
+
+Example of `LOCAL_THREAD` mode:
+
+```kotlin
+@Test
+fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
+        val myDependencyMock = MyDependencyMock()
+        myDependencyMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method6,
+            arguments = mapOf(
+                MyDependencyMock.Arg.callback to any()
+            )
+        ) { it.getArgument<() -> Unit>(MyDependencyMock.Arg.callback).invoke() }
+
+        val instance = LocalThreadAccessibleClass(myDependencyMock)
+        instance.execute()
+
+        myDependencyMock.verify(
+            methodName = MyDependencyMock.Method.method6,
+            arguments = mapOf(Mocks.MyDependencySpy.Arg.callback to any())
+        )
+        assertEquals(1, instance.counter)
+    }
+```
 
 ## License
 

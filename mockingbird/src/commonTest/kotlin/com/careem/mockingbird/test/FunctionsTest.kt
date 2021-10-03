@@ -32,6 +32,26 @@ import kotlin.test.assertTrue
 class FunctionsTest {
 
     @Test
+    fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD){
+        val myDependencyMock = MyDependencyMock()
+        myDependencyMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method6,
+            arguments = mapOf(
+                MyDependencyMock.Arg.callback to any()
+            )
+        ){ it.getArgument<() -> Unit>(MyDependencyMock.Arg.callback).invoke() }
+
+        val instance = LocalThreadAccessibleClass(myDependencyMock)
+        instance.execute()
+
+        myDependencyMock.verify(
+            methodName = MyDependencyMock.Method.method6,
+            arguments = mapOf(Mocks.MyDependencySpy.Arg.callback to any())
+        )
+        assertEquals(1, instance.counter)
+    }
+
+    @Test
     fun testEveryAnswerWhenMockCalledFromWorker() {
         val testMock = MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
