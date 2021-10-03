@@ -47,7 +47,6 @@ class MockGenerator constructor(
 
     fun createClass(kmClass: ImmutableKmClass): FileSpec {
         val classToMock = classLoader.loadClass(kmClass)
-//        val kmClassToMock = classToMock.toImmutableKmClass() // TODO complete
         val simpleName = kmClass.name.substringAfterLast("/")
 
         val packageName = classToMock.qualifiedName!!.substringBeforeLast(".")
