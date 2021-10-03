@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.5.31"
+kotlin = "1.5.21"
 junit = "4.13.1"
 jacoco = "0.8.7"
 stately = "1.1.10-a1"
