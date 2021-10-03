@@ -17,7 +17,8 @@
 package com.careem.mockingbird.sample
 
 interface InterfaceWithGenerics {
-    fun foo(fooArg: List<Int>): List<String>
+    fun foo(fooArg: List<List<Int>>): List<List<String>>
+    fun complexFoo(fooArg: List<Map<List<List<Int>>, List<String>>>): List<List<String>>
     fun foo(fooArg: Map<Int, String>): Map<String, Int>
 
     var g1: List<String>

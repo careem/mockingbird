@@ -262,21 +262,23 @@ class MockGenerator constructor(
     }
 
     private fun ImmutableKmType.buildType(): TypeName {
-        val arguments = this.arguments
-            .map { classLoader.loadClass(it.type!!).asTypeName() }// TODO support suspend fun ?
-        val result = classLoader.loadClass(this)
+        val subTypes = this.arguments.map { it.type!! }
+        return classLoader.loadClass(this)
             .asTypeName()
             .let {
-                if (arguments.isNotEmpty()) {
-                    it.parameterizedBy(arguments)
-                } else {
+                if (subTypes.isEmpty()) {
                     it
+                } else {
+                    val typeNames = subTypes.map { subType ->
+                        subType.buildType()
+                    }
+                    it.parameterizedBy(typeNames)
                 }
             }.copy(
                 nullable = this.isNullable
             )
-        return result
     }
+
 
     private fun FunSpec.Builder.addMockStatement(function: ImmutableKmFunction, isUnit: Boolean) {
         // TODO remove duplicates in args and method names
