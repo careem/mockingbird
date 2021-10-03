@@ -97,31 +97,47 @@ class ClassLoaderWrapper(
             .toURL()
 
 
-    private fun String.toJavaFullyQualifiedName(): String {
-        return when (this) {
-            "kotlin/String" -> "java.lang.String"
-            "kotlin/Int" -> "java.lang.Integer"
-            "kotlin/Long" -> "java.lang.Long"
-            "kotlin/Boolean" -> "java.lang.Boolean"
-            "kotlin/Double" -> "java.lang.Double"
-            "kotlin/Float" -> "java.lang.Float"
-            "kotlin/Short" -> "java.lang.Short"
-            "kotlin/Char" -> "java.lang.Char"
-            "kotlin/Throwable" -> "java.lang.Throwable"
-            "kotlin/collections/List" -> "java.util.List"
-            "kotlin/collections/Map" -> "java.util.Map"
-            //TODo complete/ revise/ replace with Kotlin poet types
-            else -> {
-                this.replace("/", ".")
-            }
-        }
-    }
+    private fun String.toJavaFullyQualifiedName(): String = this.replace("/", ".").toJavaPackage()
 
     private fun extractTypeString(type: ImmutableKmType): String {
         return if (type.classifier is KmClassifier.Class) {
             (type.classifier as KmClassifier.Class).name
         } else {
             throw IllegalArgumentException("I can't mock this type: ${type.classifier}")
+        }
+    }
+
+    private fun String.toJavaPackage(): String{
+        return when(this){
+            "kotlin.Byte" -> "java.lang.Byte"
+            "kotlin.Short" -> "java.lang.Short"
+            "kotlin.Int" -> "java.lang.Integer"
+            "kotlin.String" -> "java.lang.String"
+            "kotlin.Long" -> "java.lang.Long"
+            "kotlin.Char" -> "java.lang.Character"
+            "kotlin.Float" -> "java.lang.Float"
+            "kotlin.Double" -> "java.lang.Double"
+            "kotlin.Boolean" -> "java.lang.Boolean"
+
+            "kotlin.Any" -> "java.lang.Object"
+            "kotlin.Cloneable" -> "java.lang.Cloneable"
+            "kotlin.Comparable" -> "java.lang.Comparable"
+            "kotlin.Enum" -> "java.lang.Enum"
+            "kotlin.CharSequence" -> "java.lang.CharSequence"
+            "kotlin.Number" -> "java.lang.Number"
+            "kotlin.Throwable" -> "java.lang.Throwable"
+
+            // Collections
+            "kotlin.collections.Iterator" -> "java.util.Iterator"
+            "kotlin.collections.Iterable" -> "java.lang.Iterable"
+            "kotlin.collections.Collection" -> "java.util.Collection"
+            "kotlin.collections.Set" -> "java.util.Set"
+            "kotlin.collections.List" -> "java.util.List"
+            "kotlin.collections.ListIterator" -> "java.util.ListIterator"
+            "kotlin.collections.Map" -> "java.util.Map"
+//            "kotlin.collections.Map.Entry" -> "java.util.Map.Entry" // FIXME class not found
+            // TODO arrays?
+            else -> this
         }
     }
 }
