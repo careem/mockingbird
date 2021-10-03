@@ -22,7 +22,4 @@ internal class IsolateStateInvocationRecorderProvider : InvocationRecorderProvid
     private val invocationRecorder = IsolateState { InvocationRecorder() }
 
     override fun <R> access(block: (InvocationRecorder) -> R): R = invocationRecorder.access(block)
-
-    override fun dispose() = invocationRecorder.dispose()
-
 }
