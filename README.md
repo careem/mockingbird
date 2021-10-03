@@ -322,6 +322,42 @@ For capturing slot, a common use case for this capturing is when a new instance 
 want to compare some properties of the captured object initialized correctly. For capturing list, a common use case is
 invocation is invoked multiple times and you want to verify the arguments of each separately.
 
+### Test Mode
+
+Changing the test mode will allow you to mock objects for different test scenarios, for example integration tests or
+unit tests.
+
+By default mockingbirds handles mocks in a way that they can be shared across multiple threads, sometimes this will
+introduce some limitations when you want to test classes that cannot be shared across threads and that for this reason
+they might have something like `ensureNeverFrozen` in their constructor.
+
+For those cases you might want to use the `LOCAL_THREAD` test mode where the arguments you pass to the mock do not need
+to be frozen because you know that your class is a single threaded class.
+
+Example of `LOCAL_THREAD` mode:
+
+```kotlin
+@Test
+fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
+        val myDependencyMock = MyDependencyMock()
+        myDependencyMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method6,
+            arguments = mapOf(
+                MyDependencyMock.Arg.callback to any()
+            )
+        ) { it.getArgument<() -> Unit>(MyDependencyMock.Arg.callback).invoke() }
+
+        val instance = LocalThreadAccessibleClass(myDependencyMock)
+        instance.execute()
+
+        myDependencyMock.verify(
+            methodName = MyDependencyMock.Method.method6,
+            arguments = mapOf(Mocks.MyDependencySpy.Arg.callback to any())
+        )
+        assertEquals(1, instance.counter)
+    }
+```
+
 ### Mock generation plugin ( experimental )
 
 The Mock generation plugin generates the Mock boilerplate code for you, the plugin can be used along with manual mocks, 
