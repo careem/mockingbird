@@ -328,10 +328,10 @@ Changing the test mode will allow you to mock objects for different test scenari
 unit tests.
 
 By default mockingbirds handles mocks in a way that they can be shared across multiple threads, sometimes this will
-introduce some limitations when you want to test classes that are not shared across threads and that for this reason
-they might have something like `ensureNeverFrozen` on their constructor.
+introduce some limitations when you want to test classes that cannot be shared across threads and that for this reason
+they might have something like `ensureNeverFrozen` in their constructor.
 
-For those cases you might want to have a `LOCAL_THREAD` test mode where the arguments you pass to the mock do not need
+For those cases you might want to use the `LOCAL_THREAD` test mode where the arguments you pass to the mock do not need
 to be frozen because you know that your class is a single threaded class.
 
 Example of `LOCAL_THREAD` mode:

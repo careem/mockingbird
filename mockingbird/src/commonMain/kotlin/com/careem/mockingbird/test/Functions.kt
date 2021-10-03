@@ -33,7 +33,7 @@ public interface Spy : Mock
  * test allowing you to run a test in a specific mode in isolation.
  * @see README section [Test Mode]
  */
-public fun runWithTestMode(testMode: TestMode, testBlock: () -> Unit){
+public fun runWithTestMode(testMode: TestMode, testBlock: () -> Unit) {
     MockingBird.reset() // Reset in case of test not running using runWithTestMode
     MockingBird.mode = testMode
     testBlock()

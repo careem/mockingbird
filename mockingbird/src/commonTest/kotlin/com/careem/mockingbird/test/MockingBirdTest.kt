@@ -20,6 +20,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -73,13 +74,10 @@ class MockingBirdTest {
             )
         ) { Mocks.TEST_INT }
 
-        try {
+        assertFailsWith<UnsupportedOperationException> {
             MockingBird.mode = TestMode.LOCAL_THREAD
-        } catch (error: UnsupportedOperationException) {
-            assertNotNull(error)
-        } finally {
-            assertEquals(TestMode.MULTI_THREAD, MockingBird.mode)
         }
+        assertEquals(TestMode.MULTI_THREAD, MockingBird.mode)
     }
 
     @AfterTest
