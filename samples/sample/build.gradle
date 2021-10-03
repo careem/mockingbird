@@ -37,6 +37,7 @@ kotlin {
 
 mockingBird {
     generateMocksFor = [
+            'com.careem.mockingbird.sample.InterfaceWithGenerics',
             'com.careem.mockingbird.sample.PippoSample',
             'com.careem.mockingbird.sample.Mock1',
             'com.careem.mockingbird.sample.MockWithExternalDependencies',

@@ -108,7 +108,9 @@ class ClassLoaderWrapper(
             "kotlin/Short" -> "java.lang.Short"
             "kotlin/Char" -> "java.lang.Char"
             "kotlin/Throwable" -> "java.lang.Throwable"
-            //TODo complete/ revise
+            "kotlin/collections/List" -> "java.util.List"
+            "kotlin/collections/Map" -> "java.util.Map"
+            //TODo complete/ revise/ replace with Kotlin poet types
             else -> {
                 this.replace("/", ".")
             }
