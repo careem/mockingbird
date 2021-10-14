@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* **breaking** If there are multiple mocked responses matching a mock invocation, the one that was added last will be used
 * Introduced testing mode, before the behavior was always MULTI_THREAD now it is possible to set LOCAL_THREAD mode to avoid argument freeze on mock invocation
 
 ## 1.12.0
