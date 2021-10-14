@@ -46,16 +46,27 @@ public fun <T> capture(list: CapturedList<T>): CapturedMatcher<T> {
 /**
  * A slot using to fetch the method invocation and compare the property inside invocation arguments
  * Usage example @see [FunctionsTest]
- *
  */
+
+public class Slot<T> : Captureable {
+
+    private val genericSlot : GenereicSlot<T> = initializeSlot<T>()
+
+    public val captured: T?
+        get() {
+            return genericSlot.value
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun storeCapturedValue(value: Any?) {
+        genericSlot.storeCapturedValue(value)
+    }
+}
 
 private fun <T> initializeSlot(): GenereicSlot<T> {
     return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> MultiThreadSlot<T>()
-        TestMode.LOCAL_THREAD -> LocalThreadSlot<T>()
-//        TestMode.LOCAL_THREAD -> {
-//            TODO()
-//        }
+        TestMode.MULTI_THREAD -> MultiThreadSlot()
+        TestMode.LOCAL_THREAD -> LocalThreadSlot()
     }
 }
 
@@ -91,21 +102,6 @@ private class LocalThreadSlot<T> : GenereicSlot<T> {
     @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
         this.value = value as T
-    }
-}
-
-public class Slot<T> : Captureable {
-
-    private val genericSlot : GenereicSlot<T> = initializeSlot<T>()
-
-    public val captured: T?
-        get() {
-          return genericSlot.value
-        }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun storeCapturedValue(value: Any?) {
-        genericSlot.storeCapturedValue(value)
     }
 }
 
