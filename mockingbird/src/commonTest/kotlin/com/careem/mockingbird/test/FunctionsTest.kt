@@ -159,6 +159,25 @@ class FunctionsTest {
         assertEquals(TEST_STRING, stringSlot.captured)
     }
 
+    //TODO verify that the slot is a LocalThreadSlot
+    @Test
+    fun testCaptureLocalSlotWithCorrectArgument() = runWithTestMode(TestMode.LOCAL_THREAD) {
+        val testMock = MyDependencyMock()
+        val stringSlot = Slot<String>()
+
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
+        )
+        assertEquals(TEST_STRING, stringSlot.captured)
+    }
+
     @Test
     fun testCaptureSlotWithWrongArgument() {
         val testMock = MyDependencyMock()

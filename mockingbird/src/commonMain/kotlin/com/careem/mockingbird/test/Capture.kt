@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("NON_EXHAUSTIVE_WHEN")
+
 package com.careem.mockingbird.test
 
 import co.touchlab.stately.isolate.IsolateState
@@ -44,21 +46,66 @@ public fun <T> capture(list: CapturedList<T>): CapturedMatcher<T> {
 /**
  * A slot using to fetch the method invocation and compare the property inside invocation arguments
  * Usage example @see [FunctionsTest]
+ *
  */
 
-public class Slot<T> : Captureable {
+private fun <T> initializeSlot(): GenereicSlot<T> {
+    return when (MockingBird.mode) {
+        TestMode.MULTI_THREAD -> MultiThreadSlot<T>()
+        TestMode.LOCAL_THREAD -> LocalThreadSlot<T>()
+//        TestMode.LOCAL_THREAD -> {
+//            TODO()
+//        }
+    }
+}
+
+private interface GenereicSlot<T> : Captureable {
+    val value: T?
+}
+
+private class MultiThreadSlot<T> : GenereicSlot<T> {
+
     private val _captured: AtomicRef<T?> = atomic(null)
-    public var captured: T?
+
+    @Suppress("UNCHECKED_CAST")
+    override fun storeCapturedValue(value: Any?) {
+        _captured.value = value as T
+    }
+
+    override val value: T?
+        get() = _captured.value
+}
+
+private class LocalThreadSlot<T> : GenereicSlot<T> {
+
+    private var _captured: T? = null
+
+    public override var value: T?
         get() {
-            return _captured.value
+            return _captured
         }
         private set(value) {
-            _captured.value = value
+            _captured = value
         }
 
     @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
-        captured = value as T
+        this.value = value as T
+    }
+}
+
+public class Slot<T> : Captureable {
+
+    private val genericSlot : GenereicSlot<T> = initializeSlot<T>()
+
+    public val captured: T?
+        get() {
+          return genericSlot.value
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun storeCapturedValue(value: Any?) {
+        genericSlot.storeCapturedValue(value)
     }
 }
 
