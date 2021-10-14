@@ -23,7 +23,7 @@ internal class InvocationRecorder {
     }
 
     private val recorder = mutableMapOf<Int, MutableList<Invocation>>()
-    private val responses = mutableMapOf<Int, MutableMap<Invocation, (Invocation) -> Any?>>()
+    private val responses = mutableMapOf<Int, LinkedHashMap<Invocation, (Invocation) -> Any?>>()
 
     /**
      * This function must be called by the mock when a function call is exceuted on it
@@ -65,7 +65,7 @@ internal class InvocationRecorder {
      */
     fun <T> storeAnswer(instanceHash: Int, invocation: Invocation, answer: (Invocation) -> T) {
         if (!responses.containsKey(instanceHash)) {
-            responses[instanceHash] = mutableMapOf()
+            responses[instanceHash] = LinkedHashMap()
         }
         responses[instanceHash]!![invocation] = answer as (Invocation) -> Any?
     }
@@ -99,7 +99,7 @@ internal class InvocationRecorder {
         invocation: Invocation,
         relaxed: Boolean
     ): ((Invocation) -> Any?) {
-        for (storedInvocation in storedInvocationMap.keys) {
+        for (storedInvocation in storedInvocationMap.keys.reversed()) {
             if (compareInvocation(storedInvocation, invocation)) {
                 return storedInvocationMap[storedInvocation]!!
             }

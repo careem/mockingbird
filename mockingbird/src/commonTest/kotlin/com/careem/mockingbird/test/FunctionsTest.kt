@@ -240,7 +240,7 @@ class FunctionsTest {
             )
         ) { 4 }
         assertEquals(4, testMock.method3(300, 200))
-        assertEquals(1, testMock.method3(TEST_INT, TEST_INT))
+        assertEquals(4, testMock.method3(TEST_INT, TEST_INT))
     }
 
     @Test
@@ -428,6 +428,37 @@ class FunctionsTest {
         println(verifyEndTime)
 
         assertTrue { verifyEndTime - verifyStartTime < VERIFY_TIMEOUT }
+    }
+
+
+    @Test
+    fun testLastRecordedInvocationRetrivedIfMultipleMatches() {
+        val a = 2
+        val b = 3
+        val testMock = MyDependencyMock()
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method3,
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to any(),
+                MyDependencyMock.Arg.value2 to any()
+            )
+        ) {
+            return@everyAnswers a
+        }
+
+        assertEquals(a, testMock.method3(0, 1))
+
+        testMock.everyAnswers(
+            methodName = MyDependencyMock.Method.method3,
+            arguments = mapOf(
+                MyDependencyMock.Arg.value1 to any(),
+                MyDependencyMock.Arg.value2 to any()
+            )
+        ) {
+            return@everyAnswers b
+        }
+
+        assertEquals(b, testMock.method3(0, 1))
     }
 
     companion object {
