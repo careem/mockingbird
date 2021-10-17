@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("NON_EXHAUSTIVE_WHEN")
-
 package com.careem.mockingbird.test
 
 import co.touchlab.stately.isolate.IsolateState
@@ -50,31 +48,30 @@ public fun <T> capture(list: CapturedList<T>): CapturedMatcher<T> {
 
 public class Slot<T> : Captureable {
 
-    private val genericSlot : GenereicSlot<T> = initializeSlot<T>()
+    private val genericSlot : GenericSlot<T> = initializeSlot()
 
     public val captured: T?
         get() {
             return genericSlot.value
         }
 
-    @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
         genericSlot.storeCapturedValue(value)
     }
 }
 
-private fun <T> initializeSlot(): GenereicSlot<T> {
+private fun <T> initializeSlot(): GenericSlot<T> {
     return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> MultiThreadSlot()
+        TestMode.MULTI_THREAD -> ThreadSafeSlot()
         TestMode.LOCAL_THREAD -> LocalThreadSlot()
     }
 }
 
-private interface GenereicSlot<T> : Captureable {
-    val value: T?
+public interface GenericSlot<T> : Captureable {
+    public val value: T?
 }
 
-private class MultiThreadSlot<T> : GenereicSlot<T> {
+private class ThreadSafeSlot<T> : GenericSlot<T> {
 
     private val _captured: AtomicRef<T?> = atomic(null)
 
@@ -87,7 +84,8 @@ private class MultiThreadSlot<T> : GenereicSlot<T> {
         get() = _captured.value
 }
 
-private class LocalThreadSlot<T> : GenereicSlot<T> {
+
+private class LocalThreadSlot<T> : GenericSlot<T> {
 
     private var _captured: T? = null
 

@@ -156,10 +156,11 @@ class FunctionsTest {
             methodName = MyDependencyMock.Method.method1,
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
+
         assertEquals(TEST_STRING, stringSlot.captured)
+        stringSlot.verifyFreezeStateForMultiThread()
     }
 
-    //TODO verify that the slot is a LocalThreadSlot
     @Test
     fun testCaptureLocalSlotWithCorrectArgument() = runWithTestMode(TestMode.LOCAL_THREAD) {
         val testMock = MyDependencyMock()
@@ -176,6 +177,7 @@ class FunctionsTest {
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
         assertEquals(TEST_STRING, stringSlot.captured)
+        stringSlot.verifyFreezeStateForLocalThread()
     }
 
     @Test
