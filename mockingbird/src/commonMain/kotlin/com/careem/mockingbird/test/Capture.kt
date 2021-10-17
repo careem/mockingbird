@@ -75,15 +75,14 @@ private class ThreadSafeSlot<T> : GenericSlot<T> {
 
     private val _captured: AtomicRef<T?> = atomic(null)
 
+    override val value: T?
+        get() = _captured.value
+
     @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
         _captured.value = value as T
     }
-
-    override val value: T?
-        get() = _captured.value
 }
-
 
 private class LocalThreadSlot<T> : GenericSlot<T> {
 
