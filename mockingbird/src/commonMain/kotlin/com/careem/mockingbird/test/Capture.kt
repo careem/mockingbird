@@ -108,19 +108,6 @@ private class LocalThreadSlot<T> : GenericSlot<T> {
  * invocation arguments
  * Usage example @see [FunctionsTest]
  */
-//public class CapturedList<T> : Captureable {
-//    private val _captured = IsolateState { mutableListOf<T>() }
-//    public val captured: List<T>
-//        get() {
-//            return _captured.access { it.toList() }
-//        }
-//
-//    @Suppress("UNCHECKED_CAST")
-//    override fun storeCapturedValue(value: Any?) {
-//        _captured.access { it.add(value as T) }
-//    }
-//}
-
 public class CapturedList<T> : Captureable {
 
     private val genericCaptureList = initializeGenericCaptureList<T>()
@@ -135,11 +122,11 @@ public class CapturedList<T> : Captureable {
     }
 }
 
-private interface GenericCaptureList<T> : Captureable {
+private interface GenericCapturedList<T> : Captureable {
     val value: List<T>
 }
 
-private class MultiThreadCaptureList<T> : GenericCaptureList<T> {
+private class MultiThreadCapturedList<T> : GenericCapturedList<T> {
 
     private val _captured = IsolateState { mutableListOf<T>() }
 
@@ -154,24 +141,21 @@ private class MultiThreadCaptureList<T> : GenericCaptureList<T> {
     }
 }
 
-
-private fun <T> initializeGenericCaptureList(): GenericCaptureList<T> {
+private fun <T> initializeGenericCaptureList(): GenericCapturedList<T> {
     return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> MultiThreadCaptureList()
-        TestMode.LOCAL_THREAD -> LocalThreadCaptureList()
+        TestMode.MULTI_THREAD -> MultiThreadCapturedList()
+        TestMode.LOCAL_THREAD -> LocalThreadCapturedList()
     }
 }
 
+private class LocalThreadCapturedList<T> : GenericCapturedList<T> {
 
-private class LocalThreadCaptureList<T> : GenericCaptureList<T> {
+    private val _captured = mutableListOf<T>()
 
-    private val _captured =   mutableListOf<T>()
-
-    public override val value: List<T>
+    override val value: List<T>
         get() {
             return _captured.toList()
         }
-
 
     @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
