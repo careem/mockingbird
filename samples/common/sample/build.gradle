@@ -24,7 +24,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation "com.badoo.reaktive:reaktive:1.2.0"
+                implementation libs.badoo.reaktive
             }
         }
     }

@@ -49,5 +49,8 @@ dependencies {
     implementation(libs.square.kotlinpoet.metadata.specs)
     implementation(libs.kotlinx.metadatajvm)
     implementation(project(":mockingbird"))
+
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.mockk.mockk)
 }
 
