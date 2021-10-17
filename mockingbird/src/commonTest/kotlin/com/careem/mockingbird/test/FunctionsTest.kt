@@ -221,6 +221,31 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
+        capturedList.verifyFreezeStateForMultiThread()
+    }
+
+    @Test
+    fun testCapturedListSucceedOnLocalThread()= runWithTestMode(TestMode.LOCAL_THREAD) {
+        val testMock = MyDependencyMock()
+        val capturedList = CapturedList<String>()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            exactly = 3,
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(capturedList))
+        )
+        assertEquals(3, capturedList.captured.size)
+        assertEquals(TEST_STRING, capturedList.captured[0])
+        assertEquals(TEST_STRING, capturedList.captured[1])
+        assertEquals(TEST_STRING, capturedList.captured[2])
+        capturedList.verifyFreezeStateForLocalThread()
     }
 
     @Test
