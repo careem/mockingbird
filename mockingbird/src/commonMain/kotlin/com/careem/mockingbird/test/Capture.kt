@@ -98,14 +98,13 @@ public fun <T> slot(): Slot<T> {
     }
 }
 
-
 public interface CapturedList<T> : Captureable {
     public val captured: List<T>
 }
 
 @Deprecated(
     message = "Use different function call instead",
-    replaceWith = ReplaceWith("capturedList()", "com.careem.mockingbird.test.slot")
+    replaceWith = ReplaceWith("capturedList()", "com.careem.mockingbird.test.capturedList")
 )
 /**
  * A list that using to fetch the method invocation and compare the property inside
@@ -116,6 +115,11 @@ public fun <T> CapturedList(): CapturedList<T> {
     return capturedList()
 }
 
+/**
+ * A list that using to fetch the method invocation and compare the property inside
+ * invocation arguments
+ * Usage example @see [FunctionsTest]
+ */
 public fun <T> capturedList(): CapturedList<T> {
     return when (MockingBird.mode) {
         TestMode.MULTI_THREAD -> ThreadSafeCapturedList()

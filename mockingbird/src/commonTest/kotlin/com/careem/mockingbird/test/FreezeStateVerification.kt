@@ -16,7 +16,6 @@
 
 package com.careem.mockingbird.test
 
-
 expect fun <T> T.verifyFreezeStateForMultiThread()
 
 expect fun <T> T.verifyFreezeStateForLocalThread()
