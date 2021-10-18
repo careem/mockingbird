@@ -97,34 +97,37 @@ public fun <T> slot(): Slot<T> {
         TestMode.LOCAL_THREAD -> LocalThreadSlot()
     }
 }
+
+
+public interface CapturedList<T> : Captureable {
+    public val captured: List<T>
+}
+
+@Deprecated(
+    message = "Use different function call instead",
+    replaceWith = ReplaceWith("capturedList()", "com.careem.mockingbird.test.slot")
+)
 /**
  * A list that using to fetch the method invocation and compare the property inside
  * invocation arguments
  * Usage example @see [FunctionsTest]
  */
-public class CapturedList<T> : Captureable {
+public fun <T> CapturedList(): CapturedList<T> {
+    return capturedList()
+}
 
-    private val genericCaptureList = captureList<T>()
-    public val captured: List<T>
-        get() {
-            return genericCaptureList.value
-        }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun storeCapturedValue(value: Any?) {
-        genericCaptureList.storeCapturedValue(value)
+public fun <T> capturedList(): CapturedList<T> {
+    return when (MockingBird.mode) {
+        TestMode.MULTI_THREAD -> ThreadSafeCapturedList()
+        TestMode.LOCAL_THREAD -> LocalThreadCapturedList()
     }
 }
 
-public interface GenericCapturedList<T> : Captureable {
-    public val value: List<T>
-}
-
-private class ThreadSafeCapturedList<T> : GenericCapturedList<T> {
+private class ThreadSafeCapturedList<T> : CapturedList<T> {
 
     private val _captured = IsolateState { mutableListOf<T>() }
 
-    override val value: List<T>
+    override val captured: List<T>
         get() {
             return _captured.access { it.toList() }
         }
@@ -135,18 +138,11 @@ private class ThreadSafeCapturedList<T> : GenericCapturedList<T> {
     }
 }
 
-public fun <T> captureList(): GenericCapturedList<T> {
-    return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> ThreadSafeCapturedList()
-        TestMode.LOCAL_THREAD -> LocalThreadCapturedList()
-    }
-}
-
-private class LocalThreadCapturedList<T> : GenericCapturedList<T> {
+private class LocalThreadCapturedList<T> : CapturedList<T> {
 
     private val _captured = mutableListOf<T>()
 
-    override val value: List<T>
+    override val captured: List<T>
         get() {
             return _captured.toList()
         }
