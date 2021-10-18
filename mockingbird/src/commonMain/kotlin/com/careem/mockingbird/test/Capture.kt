@@ -40,26 +40,79 @@ public fun <T> capture(slot: Slot<T>): CapturedMatcher<T> {
 public fun <T> capture(list: CapturedList<T>): CapturedMatcher<T> {
     return CapturedMatcher(list)
 }
+public interface Slot<T> : Captureable {
+    public val captured: T?
+}
+
+private class ThreadSafeSlot<T> : Slot<T> {
+
+    private val _captured: AtomicRef<T?> = atomic(null)
+
+    override val captured: T?
+        get() = _captured.value
+
+    @Suppress("UNCHECKED_CAST")
+    override fun storeCapturedValue(value: Any?) {
+        _captured.value = value as T
+    }
+}
+
+private class LocalThreadSlot<T> : Slot<T> {
+
+    private var _captured: T? = null
+
+    override var captured: T?
+        get() {
+            return _captured
+        }
+        private set(value) {
+            _captured = value
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun storeCapturedValue(value: Any?) {
+        this.captured = value as T
+    }
+}
+
+@Deprecated(
+    message = "Use different function call instead",
+    replaceWith = ReplaceWith("slot()", "com.careem.mockingbird.test.slot")
+)
+/**
+ * A slot using to fetch the method invocation and compare the property inside invocation arguments
+ * Usage example @see [FunctionsTest]
+ */
+public fun <T> Slot(): Slot<T> {
+    return slot()
+}
 
 /**
  * A slot using to fetch the method invocation and compare the property inside invocation arguments
  * Usage example @see [FunctionsTest]
  */
-
-public class Slot<T> : Captureable {
-    private val _captured: AtomicRef<T?> = atomic(null)
-    public var captured: T?
-        get() {
-            return _captured.value
-        }
-        private set(value) {
-            _captured.value = value
-        }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun storeCapturedValue(value: Any?) {
-        captured = value as T
+public fun <T> slot(): Slot<T> {
+    return when (MockingBird.mode) {
+        TestMode.MULTI_THREAD -> ThreadSafeSlot()
+        TestMode.LOCAL_THREAD -> LocalThreadSlot()
     }
+}
+
+public interface CapturedList<T> : Captureable {
+    public val captured: List<T>
+}
+
+@Deprecated(
+    message = "Use different function call instead",
+    replaceWith = ReplaceWith("capturedList()", "com.careem.mockingbird.test.capturedList")
+)
+/**
+ * A list that using to fetch the method invocation and compare the property inside
+ * invocation arguments
+ * Usage example @see [FunctionsTest]
+ */
+public fun <T> CapturedList(): CapturedList<T> {
+    return capturedList()
 }
 
 /**
@@ -67,9 +120,18 @@ public class Slot<T> : Captureable {
  * invocation arguments
  * Usage example @see [FunctionsTest]
  */
-public class CapturedList<T> : Captureable {
+public fun <T> capturedList(): CapturedList<T> {
+    return when (MockingBird.mode) {
+        TestMode.MULTI_THREAD -> ThreadSafeCapturedList()
+        TestMode.LOCAL_THREAD -> LocalThreadCapturedList()
+    }
+}
+
+private class ThreadSafeCapturedList<T> : CapturedList<T> {
+
     private val _captured = IsolateState { mutableListOf<T>() }
-    public val captured: List<T>
+
+    override val captured: List<T>
         get() {
             return _captured.access { it.toList() }
         }
@@ -77,6 +139,21 @@ public class CapturedList<T> : Captureable {
     @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
         _captured.access { it.add(value as T) }
+    }
+}
+
+private class LocalThreadCapturedList<T> : CapturedList<T> {
+
+    private val _captured = mutableListOf<T>()
+
+    override val captured: List<T>
+        get() {
+            return _captured.toList()
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun storeCapturedValue(value: Any?) {
+        this._captured.add(value as T)
     }
 }
 
