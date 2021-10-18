@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 * Added support to capture objects and lists while running a test with LOCAL_THREAD mode
+* **[DEPRECATED]** `Slot()` use `slot()` instead
+* **[DEPRECATED]** `CapturedList()` use `capturedList()` instead
 
 ## 1.13.0
 * **breaking** If there are multiple mocked responses matching a mock invocation, the one that was added last will be used
