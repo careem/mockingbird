@@ -256,7 +256,7 @@ arguments.
 To do matching, you will use:
 
 1. `any()`
-2. `Slot` and `capture`
+2. `slot()` and `capture`
 
 #### Any
 
@@ -289,12 +289,12 @@ A normal use case on verify with `any()` matcher is verify invocation is invoked
 
 Another use case for matching is: for example you want to verify `myDependencyMock.method4(object1)`
 is invoked, but the reference of object1 is not mocked or initiated inside the test case, In this case, an easy way to
-verify, or say matching arguments, is create a object `Slot` or `CapturedList` and then
+verify, or say matching arguments, is create an object using `slot()` or `capturedList()` and then
 `capture` this object when verify the invocation, something like:
 
 ```kotlin
-val objectSlot = Slot<Object>()
-val objectCapturedList = CapturedList<Object>()
+val objectSlot = slot<Object>()
+val objectCapturedList = capturedList<Object>()
 
 testMock.every(
     methodName = MyDependencyMock.Method.method1,
@@ -311,11 +311,11 @@ assertEquals(expectedProperty, objectSlot.captured.property)
 // capturing by capturedList
 testMock.verify(
     methodName = MyDependencyMock.Method.method4,
-    arguments = mapOf(MyDependencyMock.Arg.object1 to capture(objectCapturedList))
+    arguments = mapOf(MyDependencyMock.Arg.object1 to capture())
 )
 assertTrue { objectCapturedList.assertSize(2) }
-assertTrue { capturedList.assertItem(0, expectedProperty) }
-assertTrue { capturedList.assertItem(1, expectedProperty) }
+assertTrue { objectCapturedList.assertItem(0, expectedProperty) }
+assertTrue { objectCapturedList.assertItem(1, expectedProperty) }
 ```
 
 For capturing slot, a common use case for this capturing is when a new instance is created inside testing method and you
@@ -357,19 +357,6 @@ fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
         assertEquals(1, instance.counter)
     }
 ```
-
-### Mock generation plugin ( experimental )
-
-The Mock generation plugin generates the Mock boilerplate code for you, the plugin can be used along with manual mocks,
-it is currently in and experimental mode and it has several limitations.
-
-NOTE: the plugin doesn't discover which class to mock, but it depends on you to configure those
-
-#### Limitations
-
-* You can use the plugin only on a module containing a `jvm` target
-* You can mock interfaces only
-* You cannot mock interfaces that have generic types
 
 ## License
 

@@ -145,6 +145,27 @@ class FunctionsTest {
     @Test
     fun testCaptureSlotWithCorrectArgument() {
         val testMock = MyDependencyMock()
+        val stringSlot = slot<String>()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
+        )
+
+        assertEquals(TEST_STRING, stringSlot.captured)
+        stringSlot.verifyFreezeStateForMultiThread()
+    }
+
+    @Test
+    fun testCaptureSlotWithCorrectArgumentDeprecated() {
+        val testMock = MyDependencyMock()
+
+        @Suppress("DEPRECATION")
         val stringSlot = Slot<String>()
         testMock.every(
             methodName = MyDependencyMock.Method.method1,
@@ -156,12 +177,59 @@ class FunctionsTest {
             methodName = MyDependencyMock.Method.method1,
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
+
         assertEquals(TEST_STRING, stringSlot.captured)
+        stringSlot.verifyFreezeStateForMultiThread()
+    }
+
+
+    @Test
+    fun testCaptureLocalSlotWithCorrectArgumentDeprecated() = runWithTestMode(TestMode.LOCAL_THREAD) {
+        val testMock = MyDependencyMock()
+
+        @Suppress("DEPRECATION")
+        val stringSlot = Slot<String>()
+
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
+        )
+        assertEquals(TEST_STRING, stringSlot.captured)
+        stringSlot.verifyFreezeStateForLocalThread()
+    }
+
+
+    @Test
+    fun testCaptureLocalSlotWithCorrectArgument() = runWithTestMode(TestMode.LOCAL_THREAD) {
+        val testMock = MyDependencyMock()
+
+        val stringSlot = slot<String>()
+
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
+        )
+        assertEquals(TEST_STRING, stringSlot.captured)
+        stringSlot.verifyFreezeStateForLocalThread()
     }
 
     @Test
-    fun testCaptureSlotWithWrongArgument() {
+    fun testCaptureSlotWithWrongArgumentDeprecated() {
         val testMock = MyDependencyMock()
+
+        @Suppress("DEPRECATION")
         val stringSlot = Slot<String>()
         testMock.every(
             methodName = MyDependencyMock.Method.method1,
@@ -176,12 +244,88 @@ class FunctionsTest {
             )
         } catch (error: AssertionError) {
             assertNotNull(error)
+            stringSlot.verifyFreezeStateForMultiThread()
         }
+    }
+
+    @Test
+    fun testCaptureSlotWithWrongArgument() {
+        val testMock = MyDependencyMock()
+
+        val stringSlot = slot<String>()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        try {
+            testMock.method1(TEST_STRING)
+            testMock.verify(
+                methodName = MyDependencyMock.Method.method1,
+                arguments = mapOf(MyDependencyMock.Arg.value to capture(stringSlot))
+            )
+        } catch (error: AssertionError) {
+            assertNotNull(error)
+            stringSlot.verifyFreezeStateForMultiThread()
+        }
+    }
+
+    @Test
+    fun testCapturedListSucceedDeprecated() {
+        val testMock = MyDependencyMock()
+
+        @Suppress("DEPRECATION")
+        val capturedList = CapturedList<String>()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            exactly = 3,
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(capturedList))
+        )
+
+        assertEquals(3, capturedList.captured.size)
+        assertEquals(TEST_STRING, capturedList.captured[0])
+        assertEquals(TEST_STRING, capturedList.captured[1])
+        assertEquals(TEST_STRING, capturedList.captured[2])
+        capturedList.verifyFreezeStateForMultiThread()
     }
 
     @Test
     fun testCapturedListSucceed() {
         val testMock = MyDependencyMock()
+
+        val capturedList = capturedList<String>()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            exactly = 3,
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(capturedList))
+        )
+        assertEquals(3, capturedList.captured.size)
+        assertEquals(TEST_STRING, capturedList.captured[0])
+        assertEquals(TEST_STRING, capturedList.captured[1])
+        assertEquals(TEST_STRING, capturedList.captured[2])
+        capturedList.verifyFreezeStateForMultiThread()
+    }
+
+    @Test
+    fun testCapturedListSucceedOnLocalThreadDeprecated() = runWithTestMode(TestMode.LOCAL_THREAD) {
+        val testMock = MyDependencyMock()
+        @Suppress("DEPRECATION")
         val capturedList = CapturedList<String>()
         testMock.every(
             methodName = MyDependencyMock.Method.method1,
@@ -200,6 +344,31 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
+        capturedList.verifyFreezeStateForLocalThread()
+    }
+
+    @Test
+    fun testCapturedListSucceedOnLocalThread() = runWithTestMode(TestMode.LOCAL_THREAD) {
+        val testMock = MyDependencyMock()
+        val capturedList = capturedList<String>()
+        testMock.every(
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
+        ) {}
+
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.method1(TEST_STRING)
+        testMock.verify(
+            exactly = 3,
+            methodName = MyDependencyMock.Method.method1,
+            arguments = mapOf(MyDependencyMock.Arg.str to capture(capturedList))
+        )
+        assertEquals(3, capturedList.captured.size)
+        assertEquals(TEST_STRING, capturedList.captured[0])
+        assertEquals(TEST_STRING, capturedList.captured[1])
+        assertEquals(TEST_STRING, capturedList.captured[2])
+        capturedList.verifyFreezeStateForLocalThread()
     }
 
     @Test
