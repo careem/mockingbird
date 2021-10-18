@@ -40,42 +40,15 @@ public fun <T> capture(slot: Slot<T>): CapturedMatcher<T> {
 public fun <T> capture(list: CapturedList<T>): CapturedMatcher<T> {
     return CapturedMatcher(list)
 }
-
-/**
- * A slot using to fetch the method invocation and compare the property inside invocation arguments
- * Usage example @see [FunctionsTest]
- */
-
-public class Slot<T> : Captureable {
-
-    private val genericSlot : GenericSlot<T> = initializeSlot()
-
+public interface Slot<T> : Captureable {
     public val captured: T?
-        get() {
-            return genericSlot.value
-        }
-
-    override fun storeCapturedValue(value: Any?) {
-        genericSlot.storeCapturedValue(value)
-    }
 }
 
-private fun <T> initializeSlot(): GenericSlot<T> {
-    return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> ThreadSafeSlot()
-        TestMode.LOCAL_THREAD -> LocalThreadSlot()
-    }
-}
-
-public interface GenericSlot<T> : Captureable {
-    public val value: T?
-}
-
-private class ThreadSafeSlot<T> : GenericSlot<T> {
+private class ThreadSafeSlot<T> : Slot<T> {
 
     private val _captured: AtomicRef<T?> = atomic(null)
 
-    override val value: T?
+    override val captured: T?
         get() = _captured.value
 
     @Suppress("UNCHECKED_CAST")
@@ -84,11 +57,11 @@ private class ThreadSafeSlot<T> : GenericSlot<T> {
     }
 }
 
-private class LocalThreadSlot<T> : GenericSlot<T> {
+private class LocalThreadSlot<T> : Slot<T> {
 
     private var _captured: T? = null
 
-    public override var value: T?
+    override var captured: T?
         get() {
             return _captured
         }
@@ -98,10 +71,32 @@ private class LocalThreadSlot<T> : GenericSlot<T> {
 
     @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
-        this.value = value as T
+        this.captured = value as T
     }
 }
 
+@Deprecated(
+    message = "Use different function call instead",
+    replaceWith = ReplaceWith("slot()", "com.careem.mockingbird.test.slot")
+)
+/**
+ * A slot using to fetch the method invocation and compare the property inside invocation arguments
+ * Usage example @see [FunctionsTest]
+ */
+public fun <T> Slot(): Slot<T> {
+    return slot()
+}
+
+/**
+ * A slot using to fetch the method invocation and compare the property inside invocation arguments
+ * Usage example @see [FunctionsTest]
+ */
+public fun <T> slot(): Slot<T> {
+    return when (MockingBird.mode) {
+        TestMode.MULTI_THREAD -> ThreadSafeSlot()
+        TestMode.LOCAL_THREAD -> LocalThreadSlot()
+    }
+}
 /**
  * A list that using to fetch the method invocation and compare the property inside
  * invocation arguments
@@ -109,7 +104,7 @@ private class LocalThreadSlot<T> : GenericSlot<T> {
  */
 public class CapturedList<T> : Captureable {
 
-    private val genericCaptureList = initializeGenericCaptureList<T>()
+    private val genericCaptureList = captureList<T>()
     public val captured: List<T>
         get() {
             return genericCaptureList.value
@@ -121,11 +116,11 @@ public class CapturedList<T> : Captureable {
     }
 }
 
-private interface GenericCapturedList<T> : Captureable {
-    val value: List<T>
+public interface GenericCapturedList<T> : Captureable {
+    public val value: List<T>
 }
 
-private class MultiThreadCapturedList<T> : GenericCapturedList<T> {
+private class ThreadSafeCapturedList<T> : GenericCapturedList<T> {
 
     private val _captured = IsolateState { mutableListOf<T>() }
 
@@ -140,9 +135,9 @@ private class MultiThreadCapturedList<T> : GenericCapturedList<T> {
     }
 }
 
-private fun <T> initializeGenericCaptureList(): GenericCapturedList<T> {
+public fun <T> captureList(): GenericCapturedList<T> {
     return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> MultiThreadCapturedList()
+        TestMode.MULTI_THREAD -> ThreadSafeCapturedList()
         TestMode.LOCAL_THREAD -> LocalThreadCapturedList()
     }
 }
