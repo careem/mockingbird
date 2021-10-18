@@ -18,28 +18,25 @@ package com.careem.mockingbird
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.sources.DefaultKotlinSourceSet
 
 /**
  * Project explorer, this class will perform all the exploration logic to determine the project structure and its dependencies
  * NOTE: for project here we mean the target project of the plugin not the root one, we refer to the root one with the name rootProject
  */
-class ProjectExplorer {
+class ProjectExplorer constructor(
+    private val sourceSetResolver: SourceSetResolver
+) {
 
-    private val moduleMap: MutableMap<String, Project> = mutableMapOf()
-    private val isExplored: HashSet<String> = hashSetOf()
-    private val dependencySet = mutableSetOf<Dependency>()
-    private val logger: Logger = Logging.getLogger(this::class.java)
+    internal val moduleMap: MutableMap<String, Project> = mutableMapOf()
+    internal val isExplored: HashSet<String> = hashSetOf()
+    internal val dependencySet = mutableSetOf<Dependency>()
 
     fun visitRootProject(rootProject: Project) {
         rootProject.traverseProjectTree()
     }
 
     fun explore(project: Project): Set<Dependency> {
-        // TODO fix this eventually I do not want root project
         project.traverseDependencyTree(dependencySet)
         return dependencySet
     }
@@ -48,9 +45,7 @@ class ProjectExplorer {
         if (!isExplored.contains(this.fullQualifier())) {
             val kmpExtension = this.extensions.findByType(KotlinMultiplatformExtension::class.java)
             if (kmpExtension != null) {
-                val sourceSets = kmpExtension.sourceSets
-                val sourceSet = (sourceSets.getByName("commonMain") as DefaultKotlinSourceSet)
-
+                val sourceSet = sourceSetResolver.getSourceSetFromKmpExtension(kmpExtension, "commonMain")
                 val configurations =
                     this.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies
                 dependencySet.addAll(configurations)
@@ -70,13 +65,8 @@ class ProjectExplorer {
 
     private fun Project.traverseProjectTree() {
         this.subprojects.forEach {
-            try {
-                moduleMap[it.name] = it
-                it.traverseProjectTree()
-            } catch (udo: org.gradle.api.UnknownDomainObjectException) {
-                this@ProjectExplorer.logger.warn("${it.name} -> SKIPPED")
-            }
+            moduleMap[it.name] = it
+            it.traverseProjectTree()
         }
     }
-
 }
