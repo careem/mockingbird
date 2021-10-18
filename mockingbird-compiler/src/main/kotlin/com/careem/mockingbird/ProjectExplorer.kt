@@ -28,9 +28,9 @@ class ProjectExplorer constructor(
     private val sourceSetResolver: SourceSetResolver
 ) {
 
-    internal val moduleMap: MutableMap<String, Project> = mutableMapOf()
-    internal val isExplored: HashSet<String> = hashSetOf()
-    internal val dependencySet = mutableSetOf<Dependency>()
+    private val moduleMap: MutableMap<String, Project> = mutableMapOf()
+    private val isExplored: HashSet<String> = hashSetOf()
+    private val dependencySet = mutableSetOf<Dependency>()
 
     fun visitRootProject(rootProject: Project) {
         rootProject.traverseProjectTree()
@@ -46,11 +46,11 @@ class ProjectExplorer constructor(
             val kmpExtension = this.extensions.findByType(KotlinMultiplatformExtension::class.java)
             if (kmpExtension != null) {
                 val sourceSet = sourceSetResolver.getSourceSetFromKmpExtension(kmpExtension, "commonMain")
-                val configurations =
-                    this.configurations.getByName(sourceSet.implementationConfigurationName).allDependencies
-                dependencySet.addAll(configurations)
+                val configurationName = sourceSet.implementationConfigurationName
+                val dependencies = this.configurations.getByName(configurationName).allDependencies
+                dependencySet.addAll(dependencies)
 
-                configurations.forEach {
+                dependencies.forEach {
                     moduleMap[it.name]?.traverseDependencyTree(dependencySet)
                 }
             } else {
