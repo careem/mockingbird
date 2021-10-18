@@ -256,7 +256,7 @@ arguments.
 To do matching, you will use:
 
 1. `any()`
-2. `Slot` and `capture`
+2. `slot()` and `capture`
 
 #### Any
 
@@ -289,12 +289,12 @@ A normal use case on verify with `any()` matcher is verify invocation is invoked
 
 Another use case for matching is: for example you want to verify `myDependencyMock.method4(object1)`
 is invoked, but the reference of object1 is not mocked or initiated inside the test case, In this case, an easy way to
-verify, or say matching arguments, is create a object `Slot` or `CapturedList` and then
+verify, or say matching arguments, is create an object using `slot()` or `capturedList()` and then
 `capture` this object when verify the invocation, something like:
 
 ```kotlin
-val objectSlot = Slot<Object>()
-val objectCapturedList = CapturedList<Object>()
+val objectSlot = slot<Object>()
+val objectCapturedList = capturedList<Object>()
 
 testMock.every(
     methodName = MyDependencyMock.Method.method1,
