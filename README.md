@@ -313,9 +313,9 @@ testMock.verify(
     methodName = MyDependencyMock.Method.method4,
     arguments = mapOf(MyDependencyMock.Arg.object1 to capture(objectCapturedList))
 )
-assertTrue { objectCapturedList.assertSize(2) }
-assertTrue { capturedList.assertItem(0, expectedProperty) }
-assertTrue { capturedList.assertItem(1, expectedProperty) }
+assertEquals {2, objectCapturedList.captured.size}
+assertEquals { expectedProperty, capturedList.captured[0]) }
+assertEquals { expectedProperty, capturedList.captured[1]) }
 ```
 
 For capturing slot, a common use case for this capturing is when a new instance is created inside testing method and you
