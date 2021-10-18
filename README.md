@@ -358,6 +358,19 @@ fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
     }
 ```
 
+### Mock generation plugin ( experimental )
+
+The Mock generation plugin generates the Mock boilerplate code for you, the plugin can be used along with manual mocks,
+it is currently in and experimental mode and it has several limitations.
+
+NOTE: the plugin doesn't discover which class to mock, but it depends on you to configure those
+
+#### Limitations
+
+* You can use the plugin only on a module containing a `jvm` target
+* You can mock interfaces only
+* You cannot mock interfaces that have generic types
+
 ## License
 
     Copyright Careem, an Uber Technologies Inc. company
