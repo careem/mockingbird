@@ -289,7 +289,6 @@ class FunctionsTest {
             methodName = MyDependencyMock.Method.method1,
             arguments = mapOf(MyDependencyMock.Arg.str to capture(capturedList))
         )
-
         assertEquals(3, capturedList.captured.size)
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
