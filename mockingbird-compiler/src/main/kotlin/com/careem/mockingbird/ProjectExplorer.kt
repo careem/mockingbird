@@ -18,6 +18,8 @@ package com.careem.mockingbird
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
@@ -31,6 +33,7 @@ class ProjectExplorer constructor(
     private val moduleMap: MutableMap<String, Project> = mutableMapOf()
     private val isExplored: HashSet<String> = hashSetOf()
     private val dependencySet = mutableSetOf<Dependency>()
+    private val logger: Logger = Logging.getLogger(this::class.java)
 
     fun visitRootProject(rootProject: Project) {
         rootProject.traverseProjectTree()
@@ -65,8 +68,12 @@ class ProjectExplorer constructor(
 
     private fun Project.traverseProjectTree() {
         this.subprojects.forEach {
-            moduleMap[it.name] = it
-            it.traverseProjectTree()
+            try {
+                moduleMap[it.name] = it
+                it.traverseProjectTree()
+            } catch (udo: org.gradle.api.UnknownDomainObjectException) {
+                this@ProjectExplorer.logger.warn("${it.name} -> SKIPPED")
+            }
         }
     }
 }

@@ -16,9 +16,9 @@
 
 package com.careem.mockingbird.common.sample
 
-import com.badoo.reaktive.disposable.Disposable
+import kotlinx.atomicfu.AtomicIntArray
 
 interface ExternalContract {
     fun fx(deepSample: DeepSampleData)
-    fun fx2(disposable: Disposable)
+    fun fx2(atomicIntArray: AtomicIntArray)
 }

@@ -51,11 +51,18 @@ class ProjectExplorerTest {
         subProject1.configurations.create("${TEST_SOURCE_SET}Implementation")
         subProject2.configurations.create("${TEST_SOURCE_SET}Implementation")
         addImplementationDependencyToProject(subProject1, TEST_DEPENDENCY_NAME)
-        addImplementationDependencyToProject(subProject1, "${TEST_DEPENDENCY_NAME}_2")
+        addImplementationDependencyToProject(subProject1, "${TEST_DEPENDENCY_NAME}_2", dependencyGroup = "new_group")
         addImplementationDependencyToProject(subProject2, "${TEST_DEPENDENCY_NAME}_3")
 
         val dependencySet = projectExplorer.explore(subProject1)
         assertEquals(2, dependencySet.size)
+        val dependencies = dependencySet.toList()
+        assertEquals(TEST_DEPENDENCY_GROUP, dependencies[0].group)
+        assertEquals(TEST_DEPENDENCY_NAME, dependencies[0].name)
+        assertEquals(TEST_DEPENDENCY_VERSION, dependencies[0].version)
+        assertEquals("new_group", dependencies[1].group)
+        assertEquals("${TEST_DEPENDENCY_NAME}_2", dependencies[1].name)
+        assertEquals(TEST_DEPENDENCY_VERSION, dependencies[1].version)
     }
 
     @Test
@@ -69,12 +76,22 @@ class ProjectExplorerTest {
         subProject1.configurations.create("${TEST_SOURCE_SET}Implementation")
         subProject2.configurations.create("${TEST_SOURCE_SET}Implementation")
         addImplementationDependencyToProject(subProject1, TEST_DEPENDENCY_NAME)
-        addImplementationDependencyToProject(subProject1, "${TEST_DEPENDENCY_NAME}_2")
-        addImplementationDependencyToProject(subProject2, "${TEST_DEPENDENCY_NAME}_3")
+        addImplementationDependencyToProject(subProject1, "${TEST_DEPENDENCY_NAME}_2", dependencyVersion = "2.0")
+        addImplementationDependencyToProject(subProject2, "${TEST_DEPENDENCY_NAME}_3", dependencyVersion = "3.0")
 
         projectExplorer.visitRootProject(rootProject)
         val dependencySet = projectExplorer.explore(subProject1)
         assertEquals(3, dependencySet.size)
+        val dependencies = dependencySet.toList()
+        assertEquals(TEST_DEPENDENCY_GROUP, dependencies[0].group)
+        assertEquals(TEST_DEPENDENCY_NAME, dependencies[0].name)
+        assertEquals(TEST_DEPENDENCY_VERSION, dependencies[0].version)
+        assertEquals(TEST_DEPENDENCY_GROUP, dependencies[1].group)
+        assertEquals("${TEST_DEPENDENCY_NAME}_2", dependencies[1].name)
+        assertEquals("2.0", dependencies[1].version)
+        assertEquals(TEST_DEPENDENCY_GROUP, dependencies[2].group)
+        assertEquals("${TEST_DEPENDENCY_NAME}_3", dependencies[2].name)
+        assertEquals("3.0", dependencies[2].version)
     }
 
     @Test
@@ -106,11 +123,16 @@ class ProjectExplorerTest {
         return testProject
     }
 
-    private fun addImplementationDependencyToProject(project: Project, dependencyName: String) {
+    private fun addImplementationDependencyToProject(
+        project: Project,
+        dependencyName: String,
+        dependencyGroup: String = TEST_DEPENDENCY_GROUP,
+        dependencyVersion: String = TEST_DEPENDENCY_VERSION
+    ) {
         addDependencyTo(
             project.dependencies,
             "${TEST_SOURCE_SET}Implementation",
-            "$TEST_DEPENDENCY_GROUP:${dependencyName}:$TEST_DEPENDENCY_VERSION",
+            "$dependencyGroup:${dependencyName}:$dependencyVersion",
             Action { })
     }
 

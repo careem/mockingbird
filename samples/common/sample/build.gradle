@@ -24,7 +24,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation libs.badoo.reaktive
+                implementation libs.kotlinx.atomicfu
             }
         }
     }

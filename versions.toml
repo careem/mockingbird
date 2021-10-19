@@ -7,7 +7,6 @@ atomicFu = "0.16.3"
 kotlinPoet = "1.9.0"
 kotlinxMetadata = "0.1.0"
 mockk = "1.12.0"
-reaktive = "1.2.0"
 
 [libraries]
 jacoco-jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
@@ -27,4 +26,3 @@ kotlinx-metadatajvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", v
 kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicFu" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-badoo-reaktive = { module = "com.badoo.reaktive:reaktive", version.ref = "reaktive" }
