@@ -39,10 +39,17 @@ if (secretPropsFile.exists()) {    // Read local.properties file first if it exi
     rootProject.ext["signing.key"] = System.getenv('SIGNING_KEY')
 }
 
+task javadocJar(type: Jar) {
+    archiveClassifier.set("javadoc")
+}
+
 afterEvaluate {
     publishing {
         publications {
-            all(MavenPublication) {
+            withType(MavenPublication) {
+
+                artifact javadocJar
+
                 pom {
                     name = POM_NAME
                     description = POM_DESCRIPTION
