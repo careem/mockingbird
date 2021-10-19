@@ -47,7 +47,8 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     override fun apply(target: Project) {
-        projectExplorer = ProjectExplorer()
+        val sourceSetResolver = SourceSetResolver()
+        projectExplorer = ProjectExplorer(sourceSetResolver)
         try {
             configureSourceSets(target)
 
