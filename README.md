@@ -17,7 +17,7 @@ This project may contain experimental code and may not be ready for general use.
 In your multiplatform project include
 
 ```groovy
-implementation "com.careem.mockingbird:mockingbird:1.2.0"
+implementation "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
 ```
 
 ## Usage
