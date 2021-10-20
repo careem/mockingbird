@@ -22,20 +22,16 @@ import com.squareup.kotlinpoet.metadata.ImmutableKmProperty
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import kotlinx.metadata.KmClassifier
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
 class FunctionsMiner(
-    private val classLoader: ClassLoaderWrapper
+    private val classLoaderWrapper: ClassLoaderWrapper
 ) {
-
-    private val logger: Logger = Logging.getLogger(this::class.java)
 
     /**
      * Extract all functions and properties, this will extract also functions that are defined into the supertypes
-     * thise functions are all the functions that the mock class should provide
+     * these functions are all the functions that the mock class should provide
      */
     fun extractFunctionsAndProperties(kmClass: ImmutableKmClass): Pair<List<ImmutableKmFunction>, List<ImmutableKmProperty>> {
         val functions: MutableList<ImmutableKmFunction> = mutableListOf()
@@ -55,14 +51,13 @@ class FunctionsMiner(
             .map { it.classifier }
             .filterIsInstance<KmClassifier.Class>()
             .filter { it.name != "kotlin/Any" }
-            .map { classLoader.loadClassFromDirectory(it.name).toImmutableKmClass() }
-        // Functions
-        kmSuperTypes.flatMapTo(functions) { it.functions }
+            .map { classLoaderWrapper.loadClassFromDirectory(it.name).toImmutableKmClass() }
+
+        // get functions and properties for current class
         functions.addAll(kmClass.functions)
-        // Properties
-        kmSuperTypes.flatMapTo(properties) { it.properties }
         properties.addAll(kmClass.properties)
 
+        // check each super type and extract functions and properties
         kmSuperTypes.forEach { rawExtractFunctionsAndProperties(it, functions, properties) }
     }
 }

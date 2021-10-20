@@ -55,7 +55,9 @@ class ClassLoaderWrapper(
 
     @Throws(ClassNotFoundException::class)
     fun loadClass(name: String): KClass<*> = classLoader.loadClass(name).kotlin
+
     fun loadClass(kmClass: ImmutableKmType): KClass<*> = loadClassFromDirectory(extractTypeString(kmClass))
+
     fun loadClass(kmClass: ImmutableKmClass): KClass<*> = loadClassFromDirectory(kmClass.name)
 
     fun loadClassFromDirectory(path: String): KClass<*> {
@@ -84,20 +86,13 @@ class ClassLoaderWrapper(
             }
     }
 
+    // TODO: this can be moved to ProjectExplorer
     private fun Project.traverseDependencyTree(mutableList: MutableList<URL>) {
         this.subprojects.forEach {
             mutableList.add(it.classPath().asURL())
             it.traverseDependencyTree(mutableList)
         }
     }
-
-    private fun String.asURL(): URL =
-        File(this)
-            .toURI()
-            .toURL()
-
-
-    private fun String.toJavaFullyQualifiedName(): String = this.replace("/", ".").toJavaPackage()
 
     private fun extractTypeString(type: ImmutableKmType): String {
         return if (type.classifier is KmClassifier.Class) {
@@ -106,6 +101,13 @@ class ClassLoaderWrapper(
             throw IllegalArgumentException("I can't mock this type: ${type.classifier}")
         }
     }
+
+    private fun String.asURL(): URL =
+        File(this)
+            .toURI()
+            .toURL()
+
+    private fun String.toJavaFullyQualifiedName(): String = this.replace("/", ".").toJavaPackage()
 
     private fun String.toJavaPackage(): String{
         return when(this){
