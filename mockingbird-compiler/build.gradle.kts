@@ -41,6 +41,11 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    from("src/main/kotlin")
+    archiveClassifier.set("sources")
+}
+
 dependencies {
     implementation(libs.kotlin.gradle)
     implementation(libs.kotlin.reflectjvm)
