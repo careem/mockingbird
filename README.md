@@ -2,7 +2,8 @@
 
 <img src="https://github.com/careem/mockingbird/blob/assets/logo.png" width="40%" height="40%" alt="MockingBird Logo"/>
 
-![version](https://img.shields.io/badge/version-1.6.0-blue) [![Build Status](https://app.bitrise.io/app/0f4e1b30e3e56dfb/status.svg?token=iHecTZF7GpuyTMqiFj618Q&branch=master)](https://app.bitrise.io/build/c0b2c4e103c222bb)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.careem.mockingbird/mockingbird/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.careem.mockingbird/mockingbird/)
+[![Build Status](https://app.bitrise.io/app/0f4e1b30e3e56dfb/status.svg?token=iHecTZF7GpuyTMqiFj618Q&branch=master)](https://app.bitrise.io/build/c0b2c4e103c222bb)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A Koltin multiplatform library that provides an easier way to mock and write unit tests for a multiplatform project
@@ -16,7 +17,7 @@ This project may contain experimental code and may not be ready for general use.
 In your multiplatform project include
 
 ```groovy
-implementation "com.careem.mockingbird:mockingbird:1.2.0"
+implementation "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
 ```
 
 ## Usage
@@ -369,7 +370,8 @@ NOTE: the plugin doesn't discover which class to mock, but it depends on you to 
 
 * You can use the plugin only on a module containing a `jvm` target
 * You can mock interfaces only
-* You cannot mock interfaces that have generic types
+* You cannot mock interfaces that have generic types on their definitions
+* You cannot mock lambdas
 
 ## License
 
