@@ -71,7 +71,9 @@ afterEvaluate {
                         }
                     }
                 }
-
+            }
+            pluginMaven(MavenPublication){
+                artifact sourcesJar
             }
         }
 
