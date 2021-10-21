@@ -361,7 +361,7 @@ fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
 
 ### Mock generation plugin ( Experimental )
 
-The Mock generation plugin generates the Mock boilerplate code for you, the plugin can be used along with manual mocks,
+The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks,
 it is currently in and experimental mode and it has several limitations.
 
 to use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples checkout `generate-mocks`
