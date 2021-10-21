@@ -371,7 +371,7 @@ NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to co
 
 #### Limitations
 
-* You can use the plugin only on a module containing a `jvm` target
+* The plugin can only be used in modules containing a `jvm` target
 * The plugin can generate mocks only, no support for spies yet
 * You can mock interfaces only
 * You cannot mock interfaces that have generic types in their definitions
