@@ -367,7 +367,7 @@ it is currently experimental and has several limitations.
 to use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples checkout `generate-mocks`
 and explore the `samples` folder, `samples` is a project itself, you can open `samples` as a standalone project.
 
-NOTE: the plugin doesn't discover which class to mock, but it depends on you to configure those
+NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
 
 #### Limitations
 
