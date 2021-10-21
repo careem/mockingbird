@@ -359,6 +359,25 @@ fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
     }
 ```
 
+### Mock generation plugin ( Experimental )
+
+The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks,
+it is currently experimental and has several limitations.
+
+To use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples checkout `generate-mocks`
+and explore the `samples` folder, `samples` is a project itself, you can open `samples` as a standalone project.
+
+NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
+
+#### Limitations
+
+* The plugin can only be used in modules containing a `jvm` target
+* The plugin can generate mocks only, no support for spies yet
+* You can mock interfaces only
+* You cannot mock interfaces that have generic types in their definitions
+* You cannot mock lambdas
+* You cannot mock suspend functions
+
 ## License
 
     Copyright Careem, an Uber Technologies Inc. company
