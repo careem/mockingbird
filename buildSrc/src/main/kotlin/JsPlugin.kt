@@ -42,7 +42,7 @@ abstract class JsPlugin : Plugin<Project> {
 
             sourceSets.getByName("jsTest") {
                 dependencies {
-                    implementation("org.jetbrains.kotlin:kotlin-test-js:1.5.21") // FIXME to investigate how to use version catalog here as well
+                    implementation("org.jetbrains.kotlin:kotlin-test-js:1.5.31") // FIXME to investigate how to use version catalog here as well
                 }
             }
         }
