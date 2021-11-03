@@ -40,16 +40,6 @@ kotlin {
                 implementation libs.kotlin.test.js
             }
         }
-
-        iosX64Main {
-            dependencies {
-
-            }
-        }
-
-        iosArm64Main {
-            dependsOn iosX64Main
-        }
     }
 }
 
