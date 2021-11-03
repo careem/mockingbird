@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.15.0
 * Support for iosSimulatorArm64
 * HMPP support
 
