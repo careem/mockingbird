@@ -328,7 +328,7 @@ dependency type you want to mock
 
 The library provides 2 functions to help you write your mocks.
 
-1. `mock` this function allows you to mock non-Unit methods
+1. `mock` this function allows you to mock non-methods with return types other than Unit
 1. `mockUnit` this function allows you to mock Unit methods
 
 These helpers enable you to map your mock invocations to MockingBird environment.
