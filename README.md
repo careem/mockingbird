@@ -33,7 +33,7 @@ implementation "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
 MockingBird doesn't use any annotation processor or reflection. This means that it is a bit more verbose with respect to
 libraries like `Mockito` or `Mockk`
 
-### Mock generation plugin ( experimental )
+### Mock generation plugin (experimental)
 
 The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks, it
 is currently experimental and has several limitations.
