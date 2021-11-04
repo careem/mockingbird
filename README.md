@@ -125,9 +125,8 @@ mockingBird {
 
 #### Plugin Usage
 
-To generate mocks you can simply run `./gradlew generateMocks` or simply run `./gradlew build`, for farted development
-loop using
-`generatedMocks` is recommended
+To generate mocks you can simply run `./gradlew generateMocks` or simply run `./gradlew build`, for faster development
+loop using `generatedMocks` is recommended
 
 #### Plugin Limitations
 
