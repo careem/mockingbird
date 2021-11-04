@@ -132,12 +132,12 @@ loop using `generatedMocks` is recommended
 
 * The plugin can only be used in modules containing a `jvm` target
 * The plugin can generate mocks only, no support for spies yet
-* You can mock interfaces only
-* You cannot mock interfaces that have generic types in their definitions
-* You cannot mock lambdas
-* You cannot mock suspend functions
-* You cannot mock inline functions
-* You cannot mock reified functions
+* Only interfaces can be mocked
+* Only interfaces that have generic types in their definitions can be mocked
+* Only interfaces without `lambdas` can be mocked
+* Only interfaces without `suspend` functions can be mocked
+* Only interfaces without `inline` functions can be mocked
+* Only interfaces without `reified` functions can be mocked
 
 ### Mocking
 
