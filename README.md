@@ -27,11 +27,11 @@ libraries like `Mockito` or `Mockk`
 
 ### Mock generation plugin ( experimental )
 
-The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks,
-it is currently experimental and has several limitations.
+The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks, it
+is currently experimental and has several limitations.
 
-To use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples checkout `generate-mocks` branch
-and explore the `samples` project, You can open `samples` is a standalone project.
+To use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples
+checkout `generate-mocks` branch and explore the `samples` project, You can open `samples` is a standalone project.
 
 NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
 
@@ -47,8 +47,8 @@ following line
 classpath("com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion")
 ```
 
-be also sure you have `mavenCentral` in your `buildscripts` repositories, your project `build.gradle.kts` might look
-similar the one below
+be also sure you have `mavenCentral` in your `buildscripts` repositories, your project build gradle might look similar
+the one below
 
 ```kotlin
 buildscript {
@@ -63,7 +63,7 @@ buildscript {
 }
 ```
 
-To generate mocks for a specific module you have first to apply the plugin in your module `build.gradle.kts`
+To generate mocks for a specific module you have first to apply the plugin in your module's build gradle
 
 ```kotlin
 apply(plugin = "com.careem.mockingbird")
