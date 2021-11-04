@@ -16,6 +16,14 @@ This project may contain experimental code and may not be ready for general use.
 
 In your multiplatform project include
 
+Koltin DSL:
+
+```kotlin
+implementation("com.careem.mockingbird:mockingbird:$mockingBirdVersion")
+```
+
+Groovy DSL:
+
 ```groovy
 implementation "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
 ```
@@ -40,15 +48,12 @@ check [Mocks](https://github.com/careem/mockingbird#mocks) or [Spies](https://gi
 
 #### Plugin Setup
 
-To start using the plugin you need to include it in your project `build.gradle.kts` or `build.gradle` adding the
-following line
+To start using the plugin you need to include it in your project `build.gradle.kts` or `build.gradle`
 
-```kotlin
-classpath("com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion")
-```
+Be sure you have `mavenCentral()` in your `buildscripts` repositories, your project build gradle might look similar the
+one below
 
-be also sure you have `mavenCentral` in your `buildscripts` repositories, your project build gradle might look similar
-the one below
+Kotlin DSL:
 
 ```kotlin
 buildscript {
@@ -63,10 +68,33 @@ buildscript {
 }
 ```
 
+Groovy DSL:
+
+```groovy
+buildscript {
+    repositories {
+        ...
+        mavenCentral()
+    }
+    dependencies {
+        ...
+        classpath "com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion"
+    }
+}
+```
+
 To generate mocks for a specific module you have first to apply the plugin in your module's build gradle
+
+Kotlin DSL:
 
 ```kotlin
 apply(plugin = "com.careem.mockingbird")
+```
+
+Groovy DSL:
+
+```groovy
+apply plugin: "com.careem.mockingbird"
 ```
 
 And then specify for what interfaces you what to generate mocks for, see the example below
