@@ -38,7 +38,7 @@ libraries like `Mockito` or `Mockk`
 The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks, it
 is currently experimental and has several limitations.
 
-To use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples
+To use this plugin you have to use mockingbird version `2.0.0-beta06` or above, to see examples
 checkout `generate-mocks` branch and explore the `samples` project, You can open `samples` is a standalone project.
 
 NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
