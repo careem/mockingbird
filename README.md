@@ -30,8 +30,8 @@ libraries like `Mockito` or `Mockk`
 The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks,
 it is currently experimental and has several limitations.
 
-To use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples checkout `generate-mocks`
-and explore the `samples` folder, `samples` is a project itself, you can open `samples` as a standalone project.
+To use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples checkout `generate-mocks` branch
+and explore the `samples` project, You can open `samples` is a standalone project.
 
 NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
 
@@ -44,7 +44,7 @@ To start using the plugin you need to include it in your project `build.gradle.k
 following line
 
 ```kotlin
-classpath("com.careem.mockingbird:mockingbird-compiler:2.0.0-beta05")
+classpath("com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion")
 ```
 
 be also sure you have `mavenCentral` in your `buildscripts` repositories, your project `build.gradle.kts` might look
@@ -58,7 +58,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath("com.careem.mockingbird:mockingbird-compiler:2.0.0-beta05")
+        classpath("com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion")
     }
 }
 ```
@@ -71,7 +71,7 @@ apply(plugin = "com.careem.mockingbird")
 
 And then specify for what interfaces you what to generate mocks for, see the example below
 
-kotlin
+Kotlin DSL:
 
 ```kotlin
 configure<com.careem.mockingbird.MockingbirdPluginExtension> {
@@ -83,7 +83,7 @@ configure<com.careem.mockingbird.MockingbirdPluginExtension> {
 }
 ```
 
-groovy
+Groovy DSL
 
 ```groovy
 mockingBird {
@@ -109,6 +109,8 @@ loop using
 * You cannot mock interfaces that have generic types in their definitions
 * You cannot mock lambdas
 * You cannot mock suspend functions
+* You cannot mock inline functions
+* You cannot mock reified functions
 
 ### Mocking
 
