@@ -83,7 +83,7 @@ buildscript {
 }
 ```
 
-To generate mocks for a specific module you have first to apply the plugin in your module's build gradle
+To generate mocks for a specific module you have first to apply the plugin in this module's build gradle
 
 Kotlin DSL:
 
