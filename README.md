@@ -16,6 +16,14 @@ This project may contain experimental code and may not be ready for general use.
 
 In your multiplatform project include
 
+Koltin DSL:
+
+```kotlin
+implementation("com.careem.mockingbird:mockingbird:$mockingBirdVersion")
+```
+
+Groovy DSL:
+
 ```groovy
 implementation "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
 ```
@@ -25,162 +33,111 @@ implementation "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
 MockingBird doesn't use any annotation processor or reflection. This means that it is a bit more verbose with respect to
 libraries like `Mockito` or `Mockk`
 
-### Mocks
+### Mock generation plugin (experimental)
 
-The first step you need to do is create a mock class for the object you want to mock, you need a mock for each
-dependency type you want to mock
+The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks, it
+is currently experimental and has several limitations.
 
-The library provides 2 functions to help you write your mocks.
+To use this plugin you have to use mockingbird version `2.0.0-beta06` or above, to see examples
+checkout `generate-mocks` branch and explore the `samples` project, You can open `samples` is a standalone project.
 
-1. `mock` this function allows you to mock non-Unit methods
-1. `mockUnit` this function allows you to mock Unit methods
+NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
 
-These helpers enable you to map your mock invocations to MockingBird environment.
+WARNING: If you do not what to use the plugin you can use the old way of manual mock generation,
+check [Mocks](https://github.com/careem/mockingbird#mocks) or [Spies](https://github.com/careem/mockingbird#spies)
 
-Your mock class must implement `Mock`, in addition to extending the actual class or implementing an interface
+#### Plugin Setup
 
-See below for an example on how to create a mock :
+To start using the plugin you need to include it in your project `build.gradle.kts` or `build.gradle`
 
-```kotlin
-interface MyDependency {
-    fun method1(str: String)
-    fun method2(str: String, value: Int)
-    fun method3(value1: Int, value2: Int): Int
-}
+Be sure you have `mavenCentral()` in your `buildscripts` repositories, your project build gradle might look similar the
+one below
 
-class MyDependencyMock : MyDependency, Mock {
-    object Method {
-        const val method1 = "method1"
-        const val method2 = "method2"
-        const val method3 = "method3"
-        const val method4 = "method4"
-    }
-
-    object Arg {
-        const val str = "str"
-        const val value = "value"
-        const val value1 = "value1"
-        const val value2 = "value2"
-        const val object1 = "object1"
-    }
-
-    override fun method1(str: String) = mockUnit(
-        methodName = Method.method1,
-        arguments = mapOf(
-            Arg.str to str
-        )
-    )
-
-    override fun method2(str: String, value: Int) = mockUnit(
-        methodName = Method.method2,
-        arguments = mapOf(
-            Arg.str to str,
-            Arg.value to value
-        )
-    )
-
-    override fun method3(value1: Int, value2: Int): Int = mock(
-        methodName = Method.method3,
-        arguments = mapOf(
-            Arg.value1 to value1,
-            Arg.value2 to value2
-        )
-    )
-
-    override fun method4(object1: Object): Int = mock(
-        methodName = Method.method4,
-        arguments = mapOf(
-            Arg.object1 to object1
-        )
-    )
-}    
-```
-
-### Spies
-
-When you need a combination of real behavior and mocked behavior you can use `spy` with spy you wrap wrap a real
-implementation. Doing so Mocking Bird will record the interactions with the spied object.
-
-To mock a specific invocation you can use the spied object like a normal mock, see sections below for further details.
-
-A Spy sample object is reported here
+Kotlin DSL:
 
 ```kotlin
-interface MyDependency {
-    fun method1(str: String)
-    fun method2(str: String, value: Int)
-    fun method3(value1: Int, value2: Int): Int
-    fun method4(): Int
-}
-
-class MyDependencySpy(private val delegate: MyDependency) : MyDependency, Spy {
-
-    object Method {
-        const val method1 = "method1"
-        const val method2 = "method2"
-        const val method3 = "method3"
-        const val method4 = "method4"
+buildscript {
+    repositories {
+        ...
+        mavenCentral()
     }
-
-    object Arg {
-        const val str = "str"
-        const val value = "value"
-        const val value1 = "value1"
-        const val value2 = "value2"
-    }
-
-    override fun method1(str: String) = spy(
-        methodName = Method.method1,
-        arguments = mapOf(
-            Arg.str to str
-        ),
-        delegate = { delegate.method1(str) }
-    )
-
-    override fun method2(str: String, value: Int) = spy(
-        methodName = Method.method2,
-        arguments = mapOf(
-            Arg.str to str,
-            Arg.value to value
-        ),
-        delegate = { delegate.method2(str, value) }
-    )
-
-    override fun method3(value1: Int, value2: Int): Int = spy(
-        methodName = Method.method3,
-        arguments = mapOf(
-            Arg.value1 to value1,
-            Arg.value2 to value2
-        ),
-        delegate = { delegate.method3(value1, value2) }
-    )
-
-    override fun method4(): Int = spy(
-        methodName = Method.method4,
-        delegate = { delegate.method4() }
-    )
-}
-
-class MyDependencyImpl : MyDependency {
-    private var value: AtomicInt = atomic(0)
-    override fun method1(str: String) {
-
-    }
-
-    override fun method2(str: String, value: Int) {
-
-    }
-
-    override fun method3(value1: Int, value2: Int): Int {
-        value.value = value1 + value2
-        return value.value
-    }
-
-    override fun method4(): Int {
-        return value.value
+    dependencies {
+        ...
+        classpath("com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion")
     }
 }
 ```
+
+Groovy DSL:
+
+```groovy
+buildscript {
+    repositories {
+        ...
+        mavenCentral()
+    }
+    dependencies {
+        ...
+        classpath "com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion"
+    }
+}
+```
+
+To generate mocks for a specific module you have first to apply the plugin in this module's build gradle
+
+Kotlin DSL:
+
+```kotlin
+apply(plugin = "com.careem.mockingbird")
+```
+
+Groovy DSL:
+
+```groovy
+apply plugin: "com.careem.mockingbird"
+```
+
+And then specify for what interfaces you what to generate mocks for, see the example below
+
+Kotlin DSL:
+
+```kotlin
+configure<com.careem.mockingbird.MockingbirdPluginExtension> {
+    generateMocksFor = listOf(
+        "com.careem.mockingbird.sample.Mock1",
+        "com.careem.mockingbird.sample.MockWithExternalDependencies",
+        "com.careem.mockingbird.common.sample.ExternalContract"
+    )
+}
+```
+
+Groovy DSL
+
+```groovy
+mockingBird {
+    generateMocksFor = [
+            'com.careem.mockingbird.sample.Mock1',
+            'com.careem.mockingbird.sample.MockWithExternalDependencies',
+            'com.careem.mockingbird.common.sample.ExternalContract'
+    ]
+}
+```
+
+#### Plugin Usage
+
+To generate mocks you can simply run `./gradlew generateMocks` or simply run `./gradlew build`, for faster development
+loop using `generatedMocks` is recommended
+
+#### Plugin Limitations
+
+* The plugin can only be used in modules containing a `jvm` target
+* The plugin can generate mocks only, no support for spies yet
+* Only interfaces can be mocked
+* Only interfaces that have generic types in their definitions can be mocked
+* Only interfaces without `lambdas` can be mocked
+* Only interfaces without `suspend` functions can be mocked
+* Only interfaces without `inline` functions can be mocked
+* Only interfaces without `reified` functions can be mocked
 
 ### Mocking
 
@@ -314,9 +271,9 @@ testMock.verify(
     methodName = MyDependencyMock.Method.method4,
     arguments = mapOf(MyDependencyMock.Arg.object1 to capture(objectCapturedList))
 )
-assertEquals (2, objectCapturedList.captured.size)
-assertEquals (expectedProperty, capturedList.captured[0])
-assertEquals (expectedProperty, capturedList.captured[1])
+assertEquals(2, objectCapturedList.captured.size)
+assertEquals(expectedProperty, capturedList.captured[0])
+assertEquals(expectedProperty, capturedList.captured[1])
 ```
 
 For capturing slot, a common use case for this capturing is when a new instance is created inside testing method and you
@@ -359,24 +316,167 @@ fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
     }
 ```
 
-### Mock generation plugin ( Experimental )
+### Manual Mocks and Spies generation
 
-The mock generation plugin generates mock boilerplate code for you, the plugin can be used along with manual mocks,
-it is currently experimental and has several limitations.
+In this section it is explained how to generate mocks and spy manually, we suggest to use this approach only when you
+face issues with the Mock generator plugin.
 
-To use this plugin you have to use mockingbird version `2.0.0-beta04` or above, to see examples checkout `generate-mocks`
-and explore the `samples` folder, `samples` is a project itself, you can open `samples` as a standalone project.
+#### Mocks
 
-NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
+The first step you need to do is create a mock class for the object you want to mock, you need a mock for each
+dependency type you want to mock
 
-#### Limitations
+The library provides 2 functions to help you write your mocks.
 
-* The plugin can only be used in modules containing a `jvm` target
-* The plugin can generate mocks only, no support for spies yet
-* You can mock interfaces only
-* You cannot mock interfaces that have generic types in their definitions
-* You cannot mock lambdas
-* You cannot mock suspend functions
+1. `mock` this function allows you to mock non-methods with return types other than Unit
+1. `mockUnit` this function allows you to mock Unit methods
+
+These helpers enable you to map your mock invocations to MockingBird environment.
+
+Your mock class must implement `Mock`, in addition to extending the actual class or implementing an interface
+
+See below for an example on how to create a mock :
+
+```kotlin
+interface MyDependency {
+    fun method1(str: String)
+    fun method2(str: String, value: Int)
+    fun method3(value1: Int, value2: Int): Int
+}
+
+class MyDependencyMock : MyDependency, Mock {
+    object Method {
+        const val method1 = "method1"
+        const val method2 = "method2"
+        const val method3 = "method3"
+        const val method4 = "method4"
+    }
+
+    object Arg {
+        const val str = "str"
+        const val value = "value"
+        const val value1 = "value1"
+        const val value2 = "value2"
+        const val object1 = "object1"
+    }
+
+    override fun method1(str: String) = mockUnit(
+        methodName = Method.method1,
+        arguments = mapOf(
+            Arg.str to str
+        )
+    )
+
+    override fun method2(str: String, value: Int) = mockUnit(
+        methodName = Method.method2,
+        arguments = mapOf(
+            Arg.str to str,
+            Arg.value to value
+        )
+    )
+
+    override fun method3(value1: Int, value2: Int): Int = mock(
+        methodName = Method.method3,
+        arguments = mapOf(
+            Arg.value1 to value1,
+            Arg.value2 to value2
+        )
+    )
+
+    override fun method4(object1: Object): Int = mock(
+        methodName = Method.method4,
+        arguments = mapOf(
+            Arg.object1 to object1
+        )
+    )
+}    
+```
+
+#### Spies
+
+When you need a combination of real behavior and mocked behavior you can use `spy` with spy you wrap wrap a real
+implementation. Doing so Mocking Bird will record the interactions with the spied object.
+
+To mock a specific invocation you can use the spied object like a normal mock, see sections below for further details.
+
+A Spy sample object is reported here
+
+```kotlin
+interface MyDependency {
+    fun method1(str: String)
+    fun method2(str: String, value: Int)
+    fun method3(value1: Int, value2: Int): Int
+    fun method4(): Int
+}
+
+class MyDependencySpy(private val delegate: MyDependency) : MyDependency, Spy {
+
+    object Method {
+        const val method1 = "method1"
+        const val method2 = "method2"
+        const val method3 = "method3"
+        const val method4 = "method4"
+    }
+
+    object Arg {
+        const val str = "str"
+        const val value = "value"
+        const val value1 = "value1"
+        const val value2 = "value2"
+    }
+
+    override fun method1(str: String) = spy(
+        methodName = Method.method1,
+        arguments = mapOf(
+            Arg.str to str
+        ),
+        delegate = { delegate.method1(str) }
+    )
+
+    override fun method2(str: String, value: Int) = spy(
+        methodName = Method.method2,
+        arguments = mapOf(
+            Arg.str to str,
+            Arg.value to value
+        ),
+        delegate = { delegate.method2(str, value) }
+    )
+
+    override fun method3(value1: Int, value2: Int): Int = spy(
+        methodName = Method.method3,
+        arguments = mapOf(
+            Arg.value1 to value1,
+            Arg.value2 to value2
+        ),
+        delegate = { delegate.method3(value1, value2) }
+    )
+
+    override fun method4(): Int = spy(
+        methodName = Method.method4,
+        delegate = { delegate.method4() }
+    )
+}
+
+class MyDependencyImpl : MyDependency {
+    private var value: AtomicInt = atomic(0)
+    override fun method1(str: String) {
+
+    }
+
+    override fun method2(str: String, value: Int) {
+
+    }
+
+    override fun method3(value1: Int, value2: Int): Int {
+        value.value = value1 + value2
+        return value.value
+    }
+
+    override fun method4(): Int {
+        return value.value
+    }
+}
+```
 
 ## License
 
