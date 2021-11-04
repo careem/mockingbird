@@ -43,7 +43,7 @@ checkout `generate-mocks` branch and explore the `samples` project, You can open
 
 NOTE: the plugin doesn't discover which interfaces to mock, it's up to you to configure those.
 
-WARNING: If you do not what to use the plugin you can use the old way of manual mock generation
+WARNING: If you do not what to use the plugin you can use the old way of manual mock generation,
 check [Mocks](https://github.com/careem/mockingbird#mocks) or [Spies](https://github.com/careem/mockingbird#spies)
 
 #### Plugin Setup
