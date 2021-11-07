@@ -29,7 +29,6 @@ class TestClass {
         assertNotNull(pippoMock)
     }
 
-
     @Test
     fun testGeneratedTargetProjectDependentMock() {
         val externalMock = MockWithExternalDependenciesMock()
@@ -49,7 +48,7 @@ class TestClass {
     }
 
     @Test
-    fun testGeneratedMulipleGetterProperties() {
+    fun testGeneratedMultipleGetterProperties() {
         val mock = MultipleGetterPropertiesMock()
         assertNotNull(mock)
     }

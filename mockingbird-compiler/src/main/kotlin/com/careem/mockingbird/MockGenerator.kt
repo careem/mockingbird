@@ -31,6 +31,7 @@ import com.squareup.kotlinpoet.metadata.ImmutableKmProperty
 import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.isNullable
+import com.squareup.kotlinpoet.metadata.isSuspend
 import kotlinx.metadata.KmClassifier
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
@@ -239,6 +240,18 @@ class MockGenerator constructor(
         mockClassBuilder.addProperty(propertyBuilder.build())
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun buildFunctionModifiers(
+        function: ImmutableKmFunction
+    ) : List<KModifier> {
+        return buildList {
+            add(KModifier.OVERRIDE)
+            if (function.isSuspend) {
+                add(KModifier.SUSPEND)
+            }
+        }
+    }
+
     private fun mockFunction(
         mockClassBuilder: TypeSpec.Builder,
         function: ImmutableKmFunction,
@@ -246,7 +259,7 @@ class MockGenerator constructor(
     ) {
         logger.info("Mocking function")
         val funBuilder = FunSpec.builder(function.name)
-            .addModifiers(KModifier.OVERRIDE)
+            .addModifiers(buildFunctionModifiers(function))
         for (valueParam in function.valueParameters) {
             logger.info(valueParam.type.toString())
             val kmType = valueParam.type!!
