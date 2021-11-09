@@ -18,10 +18,8 @@ apply from: 'jacoco.gradle'
 
 buildscript {
     repositories {
-        google()
         mavenCentral()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
-        maven { url "https://plugins.gradle.org/m2/" }
+        google()
     }
     dependencies {
         classpath libs.kotlinx.atomicfu.gradle
@@ -36,8 +34,6 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
-        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
