@@ -18,8 +18,8 @@ apply from: 'jacoco.gradle'
 
 buildscript {
     repositories {
-        google()
         mavenCentral()
+        google()
     }
     dependencies {
         classpath libs.kotlinx.atomicfu.gradle
