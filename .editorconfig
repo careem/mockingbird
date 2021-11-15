@@ -1,0 +1,4 @@
+[{*.kt,*.kts,*.gradle.kts,*.simple.kts,*.test.kts}]
+ij_kotlin_name_count_to_use_star_import = 2147483647
+ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
+ij_kotlin_packages_to_use_import_on_demand =

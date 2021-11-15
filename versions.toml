@@ -4,15 +4,25 @@ junit = "4.13.1"
 jacoco = "0.8.7"
 stately = "1.1.10-a1"
 atomicFu = "0.16.3"
+kotlinPoet = "1.9.0"
+kotlinxMetadata = "0.1.0"
+mockk = "1.12.0"
 
 [libraries]
 jacoco-jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
 touchlab-stately-isolate = { module = "co.touchlab:stately-isolate", version.ref = "stately" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicFu" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 kotlin-test-annotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-test-js = { module = "org.jetbrains.kotlin:kotlin-test-js", version.ref = "kotlin" }
 junit-junit = { module = "junit:junit", version.ref = "junit" }
+kotlin-reflectjvm = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+square-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
+square-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "kotlinPoet" }
+square-kotlinpoet-metadata-specs = { module = "com.squareup:kotlinpoet-metadata-specs", version.ref = "kotlinPoet" }
+kotlinx-metadatajvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadata" }
 
 kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicFu" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }

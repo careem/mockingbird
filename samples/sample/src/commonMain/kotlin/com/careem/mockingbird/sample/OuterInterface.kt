@@ -1,12 +1,11 @@
-/**
- *
+/*
  * Copyright Careem, an Uber Technologies Inc. company
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,20 +14,13 @@
  * limitations under the License.
  */
 
-apply from: '../utils.gradle'
+package com.careem.mockingbird.sample
 
-setupMultiplatformLibrary(project, true)
-setupAllTargetsWithDefaultSourceSets(project, true)
-
-kotlin {
-    explicitApi()
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation libs.kotlinx.atomicfu
-                implementation libs.touchlab.stately.isolate
-                implementation libs.kotlin.test
-            }
-        }
-    }
+interface OuterInterface : InnerInterface {
+    var yo: String
+    var yoo: String
+    override fun foo(fooArg: String)
+    fun foo1(fooArg1: String)
+    fun foo2(fooArg12: String, fooArg22: String)
+    fun thr(throwable: Throwable)
 }

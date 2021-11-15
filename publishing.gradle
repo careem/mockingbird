@@ -43,10 +43,16 @@ task javadocJar(type: Jar) {
     archiveClassifier.set("javadoc")
 }
 
+task emptyJar(type: Jar) {
+    archiveClassifier.set("sources")
+}
+
 afterEvaluate {
     publishing {
         publications {
             withType(MavenPublication) {
+                def type = it.name
+                logger.info("Configuring $type")
 
                 artifact javadocJar
 
@@ -72,6 +78,9 @@ afterEvaluate {
                     }
                 }
 
+                if(type == 'pluginMaven'){
+                    artifact sourcesJar
+                }
             }
         }
 

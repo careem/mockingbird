@@ -1,0 +1,103 @@
+/*
+ * Copyright Careem, an Uber Technologies Inc. company
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
+    project.apply plugin: 'org.jetbrains.kotlin.multiplatform'
+    if (shouldPublish) {
+        project.apply from: '../publishing.gradle'
+        project.group = GROUP
+        project.version = VERSION
+    }
+
+    project.kotlin {
+        sourceSets {
+            commonTest {
+                dependencies {
+                    implementation libs.kotlin.test
+                    implementation libs.kotlin.test.common
+                    implementation libs.kotlin.test.annotations
+                }
+            }
+        }
+    }
+}
+
+void setupAllTargetsWithDefaultSourceSets(Project project, Boolean includeJs = true) {
+    setupIosTargets(project)
+    setupJvmTarget(project)
+    if(includeJs){
+        setupJsTarget(project)
+    }
+
+    project.kotlin {
+        sourceSets {
+            jvmJsCommonMain.dependsOn commonMain
+            jvmJsCommonTest.dependsOn commonTest
+
+            jvmMain.dependsOn jvmJsCommonMain
+            jvmTest.dependsOn jvmJsCommonTest
+
+            if(includeJs){
+                jsMain.dependsOn jvmJsCommonMain
+                jsTest.dependsOn jvmJsCommonTest
+            }
+        }
+    }
+}
+
+private void setupIosTargets(Project project) {
+    project.kotlin {
+        ios()
+        iosSimulatorArm64()
+
+        sourceSets {
+            iosSimulatorArm64Main {
+                dependsOn iosMain
+            }
+            iosSimulatorArm64Test {
+                dependsOn iosTest
+            }
+        }
+    }
+}
+
+private void setupJvmTarget(Project project) {
+    project.kotlin {
+        targets.fromPreset(presets.jvm, 'jvm')
+
+        sourceSets {
+            jvmMain {
+                dependencies {
+
+                }
+            }
+
+            jvmTest {
+                dependencies {
+                    implementation libs.junit.junit
+                }
+            }
+        }
+    }
+}
+
+private void setupJsTarget(Project project) {
+    project.apply plugin: JsPlugin
+}
+
+ext.setupMultiplatformLibrary = { Project project, Boolean shouldPublish -> setupMultiplatformLibrary(project, shouldPublish) }
+ext.setupAllTargetsWithDefaultSourceSets = { Project project, Boolean includeJs -> setupAllTargetsWithDefaultSourceSets(project, includeJs) }
+

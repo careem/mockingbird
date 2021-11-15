@@ -13,9 +13,9 @@ hs_err_pid*
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
-.idea/*
-!.idea/codeStyles/
-!.idea/copyright/
+**/.idea/*
+!**.idea/codeStyles/
+!**.idea/copyright/
 
 local.properties
 
