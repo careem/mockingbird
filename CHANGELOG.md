@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 1.16.0
 * Upgrade kotlin to 1.5.31 in JsPlugin
 * MockingBird plugin
 
