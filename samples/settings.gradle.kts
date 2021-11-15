@@ -1,3 +1,6 @@
+import org.gradle.initialization.DependenciesAccessors
+import org.gradle.kotlin.dsl.support.serviceOf
+
 /**
  *
  * Copyright Careem, an Uber Technologies Inc. company
@@ -15,20 +18,23 @@
  * limitations under the License.
  */
 
-apply from: '../utils.gradle'
+enableFeaturePreview("VERSION_CATALOGS")
 
-setupMultiplatformLibrary(project, true)
-setupAllTargetsWithDefaultSourceSets(project, true)
-
-kotlin {
-    explicitApi()
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation libs.kotlinx.atomicfu
-                implementation libs.touchlab.stately.isolate
-                implementation libs.kotlin.test
-            }
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("../versions.toml"))
         }
+    }
+}
+
+include(":sample")
+include(":common-sample")
+include(":common:sample")
+
+includeBuild("..") {
+    dependencySubstitution {
+        substitute(module("com.careem.mockingbird:mockingbird")).using(project(":mockingbird"))
+        substitute(module("com.careem.mockingbird:mockingbird-compiler")).using(project(":mockingbird-compiler"))
     }
 }

@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-apply from: '../utils.gradle'
+apply from: '../../utils.gradle'
 
-setupMultiplatformLibrary(project, true)
-setupAllTargetsWithDefaultSourceSets(project, true)
+setupMultiplatformLibrary(project, false)
+setupAllTargetsWithDefaultSourceSets(project, false) // FIXME Js excluded here
+
 
 kotlin {
-    explicitApi()
     sourceSets {
         commonMain {
             dependencies {
                 implementation libs.kotlinx.atomicfu
-                implementation libs.touchlab.stately.isolate
-                implementation libs.kotlin.test
             }
         }
     }
 }
+

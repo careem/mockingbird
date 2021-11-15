@@ -1,12 +1,11 @@
-/**
- *
+/*
  * Copyright Careem, an Uber Technologies Inc. company
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,20 +14,13 @@
  * limitations under the License.
  */
 
-apply from: '../utils.gradle'
+package com.careem.mockingbird.sample
 
-setupMultiplatformLibrary(project, true)
-setupAllTargetsWithDefaultSourceSets(project, true)
+interface InterfaceWithGenerics {
+    fun foo(fooArg: List<List<Int>>): List<List<String>>
+    fun complexFoo(fooArg: List<Map<List<List<Int>>, List<String>>>): List<List<String>>
+    fun foo(fooArg: Map<Int, String>): Map<String, Int>
 
-kotlin {
-    explicitApi()
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation libs.kotlinx.atomicfu
-                implementation libs.touchlab.stately.isolate
-                implementation libs.kotlin.test
-            }
-        }
-    }
+    var g1: List<String>
+    var g2: Map<String, Int>
 }

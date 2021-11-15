@@ -18,6 +18,7 @@
 enableFeaturePreview("VERSION_CATALOGS")
 
 include(":mockingbird")
+include(":mockingbird-compiler")
 
 dependencyResolutionManagement {
     versionCatalogs {

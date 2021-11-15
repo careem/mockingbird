@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Upgrade kotlin to 1.5.31 in JsPlugin
 
 ## 1.15.0
 * Support for iosSimulatorArm64
