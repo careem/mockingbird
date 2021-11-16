@@ -18,13 +18,12 @@ import groovy.lang.Closure
 
 plugins{
     id("org.jetbrains.kotlin.multiplatform")
+    id("com.careem.mockingbird")
 }
 
 apply(from = "../../utils.gradle")
 val setupMultiplatformLibrary: Closure<Any> by ext
 setupMultiplatformLibrary(project, false, false) // TODO extract JsPlugin from buildSrc to be used in other modules
-
-apply(plugin = "com.careem.mockingbird")
 
 kotlin {
     sourceSets {
