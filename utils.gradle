@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
-    project.apply plugin: 'org.jetbrains.kotlin.multiplatform'
+void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true, Boolean includeJs = true) {
     if (shouldPublish) {
         project.apply from: '../publishing.gradle'
         project.group = GROUP
@@ -33,12 +32,14 @@ void setupMultiplatformLibrary(Project project, Boolean shouldPublish = true) {
             }
         }
     }
+
+    setupAllTargetsWithDefaultSourceSets(project, includeJs)
 }
 
-void setupAllTargetsWithDefaultSourceSets(Project project, Boolean includeJs = true) {
+private void setupAllTargetsWithDefaultSourceSets(Project project, Boolean includeJs = true) {
     setupIosTargets(project)
     setupJvmTarget(project)
-    if(includeJs){
+    if (includeJs) {
         setupJsTarget(project)
     }
 
@@ -50,7 +51,7 @@ void setupAllTargetsWithDefaultSourceSets(Project project, Boolean includeJs = t
             jvmMain.dependsOn jvmJsCommonMain
             jvmTest.dependsOn jvmJsCommonTest
 
-            if(includeJs){
+            if (includeJs) {
                 jsMain.dependsOn jvmJsCommonMain
                 jsTest.dependsOn jvmJsCommonTest
             }
@@ -76,15 +77,9 @@ private void setupIosTargets(Project project) {
 
 private void setupJvmTarget(Project project) {
     project.kotlin {
-        targets.fromPreset(presets.jvm, 'jvm')
+        jvm()
 
         sourceSets {
-            jvmMain {
-                dependencies {
-
-                }
-            }
-
             jvmTest {
                 dependencies {
                     implementation libs.junit.junit
@@ -98,6 +93,5 @@ private void setupJsTarget(Project project) {
     project.apply plugin: JsPlugin
 }
 
-ext.setupMultiplatformLibrary = { Project project, Boolean shouldPublish -> setupMultiplatformLibrary(project, shouldPublish) }
-ext.setupAllTargetsWithDefaultSourceSets = { Project project, Boolean includeJs -> setupAllTargetsWithDefaultSourceSets(project, includeJs) }
+ext.setupMultiplatformLibrary = { Project project, Boolean shouldPublish, Boolean includeJs -> setupMultiplatformLibrary(project, shouldPublish, includeJs) }
 

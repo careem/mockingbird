@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Converted `build.gradle`s to `build.gradle.kts`
 
 ## 2.0.0
 * Upgrade kotlin to 1.5.31 in JsPlugin

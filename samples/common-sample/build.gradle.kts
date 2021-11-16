@@ -14,21 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import groovy.lang.Closure
 
-apply from: '../utils.gradle'
+plugins{
+    id("org.jetbrains.kotlin.multiplatform")
+}
 
-setupMultiplatformLibrary(project, true)
-setupAllTargetsWithDefaultSourceSets(project, true)
+apply(from = "../../utils.gradle")
+val setupMultiplatformLibrary: Closure<Any> by ext
+setupMultiplatformLibrary(project, false, false) // TODO extract JsPlugin from buildSrc to be used in other modules
 
 kotlin {
-    explicitApi()
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
-                implementation libs.kotlinx.atomicfu
-                implementation libs.touchlab.stately.isolate
-                implementation libs.kotlin.test
+                implementation(libs.kotlinx.atomicfu)
             }
         }
     }
 }
+
