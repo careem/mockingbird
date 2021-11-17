@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.1.0
 * Fixed issue that was preventing the plugin from been applied in the `plugins` block
 * Converted `build.gradle`s to `build.gradle.kts`
 
