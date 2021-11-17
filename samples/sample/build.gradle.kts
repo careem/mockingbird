@@ -19,6 +19,7 @@ import groovy.lang.Closure
 plugins{
     id("org.jetbrains.kotlin.multiplatform")
     id("com.careem.mockingbird")
+    id("com.google.devtools.ksp") version "1.5.31-1.0.1"
 }
 
 apply(from = "../../utils.gradle")
@@ -36,6 +37,12 @@ kotlin {
             }
         }
     }
+}
+
+dependencies {
+    "kspJvmTest"("com.careem.mockingbird:mockingbird-processor")
+    "kspIosX64Test"("com.careem.mockingbird:mockingbird-processor")
+    "kspIosArm64Test"("com.careem.mockingbird:mockingbird-processor")
 }
 
 configure<com.careem.mockingbird.MockingbirdPluginExtension> {
