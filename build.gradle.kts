@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply from: 'jacoco.gradle'
+apply(from= "jacoco.gradle")
 
 buildscript {
     repositories {
@@ -22,23 +22,21 @@ buildscript {
         google()
     }
     dependencies {
-        classpath libs.kotlinx.atomicfu.gradle
-        classpath libs.jacoco.jacoco
+        classpath(libs.kotlinx.atomicfu.gradle)
+        classpath(libs.jacoco.jacoco)
     }
 }
 
 allprojects {
-    group GROUP
-    version VERSION
+    group = findProperty("GROUP") as String
+    version = findProperty("VERSION") as String
 
     repositories {
         mavenCentral()
         google()
     }
 
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-        kotlinOptions{
-            allWarningsAsErrors = true
-        }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions.allWarningsAsErrors = true
     }
 }
