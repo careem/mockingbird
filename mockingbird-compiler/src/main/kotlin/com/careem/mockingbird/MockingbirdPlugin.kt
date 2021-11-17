@@ -50,8 +50,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         val sourceSetResolver = SourceSetResolver()
         projectExplorer = ProjectExplorer(sourceSetResolver)
         try {
-            configureSourceSets(target)
-
             target.extensions.add<MockingbirdPluginExtension>(
                 EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
             )
@@ -63,13 +61,16 @@ abstract class MockingbirdPlugin : Plugin<Project> {
                 }
             }
 
-            target.tasks.getByName(GradleTasks.ALL_TESTS) {
-                dependsOn(target.tasks.getByName(GradleTasks.GENERATE_MOCKS))
-            }
-
-            projectExplorer.visitRootProject(target.rootProject)
-            // Add test dependencies for classes that need to be mocked
             target.gradle.projectsEvaluated {
+
+                target.tasks.getByName(GradleTasks.ALL_TESTS) {
+                    dependsOn(target.tasks.getByName(GradleTasks.GENERATE_MOCKS))
+                }
+
+                configureSourceSets(target)
+
+                projectExplorer.visitRootProject(target.rootProject)
+                // Add test dependencies for classes that need to be mocked
                 val dependencySet = projectExplorer.explore(target)
                 target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
                     sourceSets.getByName("commonTest") {
