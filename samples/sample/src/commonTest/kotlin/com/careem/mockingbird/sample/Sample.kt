@@ -18,9 +18,11 @@ package com.careem.mockingbird.sample
 
 import com.careem.mockingbird.common.sample.ExternalContractMock
 import com.careem.mockingbird.common.sample.ExternalDepMock
+import com.careem.mockingbird.test.GenerateMocksFor
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
+@GenerateMocksFor(mocks=[PippoSample::class])
 class TestClass {
 
     @Test
