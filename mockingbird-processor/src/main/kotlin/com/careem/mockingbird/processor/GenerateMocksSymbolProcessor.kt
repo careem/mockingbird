@@ -17,18 +17,18 @@
 package com.careem.mockingbird.processor
 
 import com.google.devtools.ksp.processing.CodeGenerator
-import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.google.devtools.ksp.symbol.Nullability
 import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
 import com.squareup.kotlinpoet.ksp.toClassName
+import com.squareup.kotlinpoet.ksp.toTypeName
 
 class GenerateMocksSymbolProcessor(
     val codeGenerator: CodeGenerator,
@@ -40,12 +40,27 @@ class GenerateMocksSymbolProcessor(
         logger.warn("KSP process")
 
 
-        val symbols = resolver.getSymbolsWithAnnotation("com.careem.mockingbird.test.GenerateMocksFor")
+        val fields = resolver.getSymbolsWithAnnotation(MOCK_ANNOTATION)
+        fields.forEach { set ->
+            if (set !is KSPropertyDeclaration) error("$set is not a property declaration but is annotated with @Mock, not supperted")
+            logger.warn("Type to Mock ${set.type.toTypeName()}")
+            // TODO delegate code generator for generating code
+        }
+
+        val symbols = resolver.getSymbolsWithAnnotation("com.careem.mockingbird.test.annotation.Mock")
         val ret = symbols.filter { !it.validate() }.toList()
+        logger.warn("symbols: $symbols")
         symbols
             .filter { it is KSClassDeclaration && it.validate() }
             .forEach { it.accept(GenerateMocksVisitor(), Unit) }
         return ret
+
+//        val symbols = resolver.getSymbolsWithAnnotation("com.careem.mockingbird.test.GenerateMocksFor")
+//        val ret = symbols.filter { !it.validate() }.toList()
+//        symbols
+//            .filter { it is KSClassDeclaration && it.validate() }
+//            .forEach { it.accept(GenerateMocksVisitor(), Unit) }
+//        return ret
     }
 
 
@@ -103,5 +118,9 @@ class GenerateMocksSymbolProcessor(
 //            file.appendText("}\n")
 //            file.close()
         }
+    }
+
+    private companion object{
+        const val MOCK_ANNOTATION = "com.careem.mockingbird.test.annotations.Mock"
     }
 }

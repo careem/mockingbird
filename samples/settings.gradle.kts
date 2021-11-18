@@ -26,6 +26,7 @@ dependencyResolutionManagement {
 }
 
 include(":sample")
+include(":kspsample")
 include(":common-sample")
 include(":common:sample")
 

@@ -18,7 +18,7 @@ import groovy.lang.Closure
 
 plugins{
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.careem.mockingbird")
+    id("com.google.devtools.ksp") version "1.5.31-1.0.1"
 }
 
 apply(from = "../../utils.gradle")
@@ -38,19 +38,9 @@ kotlin {
     }
 }
 
-configure<com.careem.mockingbird.MockingbirdPluginExtension> {
-    generateMocksFor = listOf(
-        "com.careem.mockingbird.sample.JavaTypes",
-        "com.careem.mockingbird.sample.InterfaceWithGenerics",
-        "com.careem.mockingbird.sample.PippoSample",
-        "com.careem.mockingbird.sample.InternalSampleInterface",
-        "com.careem.mockingbird.sample.LambdaSample",
-        "com.careem.mockingbird.sample.Mock1",
-        "com.careem.mockingbird.sample.MockWithExternalDependencies",
-        "com.careem.mockingbird.common.sample.ExternalContract",
-        "com.careem.mockingbird.sample.OuterInterface",
-        "com.careem.mockingbird.sample.MultipleGetterProperties",
-        "com.careem.mockingbird.common.sample.ExternalDep"
-    )
+dependencies {
+    "kspJvmTest"("com.careem.mockingbird:mockingbird-processor")
+    "kspIosX64Test"("com.careem.mockingbird:mockingbird-processor")
+    "kspIosArm64Test"("com.careem.mockingbird:mockingbird-processor")
 }
 
