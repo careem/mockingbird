@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* KotlinPoet to 1.10.2 and addressed breaking changes
+* Kotlin metadata to 0.2.0
 
 ## 2.1.0
 * Fixed issue that was preventing the plugin from been applied in the `plugins` block

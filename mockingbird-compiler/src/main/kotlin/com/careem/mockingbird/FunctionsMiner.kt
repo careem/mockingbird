@@ -16,12 +16,15 @@
 
 package com.careem.mockingbird
 
-import com.squareup.kotlinpoet.metadata.ImmutableKmClass
-import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
-import com.squareup.kotlinpoet.metadata.ImmutableKmProperty
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
-import com.squareup.kotlinpoet.metadata.toImmutableKmClass
+import com.squareup.kotlinpoet.metadata.toKmClass
+import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
+import kotlinx.metadata.KmFunction
+import kotlinx.metadata.KmProperty
+import kotlinx.metadata.jvm.getterSignature
+import kotlinx.metadata.jvm.setterSignature
+import kotlinx.metadata.jvm.signature
 
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
@@ -33,9 +36,9 @@ class FunctionsMiner(
      * Extract all functions and properties, this will extract also functions that are defined into the supertypes
      * these functions are all the functions that the mock class should provide
      */
-    fun extractFunctionsAndProperties(kmClass: ImmutableKmClass): Pair<List<ImmutableKmFunction>, List<ImmutableKmProperty>> {
-        val functions: MutableList<ImmutableKmFunction> = mutableListOf()
-        val properties: MutableList<ImmutableKmProperty> = mutableListOf()
+    fun extractFunctionsAndProperties(kmClass: KmClass): Pair<List<KmFunction>, List<KmProperty>> {
+        val functions: MutableList<KmFunction> = mutableListOf()
+        val properties: MutableList<KmProperty> = mutableListOf()
         rawExtractFunctionsAndProperties(kmClass, functions, properties)
         return functions.distinctBy { it.signature } to properties
             .filter { it.getterSignature != null || it.setterSignature != null }
@@ -43,15 +46,15 @@ class FunctionsMiner(
     }
 
     private fun rawExtractFunctionsAndProperties(
-        kmClass: ImmutableKmClass,
-        functions: MutableList<ImmutableKmFunction>,
-        properties: MutableList<ImmutableKmProperty>
+        kmClass: KmClass,
+        functions: MutableList<KmFunction>,
+        properties: MutableList<KmProperty>
     ) { // TODO optimize with tailrec
         val kmSuperTypes = kmClass.supertypes
             .map { it.classifier }
             .filterIsInstance<KmClassifier.Class>()
             .filter { it.name != "kotlin/Any" }
-            .map { classLoaderWrapper.loadClassFromDirectory(it.name).toImmutableKmClass() }
+            .map { classLoaderWrapper.loadClassFromDirectory(it.name).toKmClass() }
 
         // get functions and properties for current class
         functions.addAll(kmClass.functions)

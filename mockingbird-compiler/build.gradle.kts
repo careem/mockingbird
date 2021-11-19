@@ -51,8 +51,7 @@ dependencies {
     implementation(libs.kotlin.reflectjvm)
     implementation(libs.square.kotlinpoet)
     implementation(libs.square.kotlinpoet.metadata)
-    implementation(libs.square.kotlinpoet.metadata.specs)
-    implementation(libs.kotlinx.metadatajvm)
+    implementation(libs.kotlinx.metadata.jvm)
     implementation(project(":mockingbird"))
 
     testImplementation(libs.kotlin.test)

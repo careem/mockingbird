@@ -25,14 +25,16 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
-import com.squareup.kotlinpoet.metadata.ImmutableKmClass
-import com.squareup.kotlinpoet.metadata.ImmutableKmFunction
-import com.squareup.kotlinpoet.metadata.ImmutableKmProperty
-import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.isNullable
 import com.squareup.kotlinpoet.metadata.isSuspend
+import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
+import kotlinx.metadata.KmFunction
+import kotlinx.metadata.KmProperty
+import kotlinx.metadata.KmType
+import kotlinx.metadata.jvm.getterSignature
+import kotlinx.metadata.jvm.setterSignature
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import kotlin.reflect.KClass
@@ -46,7 +48,7 @@ class MockGenerator constructor(
     private val logger: Logger = Logging.getLogger(this::class.java)
 
 
-    fun createClass(kmClass: ImmutableKmClass): FileSpec {
+    fun createClass(kmClass: KmClass): FileSpec {
         val classToMock = classLoader.loadClass(kmClass)
         val simpleName = kmClass.name.substringAfterLast("/")
 
@@ -78,7 +80,7 @@ class MockGenerator constructor(
             .build()
     }
 
-    private fun List<ImmutableKmFunction>.buildMethodObject(): TypeSpec {
+    private fun List<KmFunction>.buildMethodObject(): TypeSpec {
         logger.info("Generating methods")
         val methodObjectBuilder = TypeSpec.objectBuilder(METHOD)
         val visitedFunctionSet = mutableSetOf<String>()
@@ -97,7 +99,7 @@ class MockGenerator constructor(
         return methodObjectBuilder.build()
     }
 
-    private fun List<ImmutableKmFunction>.buildArgObject(): TypeSpec {
+    private fun List<KmFunction>.buildArgObject(): TypeSpec {
         logger.info("Generating arguments")
         val argObjectBuilder = TypeSpec.objectBuilder(ARG)
         val visitedPropertySet = mutableSetOf<String>()
@@ -120,7 +122,7 @@ class MockGenerator constructor(
         return argObjectBuilder.build()
     }
 
-    private fun List<ImmutableKmProperty>.buildPropertyObject(): TypeSpec {
+    private fun List<KmProperty>.buildPropertyObject(): TypeSpec {
         logger.info("Generating properties")
         val propertyObjectBuilder = TypeSpec.objectBuilder(PROPERTY)
         var haveMutableProps = false
@@ -166,14 +168,14 @@ class MockGenerator constructor(
             .addModifiers(KModifier.CONST)
             .build()
 
-    private fun isUnitFunction(function: ImmutableKmFunction): Boolean {
+    private fun isUnitFunction(function: KmFunction): Boolean {
         val classifier = function.returnType.classifier
         return classifier is KmClassifier.Class && classifier.name == "kotlin/Unit"
     }
 
     private fun mockProperty(
         mockClassBuilder: TypeSpec.Builder,
-        property: ImmutableKmProperty
+        property: KmProperty
     ) {
         logger.debug("===> Mocking Property ${property.getterSignature?.name} and ${property.setterSignature?.name} and ${property.setterSignature}")
         val propertyBuilder = PropertySpec
@@ -242,7 +244,7 @@ class MockGenerator constructor(
 
     @OptIn(ExperimentalStdlibApi::class)
     private fun buildFunctionModifiers(
-        function: ImmutableKmFunction
+        function: KmFunction
     ) : List<KModifier> {
         return buildList {
             add(KModifier.OVERRIDE)
@@ -254,7 +256,7 @@ class MockGenerator constructor(
 
     private fun mockFunction(
         mockClassBuilder: TypeSpec.Builder,
-        function: ImmutableKmFunction,
+        function: KmFunction,
         isUnit: Boolean
     ) {
         logger.info("Mocking function")
@@ -274,7 +276,7 @@ class MockGenerator constructor(
         )
     }
 
-    private fun ImmutableKmType.buildType(): TypeName {
+    private fun KmType.buildType(): TypeName {
         val subTypes = this.arguments.map { it.type!! }
         return classLoader.loadClass(this)
             .asTypeName()
@@ -293,7 +295,7 @@ class MockGenerator constructor(
     }
 
 
-    private fun FunSpec.Builder.addMockStatement(function: ImmutableKmFunction, isUnit: Boolean) {
+    private fun FunSpec.Builder.addMockStatement(function: KmFunction, isUnit: Boolean) {
         // TODO remove duplicates in args and method names
         val mockFunction = if (isUnit) {
             MOCK_UNIT

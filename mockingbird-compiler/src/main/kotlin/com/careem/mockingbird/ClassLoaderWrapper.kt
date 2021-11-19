@@ -16,10 +16,10 @@
 
 package com.careem.mockingbird
 
-import com.squareup.kotlinpoet.metadata.ImmutableKmClass
-import com.squareup.kotlinpoet.metadata.ImmutableKmType
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
+import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
+import kotlinx.metadata.KmType
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
 import org.gradle.api.logging.Logger
@@ -56,9 +56,9 @@ class ClassLoaderWrapper(
     @Throws(ClassNotFoundException::class)
     fun loadClass(name: String): KClass<*> = classLoader.loadClass(name).kotlin
 
-    fun loadClass(kmClass: ImmutableKmType): KClass<*> = loadClassFromDirectory(extractTypeString(kmClass))
+    fun loadClass(kmClass: KmType): KClass<*> = loadClassFromDirectory(extractTypeString(kmClass))
 
-    fun loadClass(kmClass: ImmutableKmClass): KClass<*> = loadClassFromDirectory(kmClass.name)
+    fun loadClass(kmClass: KmClass): KClass<*> = loadClassFromDirectory(kmClass.name)
 
     fun loadClassFromDirectory(path: String): KClass<*> {
         return loadClass(path.toJavaFullyQualifiedName())
@@ -94,7 +94,7 @@ class ClassLoaderWrapper(
         }
     }
 
-    private fun extractTypeString(type: ImmutableKmType): String {
+    private fun extractTypeString(type: KmType): String {
         return if (type.classifier is KmClassifier.Class) {
             (type.classifier as KmClassifier.Class).name
         } else {

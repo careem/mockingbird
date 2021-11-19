@@ -15,9 +15,9 @@
  */
 package com.careem.mockingbird
 
-import com.squareup.kotlinpoet.metadata.ImmutableKmClass
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
-import com.squareup.kotlinpoet.metadata.toImmutableKmClass
+import com.squareup.kotlinpoet.metadata.toKmClass
+import kotlinx.metadata.KmClass
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
@@ -98,7 +98,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         outputDir.mkdirs()
 
         pluginExtensions.generateMocksFor
-            .map { classLoader.loadClass(it).toImmutableKmClass() }
+            .map { classLoader.loadClass(it).toKmClass() }
             .let { generateClasses(it, outputDir) }
     }
 
@@ -112,7 +112,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
 
-    private fun generateClasses(classNames: List<ImmutableKmClass>, outputDir: File) {
+    private fun generateClasses(classNames: List<KmClass>, outputDir: File) {
         for (kmClass in classNames) {
             mockGenerator.createClass(kmClass).writeTo(outputDir)
         }
