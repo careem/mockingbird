@@ -17,7 +17,7 @@
 package com.careem.mockingbird
 
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
-import com.squareup.kotlinpoet.metadata.toImmutableKmClass
+import com.squareup.kotlinpoet.metadata.toKmClass
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
@@ -37,7 +37,7 @@ class FunctionsMinerTest {
 
     @Test
     fun testExtractFunctionsAndPropertiesWithSuperInterface() {
-        val (functions, properties) = functionsMiner.extractFunctionsAndProperties(SuperInterface::class.toImmutableKmClass())
+        val (functions, properties) = functionsMiner.extractFunctionsAndProperties(SuperInterface::class.toKmClass())
         assertEquals(2, functions.size)
         assertEquals(0, properties.size)
     }
@@ -45,16 +45,16 @@ class FunctionsMinerTest {
     @Test
     fun testExtractFunctionsAndPropertiesWithChildInterface() {
         every { classLoaderWrapper.loadClassFromDirectory(any()) } returns SuperInterface::class
-        val (functions, properties) = functionsMiner.extractFunctionsAndProperties(ChildInterface::class.toImmutableKmClass())
+        val (functions, properties) = functionsMiner.extractFunctionsAndProperties(ChildInterface::class.toKmClass())
         assertEquals(4, functions.size)
         assertEquals(0, properties.size)
     }
 
     @Test
     fun testExtractFunctionsAndPropertiesWithChildInterfaceImpl() {
-        every { classLoaderWrapper.loadClassFromDirectory(SuperInterface::class.toImmutableKmClass().name) } returns SuperInterface::class
-        every { classLoaderWrapper.loadClassFromDirectory(ChildInterface::class.toImmutableKmClass().name) } returns ChildInterface::class
-        val (functions, properties) = functionsMiner.extractFunctionsAndProperties(ChildInterfaceImpl::class.toImmutableKmClass())
+        every { classLoaderWrapper.loadClassFromDirectory(SuperInterface::class.toKmClass().name) } returns SuperInterface::class
+        every { classLoaderWrapper.loadClassFromDirectory(ChildInterface::class.toKmClass().name) } returns ChildInterface::class
+        val (functions, properties) = functionsMiner.extractFunctionsAndProperties(ChildInterfaceImpl::class.toKmClass())
         assertEquals(4, functions.size)
         assertEquals(2, properties.size)
     }
