@@ -39,9 +39,11 @@ repositories {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
-        freeCompilerArgs = freeCompilerArgs + "-language-version=${libs.versions.kotlinTarget.get()}"
-        freeCompilerArgs = freeCompilerArgs + "-api-version=${libs.versions.kotlinTarget.get()}"
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-Xopt-in=kotlin.RequiresOptIn",
+            "-language-version=${libs.versions.kotlinTarget.get()}",
+            "-api-version=${libs.versions.kotlinTarget.get()}"
+        )
         jvmTarget = JavaVersion.VERSION_11.majorVersion
     }
 }
