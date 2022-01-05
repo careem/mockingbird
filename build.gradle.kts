@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply(from= "jacoco.gradle")
+apply(from = "jacoco.gradle")
 
 buildscript {
     repositories {
@@ -37,6 +37,8 @@ allprojects {
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.allWarningsAsErrors = true
+        kotlinOptions {
+            allWarningsAsErrors = true
+        }
     }
 }

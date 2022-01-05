@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Kotlin 1.5+ required to use the code generation plugin
+* XCode 12.5.+ now required
+* yarn.lock has been added to VCS
+* Gradle to 7.3.3
+* Kotlin to 1.6.10
+* AtomicFu to 0.17.0
 * KotlinPoet to 1.10.2 and addressed breaking changes
 * Kotlin metadata to 0.2.0
 

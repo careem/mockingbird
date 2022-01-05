@@ -38,7 +38,14 @@ repositories {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-Xopt-in=kotlin.RequiresOptIn",
+            "-language-version=${libs.versions.kotlinTarget.get()}",
+            "-api-version=${libs.versions.kotlinTarget.get()}"
+        )
+        jvmTarget = JavaVersion.VERSION_11.majorVersion
+    }
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
