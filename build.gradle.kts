@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply(from= "jacoco.gradle")
+apply(from = "jacoco.gradle")
 
 buildscript {
     repositories {
@@ -37,6 +37,9 @@ allprojects {
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.allWarningsAsErrors = true
+        kotlinOptions {
+            allWarningsAsErrors = false // TODO put back to true once gradle will target kotlin 1.6
+            jvmTarget = JavaVersion.VERSION_11.majorVersion
+        }
     }
 }
