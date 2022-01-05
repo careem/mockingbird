@@ -39,7 +39,6 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {
             allWarningsAsErrors = false // TODO put back to true once gradle will target kotlin 1.6
-            jvmTarget = JavaVersion.VERSION_11.majorVersion
         }
     }
 }
