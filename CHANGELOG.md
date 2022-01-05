@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* XCode 12.5.+ now required
 * yarn.lock has been added to VCS
 * Kotlin to 1.6.10
 * AtomicFu to 0.17.0
