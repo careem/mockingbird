@@ -1,5 +1,6 @@
 [versions]
 kotlin = "1.6.10"
+kotlinTarget = "1.5"
 junit = "4.13.1"
 jacoco = "0.8.7"
 stately = "1.2.1"
