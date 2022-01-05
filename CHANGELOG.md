@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Gradle to 7.3.3
 * XCode 12.5.+ now required
 * yarn.lock has been added to VCS
 * Kotlin to 1.6.10
