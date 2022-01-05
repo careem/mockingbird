@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.2.0
 * Kotlin 1.5+ required to use the code generation plugin
 * XCode 12.5.+ now required
 * yarn.lock has been added to VCS
