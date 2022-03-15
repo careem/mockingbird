@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.3.0
 * Fix issues #86 and #113
 
 ## 2.2.0
