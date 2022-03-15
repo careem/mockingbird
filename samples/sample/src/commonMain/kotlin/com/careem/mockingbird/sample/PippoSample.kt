@@ -24,5 +24,8 @@ interface PippoSample {
     fun sayHiWith(param: String)
     fun sayHiWith(param: String, someOtherParam: Boolean)
     fun sayHiWithCommonParam(param: String, intParam: Int)
+    fun sayHiWith(param: String, lambda: (Int) -> Int)
+    fun sayHiWith(param: String, map: Map<String, String>)
+    fun sayHiWith(param: String, entry: Map.Entry<String, String>)
     suspend fun thisIsSuspend(param: String, intParam: Int)
 }
