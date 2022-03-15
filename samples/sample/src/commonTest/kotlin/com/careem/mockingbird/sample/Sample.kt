@@ -30,6 +30,12 @@ class TestClass {
     }
 
     @Test
+    fun testGeneratedTargetProjectLambdaMock() {
+        val mock: LambdaSample = LambdaSampleMock()
+        assertNotNull(mock)
+    }
+
+    @Test
     fun testGeneratedTargetProjectDependentMock() {
         val externalMock = MockWithExternalDependenciesMock()
         assertNotNull(externalMock)
@@ -58,6 +64,5 @@ class TestClass {
         val mock = ExternalDepMock()
         assertNotNull(mock)
     }
-
 }
 
