@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Fix issues #86 and #113
 
 ## 2.2.0
 * Kotlin 1.5+ required to use the code generation plugin

@@ -109,8 +109,8 @@ class ClassLoaderWrapper(
 
     private fun String.toJavaFullyQualifiedName(): String = this.replace("/", ".").toJavaPackage()
 
-    private fun String.toJavaPackage(): String{
-        return when(this){
+    private fun String.toJavaPackage(): String {
+        return when (this) {
             "kotlin.Byte" -> "java.lang.Byte"
             "kotlin.Short" -> "java.lang.Short"
             "kotlin.Int" -> "java.lang.Integer"
@@ -137,9 +137,9 @@ class ClassLoaderWrapper(
             "kotlin.collections.List" -> "java.util.List"
             "kotlin.collections.ListIterator" -> "java.util.ListIterator"
             "kotlin.collections.Map" -> "java.util.Map"
-//            "kotlin.collections.Map.Entry" -> "java.util.Map.Entry" // FIXME class not found
+            "kotlin.collections.Map.Entry" -> "java.util.Map\$Entry"
             // TODO arrays?
-            else -> this
+            else -> this.replace("kotlin.Function", "kotlin.jvm.functions.Function")
         }
     }
 }

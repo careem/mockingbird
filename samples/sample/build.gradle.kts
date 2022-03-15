@@ -43,6 +43,7 @@ configure<com.careem.mockingbird.MockingbirdPluginExtension> {
         "com.careem.mockingbird.sample.JavaTypes",
         "com.careem.mockingbird.sample.InterfaceWithGenerics",
         "com.careem.mockingbird.sample.PippoSample",
+        "com.careem.mockingbird.sample.LambdaSample",
         "com.careem.mockingbird.sample.Mock1",
         "com.careem.mockingbird.sample.MockWithExternalDependencies",
         "com.careem.mockingbird.common.sample.ExternalContract",
