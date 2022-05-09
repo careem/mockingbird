@@ -264,7 +264,7 @@ class MockGenerator constructor(
             .addModifiers(buildFunctionModifiers(function))
         for (valueParam in function.valueParameters) {
             logger.info(valueParam.type.toString())
-            val kmType = valueParam.type!!
+            val kmType = valueParam.type
             funBuilder.addParameter(valueParam.name, kmType.buildType())
         }
         if (!isUnit) {
