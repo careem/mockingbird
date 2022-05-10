@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.4.0
 * Kotlin to 1.6.21
 * Jacoco to 0.8.8
 * AtomicFu to 0.17.2
