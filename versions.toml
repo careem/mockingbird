@@ -1,13 +1,13 @@
 [versions]
-kotlin = "1.6.10"
+kotlin = "1.6.21"
 kotlinTarget = "1.5"
 junit = "4.13.1"
-jacoco = "0.8.7"
+jacoco = "0.8.8"
 stately = "1.2.1"
-atomicFu = "0.17.0"
-kotlinPoet = "1.10.2"
-kotlinxMetadata = "0.2.0"
-mockk = "1.12.2"
+atomicFu = "0.17.2"
+kotlinPoet = "1.11.0"
+kotlinxMetadata = "0.4.2"
+mockk = "1.12.3"
 
 [libraries]
 jacoco-jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Kotlin to 1.6.21
+* Jacoco to 0.8.8
+* AtomicFu to 0.17.2
+* kotlinPoet to 1.11.0
+* kotlinxMetadata to 0.4.2
+* mockk to 1.12.3
 
 ## 2.3.0
 * Fix issues #86 and #113

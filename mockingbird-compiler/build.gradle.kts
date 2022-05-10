@@ -40,7 +40,7 @@ repositories {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
         freeCompilerArgs = freeCompilerArgs + listOf(
-            "-Xopt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlin.RequiresOptIn",
             "-language-version=${libs.versions.kotlinTarget.get()}",
             "-api-version=${libs.versions.kotlinTarget.get()}"
         )
