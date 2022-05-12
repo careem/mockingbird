@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Make individual test compilation tasks dependent on generateMocks
+* Only require jvmJar instead of assemble to generate mocks
 
 ## 2.4.0
 * Kotlin to 1.6.21
