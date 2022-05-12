@@ -24,7 +24,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 
@@ -64,7 +64,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
                 }
 
                 target.tasks.forEach { task ->
-                    if (task.name.contains("Test") && (task is KotlinCompile)) {
+                    if (task.name.contains("Test") && (task is KotlinCompile<*>)) {
                         task.dependsOn(generateMocksTask)
                     }
                 }
