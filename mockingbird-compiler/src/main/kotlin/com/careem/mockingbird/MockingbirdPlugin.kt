@@ -63,8 +63,10 @@ abstract class MockingbirdPlugin : Plugin<Project> {
                     }
                 }
 
-                target.tasks.getByName(GradleTasks.ALL_TESTS) {
-                    dependsOn(target.tasks.getByName(GradleTasks.GENERATE_MOCKS))
+                target.tasks.forEach { task ->
+                    if (task.name.contains("Test") && (task is KotlinCompile)) {
+                        task.dependsOn(generateMocksTask)
+                    }
                 }
 
                 configureSourceSets(target)
