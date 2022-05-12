@@ -21,4 +21,6 @@ internal class SimpleInvocationRecorderProvider : InvocationRecorderProvider {
     private val invocationRecorder = InvocationRecorder()
 
     override fun <R> access(block: (InvocationRecorder) -> R): R = block(invocationRecorder)
+
+    override fun reset() = invocationRecorder.reset()
 }

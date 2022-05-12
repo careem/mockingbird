@@ -18,4 +18,6 @@ package com.careem.mockingbird.test
 
 internal interface InvocationRecorderProvider {
     public fun <R> access(block: (InvocationRecorder) -> R): R
+
+    public fun reset()
 }

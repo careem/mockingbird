@@ -53,6 +53,8 @@ internal object MockingBird {
      */
     internal fun reset() {
         state.value = DEFAULT_STATE
+        localInvocationRecorder.reset()
+        mtInvocationRecorder.reset()
     }
 
     internal fun invocationRecorder(): InvocationRecorderProvider {

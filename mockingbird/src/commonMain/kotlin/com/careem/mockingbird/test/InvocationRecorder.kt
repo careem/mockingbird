@@ -91,6 +91,10 @@ internal class InvocationRecorder {
         }
     }
 
+    fun reset() {
+        recorder.clear()
+    }
+
     /**
      * Helper to find stores response, need to take care of @see [AnyMatcher]
      */
