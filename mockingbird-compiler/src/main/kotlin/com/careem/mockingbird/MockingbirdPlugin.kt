@@ -24,6 +24,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 
@@ -54,17 +55,18 @@ abstract class MockingbirdPlugin : Plugin<Project> {
                 EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
             )
 
-            target.task(GradleTasks.GENERATE_MOCKS) {
-                dependsOn(target.tasks.getByName(GradleTasks.ASSEMBLE))
-                doLast {
-                    generateMocks(target)
-                }
-            }
-
             target.gradle.projectsEvaluated {
+                val generateMocksTask = target.task(GradleTasks.GENERATE_MOCKS) {
+                    dependsOn(target.tasks.getByName(GradleTasks.JVM_JAR))
+                    doLast {
+                        generateMocks(target)
+                    }
+                }
 
-                target.tasks.getByName(GradleTasks.ALL_TESTS) {
-                    dependsOn(target.tasks.getByName(GradleTasks.GENERATE_MOCKS))
+                target.tasks.forEach { task ->
+                    if (task.name.contains("Test") && (task is KotlinCompile<*>)) {
+                        task.dependsOn(generateMocksTask)
+                    }
                 }
 
                 configureSourceSets(target)

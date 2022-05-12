@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Reduce dependencies of `generateMocks` task and make sure mocks are always generated prior to building tests
 
 ## 2.4.0
 * Kotlin to 1.6.21
