@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.5.0
 * Reduce dependencies of `generateMocks` task and make sure mocks are always generated prior to building tests
 
 ## 2.4.0
