@@ -81,7 +81,7 @@ class InvocationRecorderTest {
 
     @Test
     fun testInvocationsStoredProperlyForMultipleInstancesOfSameMock() {
-        val iterations = 1000000
+        val iterations = 100000
         val invocation1 = Invocation(METHOD_1, ARGS_1)
         val uuid = mutableSetOf<String>()
 
