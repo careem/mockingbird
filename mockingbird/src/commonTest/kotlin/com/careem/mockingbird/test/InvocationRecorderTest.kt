@@ -178,7 +178,7 @@ class InvocationRecorderTest {
             invocationRecorder.getResponse(mock.uuid, invocation1)
         } catch (ise: IllegalStateException) {
             e = ise
-            assertEquals("Not mocked response for current object and instance, instance:${mock.hashCode()}, invocation: $invocation1", e.message)
+            assertEquals("Not mocked response for current object and instance, instance:${mock.uuid}, invocation: $invocation1", e.message)
         }
         assertNotNull(e)
     }
