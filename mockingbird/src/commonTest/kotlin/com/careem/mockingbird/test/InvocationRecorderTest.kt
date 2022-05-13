@@ -58,7 +58,7 @@ class InvocationRecorderTest {
     }
 
     @Test
-    fun testUuuid() {
+    fun testUuidGeneration() {
         val mock = Mocks.MyDependencyMock()
         val uuid = mock.uuid
         assertEquals(uuid, mock.uuid)
