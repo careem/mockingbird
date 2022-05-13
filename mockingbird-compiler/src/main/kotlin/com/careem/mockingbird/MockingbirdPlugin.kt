@@ -58,6 +58,10 @@ abstract class MockingbirdPlugin : Plugin<Project> {
             target.gradle.projectsEvaluated {
                 val generateMocksTask = target.task(GradleTasks.GENERATE_MOCKS) {
                     dependsOn(target.tasks.getByName(GradleTasks.JVM_JAR))
+                    doFirst {
+                        val outputDir = targetOutputDir(target)
+                        outputDir.deleteRecursively()
+                    }
                     doLast {
                         generateMocks(target)
                     }
@@ -95,8 +99,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
         logger.info("Mocking: ${pluginExtensions.generateMocksFor}")
-        val outputDir =
-            File(target.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
+        val outputDir = targetOutputDir(target)
         outputDir.mkdirs()
 
         pluginExtensions.generateMocksFor
@@ -111,6 +114,10 @@ abstract class MockingbirdPlugin : Plugin<Project> {
                 kotlin.srcDir("build/generated/mockingbird")
             }
         }
+    }
+
+    private fun targetOutputDir(target: Project): File{
+        return File(target.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
     }
 
 
