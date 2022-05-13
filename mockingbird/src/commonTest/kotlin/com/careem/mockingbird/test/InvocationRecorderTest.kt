@@ -24,25 +24,25 @@ class InvocationRecorderTest {
 
     @Test
     fun testEmptyListWhenNoInvocationsRegisteredForAnInstance(){
-        val mock = object : Mock {}
+        val mock = newMock()
 
-        val mockInvocations = invocationRecorder.getInvocations(mock.hashCode())
+        val mockInvocations = invocationRecorder.getInvocations(mock.uuid)
         assertTrue(mockInvocations.isEmpty())
     }
 
     @Test
     fun testInvocationsStoredProperlyForMultipleInstances() {
-        val mock = object : Mock {}
-        val mock2 = object : Mock {}
+        val mock = newMock()
+        val mock2 = newMock()
         val invocation1 = Invocation(METHOD_1, ARGS_1)
         val invocation2 = Invocation(METHOD_2, ARGS_1)
 
-        invocationRecorder.storeInvocation(mock.hashCode(), invocation1)
-        invocationRecorder.storeInvocation(mock.hashCode(), invocation2)
-        invocationRecorder.storeInvocation(mock2.hashCode(), invocation1)
+        invocationRecorder.storeInvocation(mock.uuid, invocation1)
+        invocationRecorder.storeInvocation(mock.uuid, invocation2)
+        invocationRecorder.storeInvocation(mock2.uuid, invocation1)
 
-        val mockInvocations = invocationRecorder.getInvocations(mock.hashCode())
-        val mock2Invocations = invocationRecorder.getInvocations(mock2.hashCode())
+        val mockInvocations = invocationRecorder.getInvocations(mock.uuid)
+        val mock2Invocations = invocationRecorder.getInvocations(mock2.uuid)
 
         assertEquals(
             listOf(
@@ -58,22 +58,62 @@ class InvocationRecorderTest {
     }
 
     @Test
+    fun testUuuid() {
+        val mock = Mocks.MyDependencyMock()
+        val uuid = mock.uuid
+        assertEquals(uuid, mock.uuid)
+        assertEquals(uuid, mock.uuid)
+        assertEquals(uuid, mock.uuid)
+        assertEquals(uuid, mock.uuid)
+
+        val mock2 = Mocks.MyDependencyMock()
+        val uuid2 = mock2.uuid
+        assertEquals(uuid2, mock2.uuid)
+        assertEquals(uuid2, mock2.uuid)
+        assertEquals(uuid2, mock2.uuid)
+        assertEquals(uuid2, mock2.uuid)
+
+        println(uuid)
+        println(uuid2)
+
+        assertNotEquals(uuid, uuid2)
+    }
+
+    @Test
+    fun testInvocationsStoredProperlyForMultipleInstancesOfSameMock() {
+        val iterations = 1000000
+        val invocation1 = Invocation(METHOD_1, ARGS_1)
+        val uuid = mutableSetOf<String>()
+
+        (0 until iterations).forEach {
+            val mock = Mocks.MyDependencyMock()
+            uuid.add(mock.uuid)
+            invocationRecorder.storeInvocation(mock.uuid, invocation1)
+        }
+
+        assertEquals(iterations, uuid.size)
+        uuid.forEach {
+            assertEquals(1, invocationRecorder.getInvocations(it).size, message = "Key: $it")
+        }
+    }
+
+    @Test
     fun testResponsesStoredProperlyForMultipleInstances() {
-        val mock = object : Mock {}
-        val mock2 = object : Mock {}
+        val mock = newMock()
+        val mock2 = newMock()
         val invocation1 = Invocation(METHOD_1, ARGS_1)
         val invocation2 = Invocation(METHOD_2, ARGS_1)
         val responseInv1 = "Yo"
         val responseInv2 = "YoYo"
         val responseInv3 = "Ahhhhhhh"
 
-        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
-        invocationRecorder.storeResponse(mock.hashCode(), invocation2, responseInv2)
-        invocationRecorder.storeResponse(mock2.hashCode(), invocation1, responseInv3)
+        invocationRecorder.storeResponse(mock.uuid, invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock.uuid, invocation2, responseInv2)
+        invocationRecorder.storeResponse(mock2.uuid, invocation1, responseInv3)
 
-        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
-        val response2 = invocationRecorder.getResponse(mock.hashCode(), invocation2)
-        val response3 = invocationRecorder.getResponse(mock2.hashCode(), invocation1)
+        val response1 = invocationRecorder.getResponse(mock.uuid, invocation1)
+        val response2 = invocationRecorder.getResponse(mock.uuid, invocation2)
+        val response3 = invocationRecorder.getResponse(mock2.uuid, invocation1)
 
         assertEquals(responseInv1, response1)
         assertEquals(responseInv2, response2)
@@ -82,25 +122,25 @@ class InvocationRecorderTest {
 
     @Test
     fun testAnswersStoredProperly() {
-        val mock = object : Mock {}
+        val mock = newMock()
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
         val responseInv1 = "Yo"
         val responseAnswer1: (Invocation) -> String = { _ -> responseInv1 }
 
-        invocationRecorder.storeAnswer(mock.hashCode(), invocation1, responseAnswer1)
+        invocationRecorder.storeAnswer(mock.uuid, invocation1, responseAnswer1)
 
-        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
+        val response1 = invocationRecorder.getResponse(mock.uuid, invocation1)
 
         assertEquals(responseInv1, response1)
     }
 
     @Test
     fun testGetResponseWhenRelaxedAndUnitFunction() {
-        val mock = object : Mock {}
+        val mock = newMock()
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
-        val response = invocationRecorder.getResponse(mock.hashCode(), invocation1, relaxed = true)
+        val response = invocationRecorder.getResponse(mock.uuid, invocation1, relaxed = true)
         assertNull(response)
     }
 
@@ -111,7 +151,7 @@ class InvocationRecorderTest {
 
     @Test
     fun testAnswersSideEffectOnUnitFunction() {
-        val mock = object : Mock {}
+        val mock = newMock()
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
         var iWillBeSet: String? = null
@@ -121,21 +161,21 @@ class InvocationRecorderTest {
 
         assertNull(iWillBeSet)
 
-        invocationRecorder.storeAnswer(mock.hashCode(), invocation1, responseAnswer1)
+        invocationRecorder.storeAnswer(mock.uuid, invocation1, responseAnswer1)
         assertNull(iWillBeSet)
 
-        invocationRecorder.getResponse(mock.hashCode(), invocation1)
+        invocationRecorder.getResponse(mock.uuid, invocation1)
         assertEquals(SIDE_EFFECT_VALUE, iWillBeSet)
     }
 
     @Test
     fun testCrashIfNoResponseStoreForInvocation() {
-        val mock = object : Mock {}
+        val mock = newMock()
         val invocation1 = Invocation(METHOD_1, ARGS_1)
 
         var e: IllegalStateException? = null
         try {
-            invocationRecorder.getResponse(mock.hashCode(), invocation1)
+            invocationRecorder.getResponse(mock.uuid, invocation1)
         } catch (ise: IllegalStateException) {
             e = ise
             assertEquals("Not mocked response for current object and instance, instance:${mock.hashCode()}, invocation: $invocation1", e.message)
@@ -145,18 +185,18 @@ class InvocationRecorderTest {
 
     @Test
     fun testCrashIfResponseStoredButWrongArgumentSize() {
-        val mock = object : Mock {}
+        val mock = newMock()
         val invocation1 = Invocation(METHOD_1, ARGS_1)
         val invocation2 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to "value1"))
         val responseInv1 = "Yo"
         var e: IllegalStateException? = null
 
-        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock.uuid, invocation1, responseInv1)
 
-        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
+        val response1 = invocationRecorder.getResponse(mock.uuid, invocation1)
         assertEquals(responseInv1, response1)
         try {
-            invocationRecorder.getResponse(mock.hashCode(), invocation2)
+            invocationRecorder.getResponse(mock.uuid, invocation2)
         } catch (ise: IllegalStateException) {
             e = ise
             assertEquals("Not mocked response for current object and instance, invocation: $invocation2", e.message)
@@ -166,18 +206,18 @@ class InvocationRecorderTest {
 
     @Test
     fun testCrashIfResponseStoredButWrongArgumentKey() {
-        val mock = object : Mock {}
+        val mock = newMock()
         val invocation1 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to "value1"))
         val invocation2 = Invocation(METHOD_1, mapOf("wrong_key" to "value1"))
         val responseInv1 = "Yo"
         var e: IllegalStateException? = null
 
-        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock.uuid, invocation1, responseInv1)
 
-        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation1)
+        val response1 = invocationRecorder.getResponse(mock.uuid, invocation1)
         assertEquals(responseInv1, response1)
         try {
-            invocationRecorder.getResponse(mock.hashCode(), invocation2)
+            invocationRecorder.getResponse(mock.uuid, invocation2)
         } catch (ise: IllegalStateException) {
             e = ise
             assertEquals("Not mocked response for current object and instance, invocation: $invocation2", e.message)
@@ -187,8 +227,8 @@ class InvocationRecorderTest {
 
     @Test
     fun testAnyMatcherWorksProperly() {
-        val mock = object : Mock {}
-        val mock2 = object : Mock {}
+        val mock = newMock()
+        val mock2 = newMock()
         val invocation1 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to any()))
         val invocation2 = Invocation(METHOD_1, mapOf(ARG_NAME_1 to "value1"))
         val invocation3 = Invocation(METHOD_2, mapOf(ARG_NAME_1 to "value1", ARG_NAME_2 to any()))
@@ -197,14 +237,20 @@ class InvocationRecorderTest {
         val responseInv1 = "Yo"
         val responseInv2 = "YoYo"
 
-        invocationRecorder.storeResponse(mock.hashCode(), invocation1, responseInv1)
-        invocationRecorder.storeResponse(mock2.hashCode(), invocation3, responseInv2)
+        invocationRecorder.storeResponse(mock.uuid, invocation1, responseInv1)
+        invocationRecorder.storeResponse(mock2.uuid, invocation3, responseInv2)
 
-        val response1 = invocationRecorder.getResponse(mock.hashCode(), invocation2)
-        val response2 = invocationRecorder.getResponse(mock2.hashCode(), invocation4)
+        val response1 = invocationRecorder.getResponse(mock.uuid, invocation2)
+        val response2 = invocationRecorder.getResponse(mock2.uuid, invocation4)
 
         assertEquals(responseInv1, response1)
         assertEquals(responseInv2, response2)
+    }
+
+    fun newMock(): Mock{
+        return object : Mock {
+            override val uuid: String by uuid()
+        }
     }
 
     companion object {

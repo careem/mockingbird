@@ -18,7 +18,9 @@ package com.careem.mockingbird.sample
 
 import com.careem.mockingbird.common.sample.ExternalContractMock
 import com.careem.mockingbird.common.sample.ExternalDepMock
+import com.careem.mockingbird.test.verify
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class TestClass {
@@ -27,6 +29,22 @@ class TestClass {
     fun testGeneratedTargetProjectMock() {
         val pippoMock: PippoSample = PippoSampleMock()
         assertNotNull(pippoMock)
+    }
+
+    @Test
+    fun testInvocationsStoredProperlyForMultipleInstancesOfSameGeneratedMock() {
+        val iterations = 100
+        val uuids = mutableSetOf<String>()
+
+        (0 until iterations).forEach {
+            val mock = PippoSampleMock()
+            uuids.add(mock.uuid)
+            mock.sayHi()
+            mock.verify(
+                methodName = PippoSampleMock.Method.sayHi,
+            )
+        }
+        assertEquals(iterations, uuids.size)
     }
 
     @Test

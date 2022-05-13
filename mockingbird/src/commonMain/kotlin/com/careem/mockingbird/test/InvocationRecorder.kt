@@ -22,72 +22,72 @@ internal class InvocationRecorder {
         ensureNeverFrozen()
     }
 
-    private val recorder = mutableMapOf<Int, MutableList<Invocation>>()
-    private val responses = mutableMapOf<Int, LinkedHashMap<Invocation, (Invocation) -> Any?>>()
+    private val recorder = mutableMapOf<String, MutableList<Invocation>>()
+    private val responses = mutableMapOf<String, LinkedHashMap<Invocation, (Invocation) -> Any?>>()
 
     /**
      * This function must be called by the mock when a function call is exceuted on it
-     * @param instanceHash the instanceHash of the mock
+     * @param uuid the uuid of the mock
      * @param invocation the Invocation object @see [Invocation]
      */
-    fun storeInvocation(instanceHash: Int, invocation: Invocation) {
-        if (!recorder.containsKey(instanceHash)) {
-            recorder[instanceHash] = mutableListOf()
+    fun storeInvocation(uuid: String, invocation: Invocation) {
+        if (!recorder.containsKey(uuid)) {
+            recorder[uuid] = mutableListOf()
         }
-        recorder[instanceHash]!!.add(invocation)
+        recorder[uuid]!!.add(invocation)
     }
 
     /**
      * This function returns the list of invocations registered for a certain mock
-     * @param instanceHash the instanceHash of the mock
+     * @param uuid the uuid of the mock
      * @return list of [Invocation]s object (all the methods calls with args)
      */
-    internal fun getInvocations(instanceHash: Int): List<Invocation> {
-        return recorder[instanceHash] ?: emptyList()
+    internal fun getInvocations(uuid: String): List<Invocation> {
+        return recorder[uuid] ?: emptyList()
     }
 
     /**
      * This function tells to InvocationRecorder how to reply if invocation is received
-     * @param instanceHash the instanceHash of the mock
+     * @param uuid the uuid of the mock
      * @param invocation the Invocation object @see [Invocation]
      * @param response the object that must be returned if the specif invocation happen
      */
-    fun <T> storeResponse(instanceHash: Int, invocation: Invocation, response: T) {
+    fun <T> storeResponse(uuid: String, invocation: Invocation, response: T) {
         val answer: (Invocation) -> T = { _ -> response }
-        storeAnswer(instanceHash, invocation, answer)
+        storeAnswer(uuid, invocation, answer)
     }
 
     /**
      * This function tells to InvocationRecorder how to reply if invocation is received
-     * @param instanceHash the instanceHash of the mock
+     * @param uuid the uuid of the mock
      * @param invocation the Invocation object @see [Invocation]
      * @param answer the lambda that must be invoked when the invocation happen
      */
-    fun <T> storeAnswer(instanceHash: Int, invocation: Invocation, answer: (Invocation) -> T) {
-        if (!responses.containsKey(instanceHash)) {
-            responses[instanceHash] = LinkedHashMap()
+    fun <T> storeAnswer(uuid: String, invocation: Invocation, answer: (Invocation) -> T) {
+        if (!responses.containsKey(uuid)) {
+            responses[uuid] = LinkedHashMap()
         }
-        responses[instanceHash]!![invocation] = answer as (Invocation) -> Any?
+        responses[uuid]!![invocation] = answer as (Invocation) -> Any?
     }
 
     /**
      * This function will return the mocked response previously stored for the specific invocation
-     * @param instanceHash the instanceHash of the mock
+     * @param uuid the uuid of the mock
      * @param invocation the Invocation object @see [Invocation]
      * @param relaxed specify if we want to crash when no mock behavior provided
      * @throws IllegalStateException if no response was stored for the instance and invocation
      * @return the mocked response, or null if relaxed (throws if not relaxed)
      */
-    fun getResponse(instanceHash: Int, invocation: Invocation, relaxed: Boolean = false): Any? {
-        return if (instanceHash in responses.keys) {
-            responses[instanceHash]!!.let {
+    fun getResponse(uuid: String, invocation: Invocation, relaxed: Boolean = false): Any? {
+        return if (uuid in responses.keys) {
+            responses[uuid]!!.let {
                 val lambda = findResponseByInvocation(it, invocation, relaxed)
                 return@let lambda(invocation)
             }
         } else if (relaxed) {
             null
         } else {
-            throw IllegalStateException("Not mocked response for current object and instance, instance:$instanceHash, invocation: $invocation")
+            throw IllegalStateException("Not mocked response for current object and instance, instance:$uuid, invocation: $invocation")
         }
     }
 
