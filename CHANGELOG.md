@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
-* Fix issue: https://github.com/careem/mockingbird/issues/109, Stale mocks are not always removed.
 
 * **breaking** Fix issue https://github.com/careem/mockingbird/issues/116, if you are generate Mocks manually you need to
   override `public val uuid: String` like `override val uuid: String by uuid()` if you are using the plugin no changes are
   required on your side
+* * Fix issue: https://github.com/careem/mockingbird/issues/109, Stale mocks are not always removed.
 
 ## 2.5.0
 

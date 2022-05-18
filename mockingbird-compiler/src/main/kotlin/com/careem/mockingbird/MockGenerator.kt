@@ -87,9 +87,6 @@ class MockGenerator constructor(
             mockProperty(mockClassBuilder, property)
         }
 
-
-
-
         return FileSpec.builder(packageName, "${simpleName}Mock")
             .addType(mockClassBuilder.build())
             .build()
