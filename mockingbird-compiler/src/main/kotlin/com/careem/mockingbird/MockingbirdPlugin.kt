@@ -116,7 +116,7 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         }
     }
 
-    private fun targetOutputDir(target: Project): File{
+    private fun targetOutputDir(target: Project): File {
         return File(target.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
     }
 
