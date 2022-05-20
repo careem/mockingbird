@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ## master
 
+## 2.6.0
+
 * **breaking** Fix issue https://github.com/careem/mockingbird/issues/116, if you are generate Mocks manually you need to
   override `public val uuid: String` like `override val uuid: String by uuid()` if you are using the plugin no changes are
   required on your side
