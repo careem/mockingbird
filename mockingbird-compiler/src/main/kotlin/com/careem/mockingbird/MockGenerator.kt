@@ -25,6 +25,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.isNullable
 import com.squareup.kotlinpoet.metadata.isSuspend
@@ -70,6 +71,17 @@ class MockGenerator constructor(
         functionsToMock.forEach { function ->
             mockFunction(mockClassBuilder, function, isUnitFunction(function))
         }
+
+        val uuid = PropertySpec.builder("uuid", String::class, KModifier.OVERRIDE)
+            .addModifiers(KModifier.PUBLIC)
+            .delegate(
+                buildCodeBlock {
+                    val uuid = MemberName("com.careem.mockingbird.test", "uuid")
+                    add("%M()", uuid)
+                })
+            .build()
+
+        mockClassBuilder.addProperty(uuid)
 
         propertiesToMock.forEach { property ->
             mockProperty(mockClassBuilder, property)
@@ -245,7 +257,7 @@ class MockGenerator constructor(
     @OptIn(ExperimentalStdlibApi::class)
     private fun buildFunctionModifiers(
         function: KmFunction
-    ) : List<KModifier> {
+    ): List<KModifier> {
         return buildList {
             add(KModifier.OVERRIDE)
             if (function.isSuspend) {

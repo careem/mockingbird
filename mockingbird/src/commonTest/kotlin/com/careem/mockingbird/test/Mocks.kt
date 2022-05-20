@@ -50,6 +50,8 @@ object Mocks {
             const val callback = "callback"
         }
 
+        override val uuid: String by uuid()
+
         override fun method1(str: String) = mockUnit(
             methodName = Method.method1,
             arguments = mapOf(
@@ -107,6 +109,8 @@ object Mocks {
             const val value2 = "value2"
             const val callback = "callback"
         }
+
+        override val uuid: String by uuid()
 
         override fun method1(str: String) = spy(
             methodName = Method.method1,

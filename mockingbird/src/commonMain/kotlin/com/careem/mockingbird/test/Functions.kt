@@ -16,6 +16,7 @@
  */
 package com.careem.mockingbird.test
 
+import kotlinx.atomicfu.AtomicInt
 import kotlinx.atomicfu.atomic
 import kotlin.native.concurrent.SharedImmutable
 import kotlin.test.assertEquals
@@ -24,7 +25,13 @@ import kotlin.test.assertEquals
 @SharedImmutable
 internal const val AWAIT_POOLING_TIME = 10L
 
-public interface Mock
+@SharedImmutable
+private val uuidGenerator: AtomicInt = atomic(0)
+
+public interface Mock {
+    public val uuid: String
+}
+
 public interface Spy : Mock
 
 
@@ -50,11 +57,11 @@ public fun <T : Mock, R> T.every(
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
 ) {
-    val hashCode = this.hashCode()
+    val uuid = this.uuid
     val value = returns()
     MockingBird.invocationRecorder().access { recorder ->
         recorder.storeResponse(
-            hashCode,
+            uuid,
             Invocation(methodName = methodName, arguments = arguments),
             value
         )
@@ -71,10 +78,10 @@ public fun <T : Mock, R> T.everyAnswers(
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
 ) {
-    val hashCode = this.hashCode()
+    val uuid = this.uuid
     MockingBird.invocationRecorder().access { recorder ->
         recorder.storeAnswer(
-            hashCode,
+            uuid,
             Invocation(methodName = methodName, arguments = arguments),
             answer
         )
@@ -121,9 +128,9 @@ internal fun <T : Mock> T.rawVerify(
     methodName: String,
     arguments: Map<String, Any?>
 ) {
-    val hashCode = this.hashCode()
+    val uuid = this.uuid
     MockingBird.invocationRecorder().access { recorder ->
-        val methodInvocations = recorder.getInvocations(hashCode)
+        val methodInvocations = recorder.getInvocations(uuid)
             .filter { it.methodName == methodName }
         val argumentsInvocations = methodInvocations
             .filter { compareArguments(it.arguments, arguments) }
@@ -147,12 +154,12 @@ internal fun <T : Mock> T.rawVerify(
  * @return returns the mocked result for the method call described by arguments above ( it crash if no mock behavior provided )
  */
 public fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?> = emptyMap()): R {
-    val hashCode = this.hashCode()
+    val uuid = this.uuid
     return MockingBird.invocationRecorder().access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        recordInvocation(hashCode, recorder, invocation)
+        recordInvocation(uuid, recorder, invocation)
         @Suppress("UNCHECKED_CAST")
-        return@access recorder.getResponse(hashCode, invocation) as R
+        return@access recorder.getResponse(uuid, invocation) as R
     }
 }
 
@@ -168,12 +175,12 @@ public fun <T : Mock> T.mockUnit(
     arguments: Map<String, Any?> = emptyMap(),
     relaxed: Boolean = true
 ) {
-    val hashCode = this.hashCode()
+    val uuid = this.uuid
     MockingBird.invocationRecorder().access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        recordInvocation(hashCode, recorder, invocation)
+        recordInvocation(uuid, recorder, invocation)
         recorder.getResponse(
-            instanceHash = hashCode,
+            uuid = uuid,
             invocation = invocation,
             relaxed = relaxed
         )
@@ -192,18 +199,23 @@ public fun <T : Spy, R> T.spy(
     arguments: Map<String, Any?> = emptyMap(),
     delegate: () -> R
 ): R {
-    val hashCode = this.hashCode()
+    val uuid = this.uuid
     return MockingBird.invocationRecorder().access { recorder ->
         val invocation = Invocation(methodName = methodName, arguments = arguments)
-        recordInvocation(hashCode, recorder, invocation)// TODO change name
+        recordInvocation(uuid, recorder, invocation)// TODO change name
         @Suppress("UNCHECKED_CAST")
         val mockResponse = recorder.getResponse(
-            instanceHash = hashCode,
+            uuid = uuid,
             invocation = invocation,
             relaxed = true
         ) as R
         return@access mockResponse ?: delegate()
     }
+}
+
+
+public fun <T : Mock> T.uuid(): Lazy<String> {
+    return lazy { "${this.hashCode()}-${uuidGenerator.getAndAdd(1)}" }
 }
 
 /**
@@ -234,9 +246,9 @@ private fun compareArguments(
     return true
 }
 
-private fun recordInvocation(instanceHash: Int, recorder: InvocationRecorder, invocation: Invocation) {
+private fun recordInvocation(uuid: String, recorder: InvocationRecorder, invocation: Invocation) {
     recorder.storeInvocation(
-        instanceHash = instanceHash,
+        uuid = uuid,
         invocation = invocation
     )
 }
