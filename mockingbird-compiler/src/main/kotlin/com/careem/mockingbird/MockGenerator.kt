@@ -27,8 +27,13 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
+import com.squareup.kotlinpoet.metadata.isInternal
 import com.squareup.kotlinpoet.metadata.isNullable
+import com.squareup.kotlinpoet.metadata.isPrivate
+import com.squareup.kotlinpoet.metadata.isProtected
+import com.squareup.kotlinpoet.metadata.isPublic
 import com.squareup.kotlinpoet.metadata.isSuspend
+import kotlinx.metadata.Flags
 import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
@@ -39,6 +44,7 @@ import kotlinx.metadata.jvm.setterSignature
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import kotlin.reflect.KClass
+import kotlin.reflect.KVisibility
 
 @OptIn(KotlinPoetMetadataPreview::class)
 class MockGenerator constructor(
@@ -67,6 +73,7 @@ class MockGenerator constructor(
             .addSuperinterface(classToMock) // TODO check if interface or generic open class
             .addSuperinterface(externalClass) // TODO fix this
 
+        getClassVisibility(classToMock.visibility)?.let { mockClassBuilder.addModifiers(it) }
 
         functionsToMock.forEach { function ->
             mockFunction(mockClassBuilder, function, isUnitFunction(function))
@@ -91,6 +98,15 @@ class MockGenerator constructor(
             .addType(mockClassBuilder.build())
             .build()
     }
+
+    private fun getClassVisibility(visibility: KVisibility?) =
+        when (visibility) {
+            KVisibility.PUBLIC -> KModifier.PUBLIC
+            KVisibility.PROTECTED -> KModifier.PROTECTED
+            KVisibility.INTERNAL -> KModifier.INTERNAL
+            KVisibility.PRIVATE -> KModifier.INTERNAL
+            null -> null
+        }
 
     private fun List<KmFunction>.buildMethodObject(): TypeSpec {
         logger.info("Generating methods")
@@ -259,12 +275,24 @@ class MockGenerator constructor(
         function: KmFunction
     ): List<KModifier> {
         return buildList {
+            getFunctionVisibility(function.flags)?.let { add(it) }
             add(KModifier.OVERRIDE)
             if (function.isSuspend) {
                 add(KModifier.SUSPEND)
             }
         }
     }
+
+    private fun getFunctionVisibility(flags: Flags) =
+        if (flags.isInternal) {
+            KModifier.INTERNAL
+        } else if (flags.isPrivate) {
+            KModifier.PRIVATE
+        } else if (flags.isProtected) {
+            KModifier.PROTECTED
+        } else if (flags.isPublic) {
+            KModifier.PUBLIC
+        } else null
 
     private fun mockFunction(
         mockClassBuilder: TypeSpec.Builder,
