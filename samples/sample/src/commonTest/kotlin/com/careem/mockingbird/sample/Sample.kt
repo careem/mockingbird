@@ -82,5 +82,11 @@ class TestClass {
         val mock = ExternalDepMock()
         assertNotNull(mock)
     }
+
+    @Test
+    fun testGeneratedInternalClass() {
+        val mock = InternalSampleInterfaceMock()
+        assertNotNull(mock)
+    }
 }
 
