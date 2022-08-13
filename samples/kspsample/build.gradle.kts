@@ -18,7 +18,7 @@ import groovy.lang.Closure
 
 plugins{
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.google.devtools.ksp") version "1.5.31-1.0.1"
+    id("com.google.devtools.ksp") version "1.6.21-1.0.6"
 }
 
 apply(from = "../../utils.gradle")
