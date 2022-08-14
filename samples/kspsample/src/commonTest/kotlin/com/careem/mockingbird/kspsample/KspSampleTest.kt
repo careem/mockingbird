@@ -19,38 +19,38 @@ package com.careem.mockingbird.kspsample
 import com.careem.mockingbird.test.annotations.Mock
 
 class KspSampleTest {
+    @Mock
+    lateinit var pippoMock: PippoSample
 
     @Mock
-    val pippoMock: PippoSample = object : PippoSample {
-        override val currentSession: Int
-            get() = TODO("Not yet implemented")
-        override var currentMutableSession: Int
-            get() = TODO("Not yet implemented")
-            set(value) {}
+    lateinit var outerInterface: OuterInterface
 
-        override fun showRandom(): Boolean {
-            TODO("Not yet implemented")
-        }
+    @Mock
+    lateinit var multipleGetterProperties: MultipleGetterProperties
 
-        override fun sayHi() {
-            TODO("Not yet implemented")
-        }
+    @Mock
+    lateinit var mockWithExternalDependencies: MockWithExternalDependencies
 
-        override fun sayHiWith(param: String) {
-            TODO("Not yet implemented")
-        }
+    @Mock
+    lateinit var mock1: Mock1
 
-        override fun sayHiWith(param: String, someOtherParam: Boolean) {
-            TODO("Not yet implemented")
-        }
+    @Mock
+    lateinit var lambdaSample: LambdaSample
 
-        override fun sayHiWithCommonParam(param: String, intParam: Int) {
-            TODO("Not yet implemented")
-        }
+    @Mock
+    lateinit var javaTypes: JavaTypes
 
-        override suspend fun thisIsSuspend(param: String, intParam: Int) {
-            TODO("Not yet implemented")
-        }
-    }
+    @Mock
+    lateinit var internalSampleInterface: InternalSampleInterface
+
+    @Mock
+    lateinit var interfaceWithGenerics: InterfaceWithGenerics
+
+    @Mock
+    lateinit var innerInterface: InnerInterface
+
+    @Mock
+    lateinit var innerInnerInterface: InnerInnerInterface
+
 }
 

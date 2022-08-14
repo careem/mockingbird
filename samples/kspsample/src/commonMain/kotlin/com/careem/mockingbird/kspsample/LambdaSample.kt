@@ -16,15 +16,13 @@
 
 package com.careem.mockingbird.kspsample
 
-interface PippoSample {
-    val currentSession: Int
-    var currentMutableSession: Int
-    fun showRandom(): Boolean
-    fun sayHi()
-    fun sayHiWith(param: String)
-    fun sayHiWith(param: String, someOtherParam: Boolean)
-    fun sayHiWithCommonParam(param: String, intParam: Int)
-    fun sayHiWith(param: String, map: Map<String, String>)
-    fun sayHiWith(param: String, entry: Map.Entry<String, String>)
-    suspend fun thisIsSuspend(param: String, intParam: Int)
+interface LambdaSample {
+    fun lambda00(param: String, lambda: () -> Int)
+    fun lambda01(param: String, lambda: () -> Unit)
+    fun lambda10(param: String, lambda: (Int) -> Unit)
+    fun lambda11(param: String, lambda: (Int) -> Double)
+    fun lambda2(param: String, lambda: (String, Int) -> Unit)
+    fun lambda3(param: String, lambda: (String, Int, Map<String, Int>) -> Unit)
+    fun lambda4(param: String, lambda: (Boolean, Int, String, Double) -> Unit)
+    fun lambda5(param: String, lambda: (Boolean, Int, String, Double, List<String>) -> Unit)
 }

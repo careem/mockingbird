@@ -16,15 +16,8 @@
 
 package com.careem.mockingbird.kspsample
 
-interface PippoSample {
-    val currentSession: Int
-    var currentMutableSession: Int
-    fun showRandom(): Boolean
-    fun sayHi()
-    fun sayHiWith(param: String)
-    fun sayHiWith(param: String, someOtherParam: Boolean)
-    fun sayHiWithCommonParam(param: String, intParam: Int)
-    fun sayHiWith(param: String, map: Map<String, String>)
-    fun sayHiWith(param: String, entry: Map.Entry<String, String>)
-    suspend fun thisIsSuspend(param: String, intParam: Int)
+interface InnerInterface: InnerInnerInterface {
+    var yo2: String
+    fun foo(fooArg: String)
+    fun foo2(fooArg2: String)
 }

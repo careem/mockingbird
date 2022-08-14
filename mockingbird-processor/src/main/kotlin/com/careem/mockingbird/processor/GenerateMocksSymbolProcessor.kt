@@ -29,14 +29,20 @@ import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
+import com.squareup.kotlinpoet.ksp.writeTo
 
 class GenerateMocksSymbolProcessor(
     val codeGenerator: CodeGenerator,
     val logger: KSPLogger
 ) : SymbolProcessor {
 
+    private lateinit var mockGenerator: MockGenerator
+    private lateinit var functionsMiner: FunctionsMiner
+
     @OptIn(KotlinPoetKspPreview::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        functionsMiner = FunctionsMiner()
+        mockGenerator = MockGenerator(resolver, logger, functionsMiner)
         logger.warn("KSP process")
 
 
@@ -44,83 +50,16 @@ class GenerateMocksSymbolProcessor(
         fields.forEach { set ->
             if (set !is KSPropertyDeclaration) error("$set is not a property declaration but is annotated with @Mock, not supperted")
             logger.warn("Type to Mock ${set.type.toTypeName()}")
-            // TODO delegate code generator for generating code
+
+            mockGenerator.createClass(set.type).writeTo(
+                codeGenerator = codeGenerator,
+                aggregating = false
+            )
         }
-
-        val symbols = resolver.getSymbolsWithAnnotation("com.careem.mockingbird.test.annotation.Mock")
-        val ret = symbols.filter { !it.validate() }.toList()
-        logger.warn("symbols: $symbols")
-        symbols
-            .filter { it is KSClassDeclaration && it.validate() }
-            .forEach { it.accept(GenerateMocksVisitor(), Unit) }
-        return ret
-
-//        val symbols = resolver.getSymbolsWithAnnotation("com.careem.mockingbird.test.GenerateMocksFor")
-//        val ret = symbols.filter { !it.validate() }.toList()
-//        symbols
-//            .filter { it is KSClassDeclaration && it.validate() }
-//            .forEach { it.accept(GenerateMocksVisitor(), Unit) }
-//        return ret
+        return emptyList()
     }
 
-
-    @OptIn(KotlinPoetKspPreview::class)
-    inner class GenerateMocksVisitor : KSVisitorVoid() {
-
-        override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-
-            val className = classDeclaration.toClassName()
-            logger.warn("Detected class: $className")
-
-            // TODO complete generate here
-
-            classDeclaration.primaryConstructor!!.accept(this, data)
-        }
-
-        override fun visitFunctionDeclaration(function: KSFunctionDeclaration, data: Unit) {
-//            val parent = function.parentDeclaration as KSClassDeclaration
-//            val packageName = parent.containingFile!!.packageName.asString()
-//            val className = "${parent.simpleName.asString()}Builder"
-//            val file = codeGenerator.createNewFile(Dependencies(true, function.containingFile!!), packageName , className)
-//            file.appendText("package $packageName\n\n")
-//            file.appendText("import HELLO\n\n")
-//            file.appendText("class $className{\n")
-//            function.parameters.forEach {
-//                val name = it.name!!.asString()
-//                val typeName = StringBuilder(it.type.resolve().declaration.qualifiedName?.asString() ?: "<ERROR>")
-//                val typeArgs = it.type.element!!.typeArguments
-//                if (it.type.element!!.typeArguments.isNotEmpty()) {
-//                    typeName.append("<")
-//                    typeName.append(
-//                        typeArgs.map {
-//                            val type = it.type?.resolve()
-//                            "${it.variance.label} ${type?.declaration?.qualifiedName?.asString() ?: "ERROR"}" +
-//                                    if (type?.nullability == Nullability.NULLABLE) "?" else ""
-//                        }.joinToString(", ")
-//                    )
-//                    typeName.append(">")
-//                }
-//                file.appendText("    private var $name: $typeName? = null\n")
-//                file.appendText("    internal fun with${name.capitalize()}($name: $typeName): $className {\n")
-//                file.appendText("        this.$name = $name\n")
-//                file.appendText("        return this\n")
-//                file.appendText("    }\n\n")
-//            }
-//            file.appendText("    internal fun build(): ${parent.qualifiedName!!.asString()} {\n")
-//            file.appendText("        return ${parent.qualifiedName!!.asString()}(")
-//            file.appendText(
-//                function.parameters.map {
-//                    "${it.name!!.asString()}!!"
-//                }.joinToString(", ")
-//            )
-//            file.appendText(")\n")
-//            file.appendText("    }\n")
-//            file.appendText("}\n")
-//            file.close()
-        }
-    }
-
-    private companion object{
+    companion object {
         const val MOCK_ANNOTATION = "com.careem.mockingbird.test.annotations.Mock"
     }
 }
