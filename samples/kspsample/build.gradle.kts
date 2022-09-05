@@ -40,6 +40,7 @@ kotlin {
 
 dependencies {
     "kspJvmTest"("com.careem.mockingbird:mockingbird-processor")
+    "kspIosSimulatorArm64Test"("com.careem.mockingbird:mockingbird-processor")
     "kspIosX64Test"("com.careem.mockingbird:mockingbird-processor")
     "kspIosArm64Test"("com.careem.mockingbird:mockingbird-processor")
 }

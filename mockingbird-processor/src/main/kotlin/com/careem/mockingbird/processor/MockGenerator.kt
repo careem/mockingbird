@@ -145,13 +145,14 @@ class MockGenerator constructor(
         val visitedPropertySet = mutableSetOf<String>()
         this.forEach { property ->
             logger.info("Property: $property")
+            val rawName = property.simpleName.getShortName()
             property.getter?.let {
-                handleProperty("get${property.simpleName.getShortName().capitalize()}", visitedPropertySet, propertyObjectBuilder)
+                handleProperty(adjustPropertyName(true, rawName), visitedPropertySet, propertyObjectBuilder)
             }
 
             property.setter?.let {
                 haveMutableProps = true
-                handleProperty("set${property.simpleName.getShortName().capitalize()}", visitedPropertySet, propertyObjectBuilder)
+                handleProperty(adjustPropertyName(false, rawName), visitedPropertySet, propertyObjectBuilder)
             }
         }
 
@@ -160,6 +161,17 @@ class MockGenerator constructor(
             propertyObjectBuilder.addProperty(setterValueProperty)
         }
         return propertyObjectBuilder.build()
+    }
+
+    private fun adjustPropertyName(isGetter: Boolean, rawName: String): String {
+        val prefix = if (isGetter) {
+            if (rawName.startsWith("is", ignoreCase = true)) ""
+            else "get"
+        } else {
+            "set"
+        }
+        val newName = if (prefix.isNotEmpty()) rawName.capitalize() else rawName
+        return "$prefix$newName"
     }
 
     private fun handleProperty(
@@ -183,7 +195,6 @@ class MockGenerator constructor(
     private fun isUnitFunction(function: KSFunctionDeclaration): Boolean {
         val classifier = function.returnType
         val ksType = classifier!!.resolve()
-        logger.warn(">>> $function, ${ksType.fullyQualifiedName()}")
         return ksType.fullyQualifiedName() == "kotlin.Unit"
     }
 
@@ -210,7 +221,7 @@ class MockGenerator constructor(
                 mockFunction,
                 MemberName(
                     "",
-                    "get${property.simpleName.getShortName().capitalize()}"
+                    adjustPropertyName(true, property.simpleName.getShortName())
                 )
             )
             val getterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
@@ -230,7 +241,7 @@ class MockGenerator constructor(
                 mockUnitFunction,
                 MemberName(
                     "",
-                    "set${property.simpleName.getShortName().capitalize()}"
+                    adjustPropertyName(false, property.simpleName.getShortName())
                 ),
                 MemberName("", PROPERTY_SETTER_VALUE),
                 PROPERTY_SETTER_VALUE

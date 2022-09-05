@@ -17,13 +17,17 @@
 package com.careem.mockingbird.kspsample
 
 import com.careem.mockingbird.test.annotations.Mock
+import kotlin.test.Test
+import kotlin.test.assertNotNull
+import com.careem.mockingbird.kspsample.PippoSampleMock
+import kotlin.test.assertEquals
 
 class KspSampleTest {
     @Mock
-    lateinit var pippoMock: PippoSample
+    val pippoMock: PippoSample = PippoSampleMock()
 
-    @Mock
-    lateinit var outerInterface: OuterInterface
+//    @Mock
+//    lateinit var outerInterface: OuterInterface
 
     @Mock
     lateinit var multipleGetterProperties: MultipleGetterProperties
@@ -40,17 +44,22 @@ class KspSampleTest {
     @Mock
     lateinit var javaTypes: JavaTypes
 
-    @Mock
-    lateinit var internalSampleInterface: InternalSampleInterface
+//    @Mock
+//    lateinit var internalSampleInterface: InternalSampleInterface
 
     @Mock
     lateinit var interfaceWithGenerics: InterfaceWithGenerics
 
-    @Mock
-    lateinit var innerInterface: InnerInterface
+//    @Mock
+//    lateinit var innerInterface: InnerInterface
 
     @Mock
     lateinit var innerInnerInterface: InnerInnerInterface
+
+    @Test
+    fun testGeneratedTargetProjectMock() {
+        assertNotNull(pippoMock)
+    }
 
 }
 
