@@ -21,6 +21,7 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.Modifier
 import com.squareup.kotlinpoet.FileSpec
@@ -52,7 +53,7 @@ class MockGenerator constructor(
 
         val packageName = className.packageName
         val externalClass =
-            resolver.getClassDeclarationByName(resolver.getKSNameFromString(GenerateMocksSymbolProcessor.MOCK_ANNOTATION))//loadMockClass()
+            resolver.getClassDeclarationByName(resolver.getKSNameFromString("com.careem.mockingbird.test.Mock"))
 
         logger.warn("Generating mocks for $simpleName")
 
@@ -83,12 +84,12 @@ class MockGenerator constructor(
                     add("%M()", uuid)
                 })
             .build()
-//
+
         mockClassBuilder.addProperty(uuid)
-//
-//        propertiesToMock.forEach { property ->
-//            mockProperty(mockClassBuilder, property)
-//        }
+
+        propertiesToMock.forEach { property ->
+            mockProperty(mockClassBuilder, property)
+        }
 
         return FileSpec.builder(packageName, "${simpleName}Mock")
             .addType(mockClassBuilder.build())
@@ -145,12 +146,12 @@ class MockGenerator constructor(
         this.forEach { property ->
             logger.info("Property: $property")
             property.getter?.let {
-                handleProperty(property.simpleName.getShortName(), visitedPropertySet, propertyObjectBuilder)
+                handleProperty("get${property.simpleName.getShortName().capitalize()}", visitedPropertySet, propertyObjectBuilder)
             }
 
             property.setter?.let {
                 haveMutableProps = true
-                handleProperty(property.simpleName.getShortName(), visitedPropertySet, propertyObjectBuilder)
+                handleProperty("set${property.simpleName.getShortName().capitalize()}", visitedPropertySet, propertyObjectBuilder)
             }
         }
 
@@ -181,79 +182,82 @@ class MockGenerator constructor(
 
     private fun isUnitFunction(function: KSFunctionDeclaration): Boolean {
         val classifier = function.returnType
-        return classifier!!.resolve() is KSClassDeclaration //TODO fix this//&& classifier.name == "kotlin/Unit"
+        val ksType = classifier!!.resolve()
+        logger.warn(">>> $function, ${ksType.fullyQualifiedName()}")
+        return ksType.fullyQualifiedName() == "kotlin.Unit"
     }
 
-    //
-//    private fun mockProperty(
-//        mockClassBuilder: TypeSpec.Builder,
-//        property: KmProperty
-//    ) {
-//        logger.debug("===> Mocking Property ${property.getterSignature?.name} and ${property.setterSignature?.name} and ${property.setterSignature}")
-//        val propertyBuilder = PropertySpec
-//            .builder(
-//                property.name,
-//                property.returnType.buildType(),
-//                KModifier.OVERRIDE
-//            )
-//
-//        if (property.getterSignature != null) {
-//            val getterBuilder = FunSpec.getterBuilder()
-//            val mockFunction = MemberName("com.careem.mockingbird.test", MOCK)
-//            val getterArgsValue = mutableListOf(
-//                mockFunction,
-//                MemberName(
-//                    "",
-//                    property.getterSignature?.name
-//                        ?: throw IllegalArgumentException("I can't mock this property")
-//                )
-//            )
-//            val getterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
-//            val getterStatementString = """
-//            return %M(
-//                ${getterCodeBlocks.joinToString(separator = ",\n")}
-//            )
-//        """.trimIndent()
-//            getterBuilder.addStatement(getterStatementString, *(getterArgsValue.toTypedArray()))
-//            propertyBuilder.getter(getterBuilder.build())
-//        }
-//
-//        if (property.setterSignature != null) {
-//            val setterBuilder = FunSpec.setterBuilder()
-//            val mockUnitFunction = MemberName("com.careem.mockingbird.test", MOCK_UNIT)
-//            val setterArgsValue = mutableListOf(
-//                mockUnitFunction,
-//                MemberName(
-//                    "",
-//                    property.setterSignature?.name
-//                        ?: throw IllegalArgumentException("I can't mock this property")
-//                ),
-//                MemberName("", PROPERTY_SETTER_VALUE),
-//                PROPERTY_SETTER_VALUE
-//            )
-//
-//            val v = mutableListOf<String>().apply {
-//                add("Property.%M to %L")
-//            }
-//            val args = v.joinToString(separator = ",")
-//            val setterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
-//            setterCodeBlocks.add("arguments = mapOf($args)")
-//            val setterStatementString = """
-//            return %M(
-//                ${setterCodeBlocks.joinToString(separator = ",\n")}
-//            )
-//        """.trimIndent()
-//            setterBuilder
-//                .addParameter("value", property.returnType.buildType())
-//                .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
-//            propertyBuilder
-//                .mutable()
-//                .setter(setterBuilder.build())
-//        }
-//
-//        mockClassBuilder.addProperty(propertyBuilder.build())
-//    }
-//
+    private fun KSType.fullyQualifiedName() =
+        "${this.declaration.qualifiedName?.getQualifier()}.${this.declaration.qualifiedName?.getShortName()}"
+
+    @OptIn(KotlinPoetKspPreview::class)
+    private fun mockProperty(
+        mockClassBuilder: TypeSpec.Builder,
+        property: KSPropertyDeclaration
+    ) {
+        logger.info("===> Mocking Property ${property.getter} and ${property.setter}")
+        val propertyBuilder = PropertySpec
+            .builder(
+                property.simpleName.getShortName(),
+                property.type.resolve().toTypeName(),
+                KModifier.OVERRIDE
+            )
+
+        if (property.getter != null) {
+            val getterBuilder = FunSpec.getterBuilder()
+            val mockFunction = MemberName("com.careem.mockingbird.test", MOCK)
+            val getterArgsValue = mutableListOf(
+                mockFunction,
+                MemberName(
+                    "",
+                    "get${property.simpleName.getShortName().capitalize()}"
+                )
+            )
+            val getterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
+            val getterStatementString = """
+            return %M(
+                ${getterCodeBlocks.joinToString(separator = ",\n")}
+            )
+        """.trimIndent()
+            getterBuilder.addStatement(getterStatementString, *(getterArgsValue.toTypedArray()))
+            propertyBuilder.getter(getterBuilder.build())
+        }
+
+        if (property.setter != null) {
+            val setterBuilder = FunSpec.setterBuilder()
+            val mockUnitFunction = MemberName("com.careem.mockingbird.test", MOCK_UNIT)
+            val setterArgsValue = mutableListOf(
+                mockUnitFunction,
+                MemberName(
+                    "",
+                    "set${property.simpleName.getShortName().capitalize()}"
+                ),
+                MemberName("", PROPERTY_SETTER_VALUE),
+                PROPERTY_SETTER_VALUE
+            )
+
+            val v = mutableListOf<String>().apply {
+                add("Property.%M to %L")
+            }
+            val args = v.joinToString(separator = ",")
+            val setterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
+            setterCodeBlocks.add("arguments = mapOf($args)")
+            val setterStatementString = """
+            return %M(
+                ${setterCodeBlocks.joinToString(separator = ",\n")}
+            )
+        """.trimIndent()
+            setterBuilder
+                .addParameter("value", property.type.resolve().toTypeName())
+                .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
+            propertyBuilder
+                .mutable()
+                .setter(setterBuilder.build())
+        }
+
+        mockClassBuilder.addProperty(propertyBuilder.build())
+    }
+
     private fun buildFunctionModifiers(
         function: KSFunctionDeclaration
     ): List<KModifier> {
@@ -299,26 +303,6 @@ class MockGenerator constructor(
         )
     }
 
-    //
-//    private fun KSType.buildType(): TypeName {
-//        val subTypes = this.arguments.map { it.type!! }
-//        return classLoader.loadClass(this)
-//            .asTypeName()
-//            .let {
-//                if (subTypes.isEmpty()) {
-//                    it
-//                } else {
-//                    val typeNames = subTypes.map { subType ->
-//                        subType.buildType()
-//                    }
-//                    it.parameterizedBy(typeNames)
-//                }
-//            }.copy(
-//                nullable = this.isNullable
-//            )
-//    }
-//
-//
     private fun FunSpec.Builder.addMockStatement(function: KSFunctionDeclaration, isUnit: Boolean) {
         // TODO remove duplicates in args and method names
         val mockFunction = if (isUnit) {
