@@ -16,11 +16,13 @@
 
 package com.careem.mockingbird.processor
 
+import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getDeclaredFunctions
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.Modifier
 
 class FunctionsMiner {
 
@@ -31,28 +33,24 @@ class FunctionsMiner {
     fun extractFunctionsAndProperties(kmClass: KSClassDeclaration): Pair<List<KSFunctionDeclaration>, List<KSPropertyDeclaration>> {
         val functions: MutableList<KSFunctionDeclaration> = mutableListOf()
         val properties: MutableList<KSPropertyDeclaration> = mutableListOf()
-        rawExtractFunctionsAndProperties(kmClass, functions, properties)
 
-        return functions to properties // TODO use the commented code here
-//        return functions.distinctBy { it.signature } to properties
-//            .filter { it.getterSignature != null || it.setterSignature != null }
-//            .distinctBy { it.getterSignature ?: it.setterSignature }
+        val kmSuperTypes = kmClass.getAllSuperTypes()
+            .filter { it.fullyQualifiedName() != "kotlin.Any" }
+            .map { it.declaration }
+            .filter { it is KSClassDeclaration }
+            .map { it as KSClassDeclaration }
+
+        (listOf(kmClass) + kmSuperTypes).forEach { rawExtractFunctionsAndProperties(it, functions, properties) }
+        return functions to properties
     }
 
     private fun rawExtractFunctionsAndProperties(
         kmClass: KSClassDeclaration,
         functions: MutableList<KSFunctionDeclaration>,
         properties: MutableList<KSPropertyDeclaration>
-    ) { // TODO optimize with tailrec
-        val kmSuperTypes = kmClass.superTypes
-            .filter { it is KSClassDeclaration }
-            .map { it as KSClassDeclaration }
-
+    ) {
         // get functions and properties for current class
-        functions.addAll(kmClass.getDeclaredFunctions())
-        properties.addAll(kmClass.getDeclaredProperties())
-
-        // check each super type and extract functions and properties
-        kmSuperTypes.forEach { rawExtractFunctionsAndProperties(it, functions, properties) }
+        functions.addAll(kmClass.getDeclaredFunctions().filterNot { it.modifiers.contains(Modifier.OVERRIDE) })
+        properties.addAll(kmClass.getDeclaredProperties().filterNot { it.modifiers.contains(Modifier.OVERRIDE) })
     }
 }

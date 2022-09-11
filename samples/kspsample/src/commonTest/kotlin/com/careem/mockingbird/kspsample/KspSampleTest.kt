@@ -26,8 +26,8 @@ class KspSampleTest {
     @Mock
     val pippoMock: PippoSample = PippoSampleMock()
 
-//    @Mock
-//    lateinit var outerInterface: OuterInterface
+    @Mock
+    lateinit var outerInterface: OuterInterface
 
     @Mock
     lateinit var multipleGetterProperties: MultipleGetterProperties
@@ -50,8 +50,8 @@ class KspSampleTest {
     @Mock
     lateinit var interfaceWithGenerics: InterfaceWithGenerics
 
-//    @Mock
-//    lateinit var innerInterface: InnerInterface
+    @Mock
+    lateinit var innerInterface: InnerInterface
 
     @Mock
     lateinit var innerInnerInterface: InnerInnerInterface

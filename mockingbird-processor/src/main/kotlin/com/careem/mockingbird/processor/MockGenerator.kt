@@ -198,9 +198,6 @@ class MockGenerator constructor(
         return ksType.fullyQualifiedName() == "kotlin.Unit"
     }
 
-    private fun KSType.fullyQualifiedName() =
-        "${this.declaration.qualifiedName?.getQualifier()}.${this.declaration.qualifiedName?.getShortName()}"
-
     @OptIn(KotlinPoetKspPreview::class)
     private fun mockProperty(
         mockClassBuilder: TypeSpec.Builder,
