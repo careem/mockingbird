@@ -44,8 +44,8 @@ class KspSampleTest {
     @Mock
     lateinit var javaTypes: JavaTypes
 
-//    @Mock
-//    lateinit var internalSampleInterface: InternalSampleInterface
+    @Mock
+    private lateinit var internalSampleInterface: InternalSampleInterface
 
     @Mock
     lateinit var interfaceWithGenerics: InterfaceWithGenerics
