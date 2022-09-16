@@ -18,16 +18,27 @@
 
 plugins {
     kotlin("jvm")
+    id("maven-publish")
 }
 
 apply(from = "../publishing.gradle")
 
 repositories {
     mavenCentral()
+    google()
+    gradlePluginPortal()
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mockingbird-processor") {
+            from(components["java"])
+        }
+    }
 }
 
 dependencies {
