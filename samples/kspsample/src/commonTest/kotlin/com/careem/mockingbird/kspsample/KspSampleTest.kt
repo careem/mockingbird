@@ -27,34 +27,34 @@ class KspSampleTest {
     val pippoMock: PippoSample = PippoSampleMock()
 
     @Mock
-    lateinit var outerInterface: OuterInterface
+    val outerInterface: OuterInterface = OuterInterfaceMock()
 
     @Mock
-    lateinit var multipleGetterProperties: MultipleGetterProperties
+    val multipleGetterProperties: MultipleGetterProperties = MultipleGetterPropertiesMock()
 
     @Mock
-    lateinit var mockWithExternalDependencies: MockWithExternalDependencies
+    val mockWithExternalDependencies: MockWithExternalDependencies = MockWithExternalDependenciesMock()
 
     @Mock
-    lateinit var mock1: Mock1
+    val mock1: Mock1 = Mock1Mock()
 
     @Mock
-    lateinit var lambdaSample: LambdaSample
+    val lambdaSample: LambdaSample = LambdaSampleMock()
 
     @Mock
-    lateinit var javaTypes: JavaTypes
+    val javaTypes: JavaTypes = JavaTypesMock()
 
     @Mock
-    private lateinit var internalSampleInterface: InternalSampleInterface
+    private val internalSampleInterface: InternalSampleInterface = InternalSampleInterfaceMock()
 
     @Mock
-    lateinit var interfaceWithGenerics: InterfaceWithGenerics
+    val interfaceWithGenerics: InterfaceWithGenerics = InterfaceWithGenericsMock()
 
     @Mock
-    lateinit var innerInterface: InnerInterface
+    val innerInterface: InnerInterface = InnerInterfaceMock()
 
     @Mock
-    lateinit var innerInnerInterface: InnerInnerInterface
+    val innerInnerInterface: InnerInnerInterface = InnerInnerInterfaceMock()
 
     @Test
     fun testGeneratedTargetProjectMock() {
