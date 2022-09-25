@@ -63,8 +63,8 @@ class MockGenerator constructor(
             .addType(functionsToMock.buildMethodObject())
             .addType(functionsToMock.buildArgObject())
             .addType(propertiesToMock.buildPropertyObject())
-            .addSuperinterface(classToMock.toTypeName()) // TODO check if interface or generic open class
-            .addSuperinterface(externalClass!!.toClassName()) // TODO fix this
+            .addSuperinterface(classToMock.toTypeName())
+            .addSuperinterface(externalClass!!.toClassName())
 
         ksClassDeclaration.modifiers.filter {
             it == Modifier.PUBLIC || it == Modifier.INTERNAL || it == Modifier.PROTECTED || it == Modifier.PRIVATE
@@ -312,7 +312,6 @@ class MockGenerator constructor(
     }
 
     private fun FunSpec.Builder.addMockStatement(function: KSFunctionDeclaration, isUnit: Boolean) {
-        // TODO remove duplicates in args and method names
         val mockFunction = if (isUnit) {
             MOCK_UNIT
         } else {
