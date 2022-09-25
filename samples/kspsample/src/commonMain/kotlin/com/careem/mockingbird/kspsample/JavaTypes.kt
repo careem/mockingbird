@@ -40,5 +40,5 @@ interface JavaTypes {
     fun list(l: List<String>)
     fun listIterator(li: ListIterator<String>)
     fun map(m: Map<String, String>)
-//    fun mapEntry(me: Map.Entry<String, String>) // FIXME class not found
+    fun mapEntry(me: Map.Entry<String, String>)
 }
