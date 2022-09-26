@@ -158,9 +158,10 @@ To generate mocks you can simply run `./gradlew generateMocks` or simply run `./
 loop using `generatedMocks` is recommended
 
 #### Plugin Limitations
-
+* The plugin can only be used in modules containing a `jvm` target ( this limitation applies only to the legacy code generator )
 * The plugin can generate mocks only, no support for spies yet
 * Only interfaces can be mocked
+* Only interfaces that have generic types in their definitions can be mocked
 * Only interfaces without `inline` functions can be mocked
 * Only interfaces without `reified` functions can be mocked
 
