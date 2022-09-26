@@ -17,6 +17,8 @@ package com.careem.mockingbird
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
 
@@ -26,6 +28,8 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     private val mockingbirdPluginLegacyCodeGenDelegate = MockingbirdPluginLegacyCodeGenDelegate()
     private val mockingbirdPluginKspDelegate = MockingbirdPluginKspDelegate()
+
+    private val logger: Logger = Logging.getLogger(this::class.java)
 
     override fun apply(target: Project) {
         target.extensions.add<MockingbirdPluginExtension>(
@@ -39,7 +43,9 @@ abstract class MockingbirdPlugin : Plugin<Project> {
 
     private fun legacyCodeGenRequired(target: Project): Boolean {
         val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
-        return pluginExtensions.generateMocksFor.isNotEmpty()
+        val legacyCodeGenRequested = pluginExtensions.generateMocksFor.isNotEmpty()
+        logger.info("LegacyCodeGen: $legacyCodeGenRequested")
+        return legacyCodeGenRequested
     }
 }
 
