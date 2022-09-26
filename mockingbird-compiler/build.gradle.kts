@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.square.kotlinpoet)
     implementation(libs.square.kotlinpoet.metadata)
     implementation(libs.kotlinx.metadata.jvm)
+    implementation(project(":mockingbird-processor"))
     implementation(project(":mockingbird"))
 
     testImplementation(libs.kotlin.test)

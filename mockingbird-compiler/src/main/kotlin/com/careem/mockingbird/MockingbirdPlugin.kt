@@ -28,9 +28,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 
-internal const val EXTENSION_NAME = "mockingBird"
+private const val EXTENSION_NAME = "mockingBird"
 
-@Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
 abstract class MockingbirdPlugin : Plugin<Project> {
 
