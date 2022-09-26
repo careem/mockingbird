@@ -55,7 +55,7 @@ class MockGenerator constructor(
         val externalClass =
             resolver.getClassDeclarationByName(resolver.getKSNameFromString("com.careem.mockingbird.test.Mock"))
 
-        logger.warn("Generating mocks for $simpleName")
+        logger.info("Generating mocks for $simpleName")
 
         val (functionsToMock, propertiesToMock) = functionsMiner.extractFunctionsAndProperties(ksClassDeclaration)
 

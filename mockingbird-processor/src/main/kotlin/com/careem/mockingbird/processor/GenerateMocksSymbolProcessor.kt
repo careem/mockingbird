@@ -43,14 +43,10 @@ class GenerateMocksSymbolProcessor(
     override fun process(resolver: Resolver): List<KSAnnotated> {
         functionsMiner = FunctionsMiner()
         mockGenerator = MockGenerator(resolver, logger, functionsMiner)
-        logger.warn("KSP process")
-
 
         val fields = resolver.getSymbolsWithAnnotation(MOCK_ANNOTATION)
         fields.forEach { set ->
-            if (set !is KSPropertyDeclaration) error("$set is not a property declaration but is annotated with @Mock, not supperted")
-            logger.warn("Type to Mock ${set.type.toTypeName()}")
-
+            if (set !is KSPropertyDeclaration) error("$set is not a property declaration but is annotated with @Mock, not supported")
             mockGenerator.createClass(set.type).writeTo(
                 codeGenerator = codeGenerator,
                 aggregating = false
