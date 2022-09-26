@@ -28,8 +28,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 
-private const val EXTENSION_NAME = "mockingBird"
-
+internal const val EXTENSION_NAME = "mockingBird"
 
 @Suppress("UnstableApiUsage")
 @KotlinPoetMetadataPreview
@@ -41,6 +40,8 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     private lateinit var mockGenerator: MockGenerator
     private val logger: Logger = Logging.getLogger(this::class.java)
 
+    private val mockingbirdPluginKspDelegate = MockingbirdPluginKspDelegate()
+
     private fun setupDependencies(target: Project) {
         classLoader = ClassLoaderWrapper(projectExplorer, target)
         functionsMiner = FunctionsMiner(classLoader)
@@ -48,50 +49,64 @@ abstract class MockingbirdPlugin : Plugin<Project> {
     }
 
     override fun apply(target: Project) {
-        val sourceSetResolver = SourceSetResolver()
-        projectExplorer = ProjectExplorer(sourceSetResolver)
-        try {
-            target.extensions.add<MockingbirdPluginExtension>(
-                EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
-            )
-
-            target.gradle.projectsEvaluated {
-                val generateMocksTask = target.task(GradleTasks.GENERATE_MOCKS) {
-                    dependsOn(target.tasks.getByName(GradleTasks.JVM_JAR))
-                    doFirst {
-                        val outputDir = targetOutputDir(target)
-                        outputDir.deleteRecursively()
+        target.extensions.add<MockingbirdPluginExtension>(
+            EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
+        )
+        if (legacyCodeGenRequired(target)) {
+            val sourceSetResolver = SourceSetResolver()
+            projectExplorer = ProjectExplorer(sourceSetResolver)
+            try {
+                target.gradle.projectsEvaluated {
+                    val generateMocksTask = target.task(GradleTasks.GENERATE_MOCKS) {
+                        dependsOn(target.tasks.getByName(GradleTasks.JVM_JAR))
+                        doFirst {
+                            val outputDir = targetOutputDir(target)
+                            outputDir.deleteRecursively()
+                        }
+                        doLast {
+                            generateMocks(target)
+                        }
                     }
-                    doLast {
-                        generateMocks(target)
+
+                    target.tasks.forEach { task ->
+                        if (task.name.contains("Test") && (task is KotlinCompile<*>)) {
+                            task.dependsOn(generateMocksTask)
+                        }
                     }
-                }
 
-                target.tasks.forEach { task ->
-                    if (task.name.contains("Test") && (task is KotlinCompile<*>)) {
-                        task.dependsOn(generateMocksTask)
-                    }
-                }
+                    configureSourceSets(target)
 
-                configureSourceSets(target)
-
-                projectExplorer.visitRootProject(target.rootProject)
-                // Add test dependencies for classes that need to be mocked
-                val dependencySet = projectExplorer.explore(target)
-                target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
-                    sourceSets.getByName("commonTest") {
-                        dependencies {
-                            dependencySet.forEach { implementation(it) }
+                    projectExplorer.visitRootProject(target.rootProject)
+                    // Add test dependencies for classes that need to be mocked
+                    val dependencySet = projectExplorer.explore(target)
+                    target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
+                        sourceSets.getByName("commonTest") {
+                            dependencies {
+                                dependencySet.forEach { implementation(it) }
+                            }
                         }
                     }
                 }
-            }
 
-        } catch (e: Exception) {
-            // Useful to debug
-            e.printStackTrace()
-            throw e
+            } catch (e: Exception) {
+                // Useful to debug
+                e.printStackTrace()
+                throw e
+            }
         }
+        mockingbirdPluginKspDelegate.apply(target)
+    }
+
+    private fun hasKspPlugin(target: Project): Boolean{
+        return target.plugins.findPlugin("com.google.devtools.ksp") != null
+    }
+
+    /**
+     * This function check if code generation with the old plugin is required
+     */
+    private fun legacyCodeGenRequired(target: Project): Boolean {
+        val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
+        return pluginExtensions.generateMocksFor.isNotEmpty()
     }
 
     private fun generateMocks(target: Project) {

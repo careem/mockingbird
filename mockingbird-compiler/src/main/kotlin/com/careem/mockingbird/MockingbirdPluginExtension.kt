@@ -25,6 +25,7 @@ import org.gradle.kotlin.dsl.setValue
 import kotlin.reflect.KProperty
 
 interface MockingbirdPluginExtension {
+    var kspProcessorVersion: String
     var generateMocksFor: List<String>
     val printLogs: Boolean
 }
@@ -34,9 +35,13 @@ internal class MockingbirdPluginExtensionImpl(objects: ObjectFactory) : Mockingb
     internal val _generateMocksFor = objects.listProperty<String>().convention(listOf())
 
     @JvmField
+    internal val _kspProcessorVersion = objects.property<String>().convention("2.+")
+
+    @JvmField
     internal val _printLogs = objects.property<Boolean>().convention(false)
 
     override var generateMocksFor: List<String> by _generateMocksFor
+    override var kspProcessorVersion: String by _kspProcessorVersion
     override var printLogs: Boolean by _printLogs // TODO implement this
 }
 
