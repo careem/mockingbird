@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Allow mockingbird plugin to abstract on top of ksp to expose a nice api until ksp support for multiplatform will improve
 * Introduced Ksp code generation using the @Mock annotation
 * Fix for mock generation to set the right visibility
 
