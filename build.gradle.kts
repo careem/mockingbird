@@ -38,7 +38,7 @@ allprojects {
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {
-            allWarningsAsErrors = false
+            allWarningsAsErrors = true
         }
     }
 }

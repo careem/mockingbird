@@ -170,7 +170,7 @@ class MockGenerator constructor(
         } else {
             "set"
         }
-        val newName = if (prefix.isNotEmpty()) rawName.capitalize() else rawName
+        val newName = if (prefix.isNotEmpty()) rawName.replaceFirstChar(Char::titlecase) else rawName
         return "$prefix$newName"
     }
 
