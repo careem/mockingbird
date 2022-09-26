@@ -12,9 +12,12 @@ class MockingbirdPluginKspDelegate {
     fun apply(target: Project) {
         target.afterEvaluate {
             if (hasKspPlugin(this)) {
-                // TODO revisit this whole block once Ksp will be able to generate code for commonTest ( not the case today see: https://github.com/google/ksp/issues/567 )
-                // This leads to following limitations:
-                // 1. It is not possible to mock on target specific tests the same object, otherwise there will be a file already exists problme since the output of commonTest and jvmTest for exampel are on the same folder
+                // TODO revisit this whole logic once Ksp will be able to generate code for commonTest ( not the case today see: https://github.com/google/ksp/issues/567 )
+                // The following code will workaround the current ksp limitations doing the follow:
+                // 1. To avoid running ksp for each target the plugin will run ksp for a single target jvm will be prefered if the target is available otherwise it will pick the first target
+                // 2. Since current multiplatform ksp implementation can target specific targets, mocks generated will not be resolved
+                //    in commonTest. The plugin will add this the code generated at point 1 as source set for common test so that
+                //    this code will be available for each platform and resolvable by the IDE
                 target.extensions.configure(KotlinMultiplatformExtension::class.java) {
                     val firstTargetName = targets.filter { it.targetName != "metadata" }.first().targetName
                     val selectedTargetName =
