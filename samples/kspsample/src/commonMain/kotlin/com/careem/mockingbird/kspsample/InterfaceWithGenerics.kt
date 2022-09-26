@@ -1,12 +1,11 @@
-/**
- *
+/*
  * Copyright Careem, an Uber Technologies Inc. company
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +14,13 @@
  * limitations under the License.
  */
 
-enableFeaturePreview("VERSION_CATALOGS")
+package com.careem.mockingbird.kspsample
 
-include(":mockingbird")
-include(":mockingbird-compiler")
-include(":mockingbird-processor")
+interface InterfaceWithGenerics {
+    fun foo(fooArg: List<List<Int>>): List<List<String>>
+    fun complexFoo(fooArg: List<Map<List<List<Int>>, List<String>>>): List<List<String>>
+    fun foo(fooArg: Map<Int, String>): Map<String, Int>
 
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("versions.toml"))
-        }
-    }
+    var g1: List<String>
+    var g2: Map<String, Int>
 }

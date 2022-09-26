@@ -1,6 +1,3 @@
-import org.gradle.initialization.DependenciesAccessors
-import org.gradle.kotlin.dsl.support.serviceOf
-
 /**
  *
  * Copyright Careem, an Uber Technologies Inc. company
@@ -29,6 +26,7 @@ dependencyResolutionManagement {
 }
 
 include(":sample")
+include(":kspsample")
 include(":common-sample")
 include(":common:sample")
 
@@ -36,5 +34,6 @@ includeBuild("..") {
     dependencySubstitution {
         substitute(module("com.careem.mockingbird:mockingbird")).using(project(":mockingbird"))
         substitute(module("com.careem.mockingbird:mockingbird-compiler")).using(project(":mockingbird-compiler"))
+        substitute(module("com.careem.mockingbird:mockingbird-processor")).using(project(":mockingbird-processor"))
     }
 }

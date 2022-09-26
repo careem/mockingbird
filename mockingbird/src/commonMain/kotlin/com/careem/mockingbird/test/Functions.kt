@@ -52,11 +52,12 @@ public fun runWithTestMode(testMode: TestMode, testBlock: () -> Unit) {
  * @param methodName name of the method that you want to mock
  * @param arguments map between names and method arguments
  */
-public fun <T : Mock, R> T.every(
+public fun <T, R> T.every(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
 ) {
+    if(this !is Mock) throw IllegalArgumentException("This object is not a mock")
     val uuid = this.uuid
     val value = returns()
     MockingBird.invocationRecorder().access { recorder ->
@@ -73,11 +74,12 @@ public fun <T : Mock, R> T.every(
  * @param methodName name of the method that you want to mock
  * @param arguments map between names and method arguments
  */
-public fun <T : Mock, R> T.everyAnswers(
+public fun <T, R> T.everyAnswers(
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
 ) {
+    if(this !is Mock) throw IllegalArgumentException("This object is not a mock")
     val uuid = this.uuid
     MockingBird.invocationRecorder().access { recorder ->
         recorder.storeAnswer(
@@ -95,12 +97,13 @@ public fun <T : Mock, R> T.everyAnswers(
  * @param arguments map between names and method arguments
  * @param timeoutMillis milliseconds allowed to wait until the condition is considered false
  */
-public fun <T : Mock> T.verify(
+public fun <T> T.verify(
     exactly: Int = 1,
     methodName: String,
     arguments: Map<String, Any?> = emptyMap(),
     timeoutMillis: Long = 0L
 ) {
+    if(this !is Mock) throw IllegalArgumentException("This object is not a mock")
     val elapsedTime = atomic(0L)
     val run = atomic(true)
     while (run.value && elapsedTime.value < timeoutMillis) {

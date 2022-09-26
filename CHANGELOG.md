@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Introduced Ksp code generation using the @Mock annotation
 * Fix for mock generation to set the right visibility
 
 ## 2.6.0

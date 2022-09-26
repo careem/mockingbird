@@ -1,11 +1,13 @@
 [versions]
 kotlin = "1.6.21"
-kotlinTarget = "1.5"
+kspVersion = "1.6.21-1.0.6"
+kotlinTarget = "1.6"
 junit = "4.13.1"
 jacoco = "0.8.8"
 stately = "1.2.1"
 atomicFu = "0.17.2"
 kotlinPoet = "1.11.0"
+kotlinPoetKsp = "1.10.2"
 kotlinxMetadata = "0.4.2"
 mockk = "1.12.3"
 
@@ -20,8 +22,11 @@ kotlin-test-js = { module = "org.jetbrains.kotlin:kotlin-test-js", version.ref =
 junit-junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-reflectjvm = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 square-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
+square-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinPoetKsp" }
 square-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "kotlinPoet" }
+square-kotlinpoet-metadata-specs = { module = "com.squareup:kotlinpoet-metadata-specs", version.ref = "kotlinPoet" }
 kotlinx-metadata-jvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadata" }
+google-ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
 
 kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicFu" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

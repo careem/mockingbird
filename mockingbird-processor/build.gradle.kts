@@ -15,16 +15,35 @@
  * limitations under the License.
  */
 
-enableFeaturePreview("VERSION_CATALOGS")
 
-include(":mockingbird")
-include(":mockingbird-compiler")
-include(":mockingbird-processor")
+plugins {
+    kotlin("jvm")
+    id("maven-publish")
+}
 
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("versions.toml"))
+apply(from = "../publishing.gradle")
+
+repositories {
+    mavenCentral()
+    google()
+    gradlePluginPortal()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mockingbird-processor") {
+            from(components["java"])
         }
     }
 }
+
+dependencies {
+    implementation(libs.google.ksp)
+    implementation(libs.square.kotlinpoet.ksp)
+    implementation(project(":mockingbird"))
+}
+
