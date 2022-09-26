@@ -18,12 +18,12 @@ import groovy.lang.Closure
 
 plugins{
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.google.devtools.ksp") version "1.6.21-1.0.6"
+    id("com.google.devtools.ksp") version libs.versions.kspVersion.get()
 }
 
 apply(from = "../../utils.gradle")
 val setupMultiplatformLibrary: Closure<Any> by ext
-setupMultiplatformLibrary(project, false, false) // TODO extract JsPlugin from buildSrc to be used in other modules
+setupMultiplatformLibrary(project, false, false)
 
 kotlin {
     sourceSets {
@@ -31,8 +31,12 @@ kotlin {
             dependencies {
                 implementation(project(":common-sample"))
                 implementation(project(":common:sample"))
-                implementation("com.careem.mockingbird:mockingbird")
                 implementation(libs.touchlab.stately.isolate)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation("com.careem.mockingbird:mockingbird")
             }
         }
     }

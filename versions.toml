@@ -1,5 +1,6 @@
 [versions]
 kotlin = "1.6.21"
+kspVersion = "1.6.21-1.0.6"
 kotlinTarget = "1.6"
 junit = "4.13.1"
 jacoco = "0.8.8"
@@ -9,7 +10,6 @@ kotlinPoet = "1.11.0"
 kotlinPoetKsp = "1.10.2"
 kotlinxMetadata = "0.4.2"
 mockk = "1.12.3"
-kspVersion = "1.6.21-1.0.6"
 
 [libraries]
 jacoco-jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }

@@ -19,8 +19,6 @@ package com.careem.mockingbird.kspsample
 import com.careem.mockingbird.test.annotations.Mock
 import kotlin.test.Test
 import kotlin.test.assertNotNull
-import com.careem.mockingbird.kspsample.PippoSampleMock
-import kotlin.test.assertEquals
 
 class KspSampleTest {
     @Mock
