@@ -10,6 +10,7 @@ kotlinPoet = "1.11.0"
 kotlinPoetKsp = "1.10.2"
 kotlinxMetadata = "0.4.2"
 mockk = "1.12.3"
+buildconfig = "3.1.0"
 
 [libraries]
 jacoco-jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
@@ -31,3 +32,6 @@ google-ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version
 kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicFu" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+[plugins]
+gmazzo-buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }

@@ -18,6 +18,7 @@
 
 plugins {
     `kotlin-dsl`
+    id("com.github.gmazzo.buildconfig") version libs.versions.buildconfig.get()
 }
 
 apply(from = "../publishing.gradle")
@@ -36,6 +37,11 @@ repositories {
     google()
     gradlePluginPortal()
 }
+
+buildConfig{
+    buildConfigField("String", "VERSION", "\"${project.property("VERSION") as String}\"")
+}
+
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {

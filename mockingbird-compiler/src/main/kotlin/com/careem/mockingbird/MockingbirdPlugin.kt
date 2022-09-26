@@ -97,10 +97,6 @@ abstract class MockingbirdPlugin : Plugin<Project> {
         mockingbirdPluginKspDelegate.apply(target)
     }
 
-    private fun hasKspPlugin(target: Project): Boolean{
-        return target.plugins.findPlugin("com.google.devtools.ksp") != null
-    }
-
     /**
      * This function check if code generation with the old plugin is required
      */
