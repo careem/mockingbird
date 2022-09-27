@@ -18,6 +18,7 @@
 
 plugins {
     `kotlin-dsl`
+    id("com.github.gmazzo.buildconfig") version libs.versions.buildconfig.get()
 }
 
 apply(from = "../publishing.gradle")
@@ -36,6 +37,11 @@ repositories {
     google()
     gradlePluginPortal()
 }
+
+buildConfig{
+    buildConfigField("String", "VERSION", "\"${project.property("VERSION") as String}\"")
+}
+
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
@@ -59,6 +65,7 @@ dependencies {
     implementation(libs.square.kotlinpoet)
     implementation(libs.square.kotlinpoet.metadata)
     implementation(libs.kotlinx.metadata.jvm)
+    implementation(project(":mockingbird-processor"))
     implementation(project(":mockingbird"))
 
     testImplementation(libs.kotlin.test)

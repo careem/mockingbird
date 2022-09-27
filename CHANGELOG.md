@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* MockingBird plugin support ksp codegen out of the box of google ksp plugin is applied
 * Introduced Ksp code generation using the @Mock annotation
 * Fix for mock generation to set the right visibility
 
