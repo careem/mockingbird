@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.8.0
 * Bumping dependencies and migration to Kotlin 1.7.10
 * Support mock generation for interfaces with generics
 
