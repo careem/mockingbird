@@ -33,7 +33,6 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
-import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toKModifier
 import com.squareup.kotlinpoet.ksp.toTypeName
@@ -44,7 +43,6 @@ class MockGenerator constructor(
     private val functionsMiner: FunctionsMiner
 ) {
 
-    @OptIn(KotlinPoetKspPreview::class)
     fun createClass(ksTypeRef: KSTypeReference): FileSpec {
 
         val classToMock = ksTypeRef.resolve()
@@ -208,7 +206,6 @@ class MockGenerator constructor(
         return ksType.fullyQualifiedName() == "kotlin.Unit"
     }
 
-    @OptIn(KotlinPoetKspPreview::class)
     private fun mockProperty(
         typeResolver: Map<KSTypeParameter, KSTypeArgument>,
         mockClassBuilder: TypeSpec.Builder,
@@ -300,7 +297,6 @@ class MockGenerator constructor(
             KModifier.PUBLIC
         } else null
 
-    @OptIn(KotlinPoetKspPreview::class)
     private fun mockFunction(
         typeResolver: Map<KSTypeParameter, KSTypeArgument>,
         mockClassBuilder: TypeSpec.Builder,
@@ -326,7 +322,6 @@ class MockGenerator constructor(
         )
     }
 
-    @OptIn(KotlinPoetKspPreview::class)
     fun KSTypeReference.toTypeNameResolved(typeResolver: Map<KSTypeParameter, KSTypeArgument>): TypeName {
         return if (typeResolver.containsKey(this.resolve().declaration)) {
             typeResolver.get(this.resolve().declaration)!!.toTypeName()

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Bumping dependencies and migration to Kotlin 1.7.10
 * Support mock generation for interfaces with generics
 
 ## 2.7.0

@@ -21,6 +21,14 @@ include(":mockingbird")
 include(":mockingbird-compiler")
 include(":mockingbird-processor")
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {

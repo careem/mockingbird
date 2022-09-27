@@ -18,6 +18,7 @@ apply(from = "jacoco.gradle")
 
 buildscript {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         google()
     }

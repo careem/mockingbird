@@ -26,7 +26,6 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
-import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import com.squareup.kotlinpoet.ksp.writeTo
@@ -39,7 +38,6 @@ class GenerateMocksSymbolProcessor(
     private lateinit var mockGenerator: MockGenerator
     private lateinit var functionsMiner: FunctionsMiner
 
-    @OptIn(KotlinPoetKspPreview::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
         functionsMiner = FunctionsMiner()
         mockGenerator = MockGenerator(resolver, logger, functionsMiner)
