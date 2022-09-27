@@ -78,7 +78,7 @@ afterEvaluate {
                     }
                 }
 
-                if(type == 'pluginMaven'){
+                if(type == 'pluginMaven' || type == 'mockingbird-processor'){
                     artifact sourcesJar
                 }
             }
