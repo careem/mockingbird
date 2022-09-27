@@ -41,6 +41,11 @@ publishing {
     }
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    from("src/main/kotlin")
+    archiveClassifier.set("sources")
+}
+
 dependencies {
     implementation(libs.google.ksp)
     implementation(libs.square.kotlinpoet.ksp)
