@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Support mock generation for interfaces with generics
 
 ## 2.7.0
 * MockingBird plugin support ksp codegen out of the box of google ksp plugin is applied

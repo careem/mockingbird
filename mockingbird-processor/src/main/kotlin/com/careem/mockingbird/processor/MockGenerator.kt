@@ -21,7 +21,8 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
-import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.Modifier
 import com.squareup.kotlinpoet.FileSpec
@@ -29,6 +30,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
@@ -46,10 +48,16 @@ class MockGenerator constructor(
     fun createClass(ksTypeRef: KSTypeReference): FileSpec {
 
         val classToMock = ksTypeRef.resolve()
+
+        val classGenerics = classToMock.arguments.map { "_${it.type.toString()}" }.joinToString("")
+
         val className = classToMock.toClassName()
         val simpleName = className.simpleName
 
         val ksClassDeclaration = classToMock.declaration as KSClassDeclaration
+
+        val typeResolver: Map<KSTypeParameter, KSTypeArgument> =
+            ksClassDeclaration.typeParameters.zip(classToMock.arguments).toMap()
 
         val packageName = className.packageName
         val externalClass =
@@ -59,7 +67,7 @@ class MockGenerator constructor(
 
         val (functionsToMock, propertiesToMock) = functionsMiner.extractFunctionsAndProperties(ksClassDeclaration)
 
-        val mockClassBuilder = TypeSpec.classBuilder("${simpleName}Mock")
+        val mockClassBuilder = TypeSpec.classBuilder("${simpleName}${classGenerics}Mock")
             .addType(functionsToMock.buildMethodObject())
             .addType(functionsToMock.buildArgObject())
             .addType(propertiesToMock.buildPropertyObject())
@@ -73,7 +81,7 @@ class MockGenerator constructor(
         }
 
         functionsToMock.forEach { function ->
-            mockFunction(mockClassBuilder, function, isUnitFunction(function))
+            mockFunction(typeResolver, mockClassBuilder, function, isUnitFunction(function))
         }
 
         val uuid = PropertySpec.builder("uuid", String::class, KModifier.OVERRIDE)
@@ -88,11 +96,13 @@ class MockGenerator constructor(
         mockClassBuilder.addProperty(uuid)
 
         propertiesToMock.forEach { property ->
-            mockProperty(mockClassBuilder, property)
+            mockProperty(typeResolver, mockClassBuilder, property)
         }
 
+        val mockedClass = mockClassBuilder.build()
+
         return FileSpec.builder(packageName, "${simpleName}Mock")
-            .addType(mockClassBuilder.build())
+            .addType(mockedClass)
             .build()
     }
 
@@ -200,6 +210,7 @@ class MockGenerator constructor(
 
     @OptIn(KotlinPoetKspPreview::class)
     private fun mockProperty(
+        typeResolver: Map<KSTypeParameter, KSTypeArgument>,
         mockClassBuilder: TypeSpec.Builder,
         property: KSPropertyDeclaration
     ) {
@@ -207,7 +218,7 @@ class MockGenerator constructor(
         val propertyBuilder = PropertySpec
             .builder(
                 property.simpleName.getShortName(),
-                property.type.resolve().toTypeName(),
+                property.type.toTypeNameResolved(typeResolver),
                 KModifier.OVERRIDE
             )
 
@@ -256,7 +267,7 @@ class MockGenerator constructor(
             )
         """.trimIndent()
             setterBuilder
-                .addParameter("value", property.type.resolve().toTypeName())
+                .addParameter("value", property.type.toTypeNameResolved(typeResolver))
                 .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
             propertyBuilder
                 .mutable()
@@ -291,6 +302,7 @@ class MockGenerator constructor(
 
     @OptIn(KotlinPoetKspPreview::class)
     private fun mockFunction(
+        typeResolver: Map<KSTypeParameter, KSTypeArgument>,
         mockClassBuilder: TypeSpec.Builder,
         function: KSFunctionDeclaration,
         isUnit: Boolean
@@ -300,15 +312,27 @@ class MockGenerator constructor(
             .addModifiers(buildFunctionModifiers(function))
         for (valueParam in function.parameters) {
             logger.info(valueParam.type.toString())
-            funBuilder.addParameter(valueParam.name!!.getShortName(), valueParam.type.toTypeName())
+            funBuilder.addParameter(
+                valueParam.name!!.getShortName(),
+                valueParam.type.toTypeNameResolved(typeResolver)
+            )
         }
         if (!isUnit) {
-            funBuilder.returns(function.returnType!!.toTypeName())
+            funBuilder.returns(function.returnType!!.toTypeNameResolved(typeResolver))
         }
         funBuilder.addMockStatement(function, isUnit)
         mockClassBuilder.addFunction(
             funBuilder.build()
         )
+    }
+
+    @OptIn(KotlinPoetKspPreview::class)
+    fun KSTypeReference.toTypeNameResolved(typeResolver: Map<KSTypeParameter, KSTypeArgument>): TypeName {
+        return if (typeResolver.containsKey(this.resolve().declaration)) {
+            typeResolver.get(this.resolve().declaration)!!.toTypeName()
+        } else {
+            this.toTypeName()
+        }
     }
 
     private fun FunSpec.Builder.addMockStatement(function: KSFunctionDeclaration, isUnit: Boolean) {
