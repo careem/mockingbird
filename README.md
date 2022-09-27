@@ -110,7 +110,7 @@ plugins {
 }
 ```
 
-To create a mock you just need to annotate the filed in your test class example:
+To create a mock you just need to annotate the field in your test class example:
 
 ```kotlin
 class KspSampleTest {
