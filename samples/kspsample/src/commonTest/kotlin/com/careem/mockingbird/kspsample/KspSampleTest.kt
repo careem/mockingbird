@@ -54,6 +54,12 @@ class KspSampleTest {
     @Mock
     val innerInnerInterface: InnerInnerInterface = InnerInnerInterfaceMock()
 
+    @Mock
+    val uiDelegate: UiDelegate<UiState> = UiDelegate_UiStateMock()
+
+    @Mock
+    val uiDelegate2Args: UiDelegate2Args<UiState, Value> = UiDelegate2Args_UiState_ValueMock()
+
     @Test
     fun testGeneratedTargetProjectMock() {
         assertNotNull(pippoMock)
