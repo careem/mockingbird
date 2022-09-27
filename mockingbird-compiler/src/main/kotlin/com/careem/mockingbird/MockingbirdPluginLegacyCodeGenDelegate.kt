@@ -6,6 +6,7 @@ import kotlinx.metadata.KmClass
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -19,48 +20,60 @@ class MockingbirdPluginLegacyCodeGenDelegate {
     private lateinit var mockGenerator: MockGenerator
     private val logger: Logger = Logging.getLogger(this::class.java)
 
-
     fun apply(target: Project) {
+        target.extensions.add<MockingbirdPluginExtension>(
+            EXTENSION_NAME, MockingbirdPluginExtensionImpl(target.objects)
+        )
         val sourceSetResolver = SourceSetResolver()
         projectExplorer = ProjectExplorer(sourceSetResolver)
         try {
-            target.gradle.projectsEvaluated {
-                val generateMocksTask = target.task(GradleTasks.GENERATE_MOCKS) {
-                    dependsOn(target.tasks.getByName(GradleTasks.JVM_JAR))
-                    doFirst {
-                        val outputDir = targetOutputDir(target)
-                        outputDir.deleteRecursively()
-                    }
-                    doLast {
-                        generateMocks(target)
-                    }
-                }
+            target.afterEvaluate {
+                if(legacyCodeGenRequired(this)){
+                    target.gradle.projectsEvaluated {
+                        val generateMocksTask = target.task(GradleTasks.GENERATE_MOCKS) {
+                            dependsOn(target.tasks.getByName(GradleTasks.JVM_JAR))
+                            doFirst {
+                                val outputDir = targetOutputDir(target)
+                                outputDir.deleteRecursively()
+                            }
+                            doLast {
+                                generateMocks(target)
+                            }
+                        }
 
-                target.tasks.forEach { task ->
-                    if (task.name.contains("Test") && (task is KotlinCompile<*>)) {
-                        task.dependsOn(generateMocksTask)
-                    }
-                }
+                        target.tasks.forEach { task ->
+                            if (task.name.contains("Test") && (task is KotlinCompile<*>)) {
+                                task.dependsOn(generateMocksTask)
+                            }
+                        }
 
-                configureSourceSets(target)
+                        configureSourceSets(target)
 
-                projectExplorer.visitRootProject(target.rootProject)
-                // Add test dependencies for classes that need to be mocked
-                val dependencySet = projectExplorer.explore(target)
-                target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
-                    sourceSets.getByName("commonTest") {
-                        dependencies {
-                            dependencySet.forEach { implementation(it) }
+                        projectExplorer.visitRootProject(target.rootProject)
+                        // Add test dependencies for classes that need to be mocked
+                        val dependencySet = projectExplorer.explore(target)
+                        target.extensions.getByType(KotlinMultiplatformExtension::class.java).run {
+                            sourceSets.getByName("commonTest") {
+                                dependencies {
+                                    dependencySet.forEach { implementation(it) }
+                                }
+                            }
                         }
                     }
                 }
             }
-
         } catch (e: Exception) {
             // Useful to debug
             e.printStackTrace()
             throw e
         }
+    }
+
+    private fun legacyCodeGenRequired(target: Project): Boolean {
+        val pluginExtensions = target.extensions[EXTENSION_NAME] as MockingbirdPluginExtensionImpl
+        val legacyCodeGenRequested = pluginExtensions.generateMocksFor.isNotEmpty()
+        logger.info("LegacyCodeGen: $legacyCodeGenRequested")
+        return legacyCodeGenRequested
     }
 
     private fun generateMocks(target: Project) {
@@ -100,5 +113,9 @@ class MockingbirdPluginLegacyCodeGenDelegate {
         classLoader = ClassLoaderWrapper(projectExplorer, target)
         functionsMiner = FunctionsMiner(classLoader)
         mockGenerator = MockGenerator(classLoader, functionsMiner)
+    }
+
+    companion object{
+        private const val EXTENSION_NAME = "mockingBird"
     }
 }
