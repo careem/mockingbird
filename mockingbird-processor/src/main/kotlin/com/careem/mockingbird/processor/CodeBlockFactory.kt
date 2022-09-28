@@ -13,8 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.careem.mockingbird.test.annotations
 
-@Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.PROPERTY)
-public annotation class Mock
+package com.careem.mockingbird.processor
+
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.TypeSpec
+
+interface CodeBlockFactory {
+    fun resolveSupertype(): String
+    fun decorateConstructor(classToMock: KSClassDeclaration, classBuilder: TypeSpec.Builder)
+    fun decorateFunctionBody(classToMock: KSClassDeclaration, function: KSFunctionDeclaration, isUnit: Boolean, functionBuilder: FunSpec.Builder)
+}

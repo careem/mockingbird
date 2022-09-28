@@ -17,12 +17,16 @@
 package com.careem.mockingbird.kspsample
 
 import com.careem.mockingbird.test.annotations.Mock
+import com.careem.mockingbird.test.annotations.Spy
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 class KspSampleTest {
     @Mock
     val pippoMock: PippoSample = PippoSampleMock()
+
+    @Spy
+    val pippoSpy: PippoSample = PippoSampleSpy()
 
     @Mock
     val outerInterface: OuterInterface = OuterInterfaceMock()

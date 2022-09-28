@@ -24,17 +24,35 @@ import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.ksp.toClassName
 
-class MockGenerator(
+class SpyGenerator(
     resolver: Resolver,
     logger: KSPLogger,
     functionsMiner: FunctionsMiner
 ) : CodeBlockFactory {
 
-    private val generator : Generator = Generator(resolver, logger, functionsMiner, this)
+    private val generator: Generator = Generator(resolver, logger, functionsMiner, this)
 
-    override fun resolveSupertype(): String = "Mock"
+    override fun resolveSupertype(): String = "Spy"
+
+    override fun decorateConstructor(classToMock: KSClassDeclaration, classBuilder: TypeSpec.Builder) {
+        val className = classToMock.toClassName()
+        val propertyName = className.simpleName.replaceFirstChar(Char::lowercase)
+        classBuilder
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter(propertyName, className)
+                    .build()
+            )
+            .addProperty(
+                PropertySpec.builder(propertyName, className)
+                    .initializer(propertyName)
+                    .build()
+            )
+    }
 
     override fun decorateFunctionBody(
         classToMock: KSClassDeclaration,
@@ -42,12 +60,7 @@ class MockGenerator(
         isUnit: Boolean,
         functionBuilder: FunSpec.Builder
     ) {
-        val mockFunction = if (isUnit) {
-            MOCK_UNIT
-        } else {
-            MOCK
-        }
-        val mockUnit = MemberName("com.careem.mockingbird.test", mockFunction)
+        val mockUnit = MemberName("com.careem.mockingbird.test", SPY)
         val v = mutableListOf<String>()
         for (i in function.parameters.indices) {
             v.add("Arg.%M to %L")
@@ -58,11 +71,17 @@ class MockGenerator(
             argsValue.add(MemberName("", vp.name!!.getShortName()))
             argsValue.add(vp.name!!.getShortName())
         }
+        argsValue.add(MemberName("", function.simpleName.getShortName()))
 
         val codeBlocks = mutableListOf("methodName = Method.%M")
         if (args.isNotEmpty()) {
             codeBlocks.add("arguments = mapOf($args)")
         }
+        codeBlocks.add(
+            "delegate = { ${
+                classToMock.simpleName.getShortName().replaceFirstChar(Char::lowercase)
+            }.%M(${function.parameters.joinToString(",") { it.name!!.getShortName() }}) }"
+        ) // TODO fill here
         val statementString = """
             return %M(
                 ${codeBlocks.joinToString(separator = ",\n")}
@@ -72,15 +91,9 @@ class MockGenerator(
         functionBuilder.addStatement(statementString, *(argsValue.toTypedArray()))
     }
 
-
-    override fun decorateConstructor(classToMock: KSClassDeclaration, classBuilder: TypeSpec.Builder) {
-        // No extra constructor parameters
-    }
-
     fun createClass(ksTypeRef: KSTypeReference): FileSpec = generator.createClass(ksTypeRef)
 
     companion object {
-        private const val MOCK_UNIT = "mockUnit"
-        private const val MOCK = "mock"
+        private const val SPY = "spy"
     }
 }

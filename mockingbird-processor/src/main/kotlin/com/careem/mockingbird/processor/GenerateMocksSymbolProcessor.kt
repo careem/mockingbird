@@ -31,11 +31,14 @@ class GenerateMocksSymbolProcessor(
 ) : SymbolProcessor {
 
     private lateinit var mockGenerator: MockGenerator
+    private lateinit var spyGenerator: SpyGenerator
     private lateinit var functionsMiner: FunctionsMiner
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         functionsMiner = FunctionsMiner()
         mockGenerator = MockGenerator(resolver, logger, functionsMiner)
+        spyGenerator = SpyGenerator(resolver, logger, functionsMiner)
+
         resolver.getSymbolsWithAnnotation(MOCK_ANNOTATION)
             .map {
                 if (it !is KSPropertyDeclaration) error("$it is not a property declaration but is annotated with @Mock, not supported")
@@ -51,10 +54,28 @@ class GenerateMocksSymbolProcessor(
                     aggregating = false
                 )
             }
+
+        resolver.getSymbolsWithAnnotation(SPY_ANNOTATION)
+            .map {
+                if (it !is KSPropertyDeclaration) error("$it is not a property declaration but is annotated with @Mock, not supported")
+                it.type
+            }
+            .distinctBy {
+                it.resolve().toClassName().canonicalName
+            }
+            .forEach {
+                logger.info(it.resolve().toClassName().canonicalName)
+                spyGenerator.createClass(it).writeTo(
+                    codeGenerator = codeGenerator,
+                    aggregating = false
+                )
+            }
+
         return emptyList()
     }
 
     companion object {
         const val MOCK_ANNOTATION = "com.careem.mockingbird.test.annotations.Mock"
+        const val SPY_ANNOTATION = "com.careem.mockingbird.test.annotations.Spy"
     }
 }
