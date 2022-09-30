@@ -22,14 +22,12 @@ import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 class KspSampleTest {
+
     @Mock
     val pippoMock: PippoSample = PippoSampleMock()
 
-    @Spy
-    val pippoSpy: PippoSample = PippoSampleSpy()
-
     @Mock
-    val outerInterface: OuterInterface = OuterInterfaceMock()
+    val outerInterfaceMock: OuterInterface = OuterInterfaceMock()
 
     @Mock
     val multipleGetterProperties: MultipleGetterProperties = MultipleGetterPropertiesMock()

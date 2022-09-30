@@ -18,11 +18,17 @@ package com.careem.mockingbird.processor
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 
 interface CodeBlockFactory {
     fun resolveSupertype(): String
     fun decorateConstructor(classToMock: KSClassDeclaration, classBuilder: TypeSpec.Builder)
     fun decorateFunctionBody(classToMock: KSClassDeclaration, function: KSFunctionDeclaration, isUnit: Boolean, functionBuilder: FunSpec.Builder)
+    fun decoratePropertyGetter(classToMock: KSClassDeclaration, property: KSPropertyDeclaration, propertyBuilder: PropertySpec.Builder, typeResolver: Map<KSTypeParameter, KSTypeArgument>)
+    fun decoratePropertySetter(classToMock: KSClassDeclaration, property: KSPropertyDeclaration, propertyBuilder: PropertySpec.Builder, typeResolver: Map<KSTypeParameter, KSTypeArgument>)
 }

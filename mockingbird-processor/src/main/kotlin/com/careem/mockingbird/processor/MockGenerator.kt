@@ -20,19 +20,21 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 
 class MockGenerator(
     resolver: Resolver,
     logger: KSPLogger,
     functionsMiner: FunctionsMiner
-) : CodeBlockFactory {
-
-    private val generator : Generator = Generator(resolver, logger, functionsMiner, this)
+) : Generator(resolver, logger, functionsMiner) {
 
     override fun resolveSupertype(): String = "Mock"
 
@@ -72,12 +74,61 @@ class MockGenerator(
         functionBuilder.addStatement(statementString, *(argsValue.toTypedArray()))
     }
 
+    override fun decoratePropertyGetter(classToMock: KSClassDeclaration, property: KSPropertyDeclaration, propertyBuilder: PropertySpec.Builder, typeResolver: Map<KSTypeParameter, KSTypeArgument>) {
+        val getterBuilder = FunSpec.getterBuilder()
+        val mockFunction = MemberName("com.careem.mockingbird.test", MOCK)
+        val getterArgsValue = mutableListOf(
+            mockFunction,
+            MemberName(
+                "",
+                adjustPropertyName(true, property.simpleName.getShortName())
+            )
+        )
+        val getterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
+        val getterStatementString = """
+            return %M(
+                ${getterCodeBlocks.joinToString(separator = ",\n")}
+            )
+        """.trimIndent()
+        getterBuilder.addStatement(getterStatementString, *(getterArgsValue.toTypedArray()))
+        propertyBuilder.getter(getterBuilder.build())
+    }
+
+    override fun decoratePropertySetter(classToMock: KSClassDeclaration, property: KSPropertyDeclaration, propertyBuilder: PropertySpec.Builder, typeResolver: Map<KSTypeParameter, KSTypeArgument>) {
+        val setterBuilder = FunSpec.setterBuilder()
+        val mockUnitFunction = MemberName("com.careem.mockingbird.test", MOCK_UNIT)
+        val setterArgsValue = mutableListOf(
+            mockUnitFunction,
+            MemberName(
+                "",
+                adjustPropertyName(false, property.simpleName.getShortName())
+            ),
+            MemberName("", PROPERTY_SETTER_VALUE),
+            PROPERTY_SETTER_VALUE
+        )
+
+        val v = mutableListOf<String>().apply {
+            add("Property.%M to %L")
+        }
+        val args = v.joinToString(separator = ",")
+        val setterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
+        setterCodeBlocks.add("arguments = mapOf($args)")
+        val setterStatementString = """
+            return %M(
+                ${setterCodeBlocks.joinToString(separator = ",\n")}
+            )
+        """.trimIndent()
+        setterBuilder
+            .addParameter("value", property.type.toTypeNameResolved(typeResolver))
+            .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
+        propertyBuilder
+            .mutable()
+            .setter(setterBuilder.build())
+    }
 
     override fun decorateConstructor(classToMock: KSClassDeclaration, classBuilder: TypeSpec.Builder) {
         // No extra constructor parameters
     }
-
-    fun createClass(ksTypeRef: KSTypeReference): FileSpec = generator.createClass(ksTypeRef)
 
     companion object {
         private const val MOCK_UNIT = "mockUnit"

@@ -20,6 +20,9 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -32,9 +35,7 @@ class SpyGenerator(
     resolver: Resolver,
     logger: KSPLogger,
     functionsMiner: FunctionsMiner
-) : CodeBlockFactory {
-
-    private val generator: Generator = Generator(resolver, logger, functionsMiner, this)
+) : Generator(resolver, logger, functionsMiner) {
 
     override fun resolveSupertype(): String = "Spy"
 
@@ -81,7 +82,7 @@ class SpyGenerator(
             "delegate = { ${
                 classToMock.simpleName.getShortName().replaceFirstChar(Char::lowercase)
             }.%M(${function.parameters.joinToString(",") { it.name!!.getShortName() }}) }"
-        ) // TODO fill here
+        )
         val statementString = """
             return %M(
                 ${codeBlocks.joinToString(separator = ",\n")}
@@ -91,7 +92,85 @@ class SpyGenerator(
         functionBuilder.addStatement(statementString, *(argsValue.toTypedArray()))
     }
 
-    fun createClass(ksTypeRef: KSTypeReference): FileSpec = generator.createClass(ksTypeRef)
+    override fun decoratePropertyGetter(
+        classToMock: KSClassDeclaration,
+        property: KSPropertyDeclaration,
+        propertyBuilder: PropertySpec.Builder,
+        typeResolver: Map<KSTypeParameter, KSTypeArgument>
+    ) {
+        val getterBuilder = FunSpec.getterBuilder()
+        val mockFunction = MemberName("com.careem.mockingbird.test", SPY)
+        val getterArgsValue = mutableListOf(
+            mockFunction,
+            MemberName(
+                "",
+                adjustPropertyName(true, property.simpleName.getShortName())
+            ),
+            MemberName(
+                "",
+                property.simpleName.getShortName()
+            )
+        )
+        val getterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
+        getterCodeBlocks.add(
+            "delegate = { ${
+                classToMock.simpleName.getShortName().replaceFirstChar(Char::lowercase)
+            }.%M }"
+        )
+        val getterStatementString = """
+            return %M(
+                ${getterCodeBlocks.joinToString(separator = ",\n")}
+            )
+        """.trimIndent()
+        getterBuilder.addStatement(getterStatementString, *(getterArgsValue.toTypedArray()))
+        propertyBuilder.getter(getterBuilder.build())
+    }
+
+    override fun decoratePropertySetter(
+        classToMock: KSClassDeclaration,
+        property: KSPropertyDeclaration,
+        propertyBuilder: PropertySpec.Builder,
+        typeResolver: Map<KSTypeParameter, KSTypeArgument>
+    ) {
+        val setterBuilder = FunSpec.setterBuilder()
+        val mockUnitFunction = MemberName("com.careem.mockingbird.test", SPY)
+        val setterArgsValue = mutableListOf(
+            mockUnitFunction,
+            MemberName(
+                "",
+                adjustPropertyName(false, property.simpleName.getShortName())
+            ),
+            MemberName("", PROPERTY_SETTER_VALUE),
+            PROPERTY_SETTER_VALUE,
+            MemberName(
+                "",
+                property.simpleName.getShortName()
+            )
+        )
+
+        val v = mutableListOf<String>().apply {
+            add("Property.%M to %L")
+        }
+        val args = v.joinToString(separator = ",")
+        val setterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
+        setterCodeBlocks.add("arguments = mapOf($args)")
+        setterCodeBlocks.add(
+            "delegate = { ${
+                classToMock.simpleName.getShortName().replaceFirstChar(Char::lowercase)
+            }.%M = value }"
+        )
+        val setterStatementString = """
+            return %M(
+                ${setterCodeBlocks.joinToString(separator = ",\n")}
+            )
+        """.trimIndent()
+        setterBuilder
+            .addParameter("value", property.type.toTypeNameResolved(typeResolver))
+            .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
+        propertyBuilder
+            .mutable()
+            .setter(setterBuilder.build())
+    }
 
     companion object {
         private const val SPY = "spy"

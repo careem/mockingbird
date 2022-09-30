@@ -37,12 +37,11 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toKModifier
 import com.squareup.kotlinpoet.ksp.toTypeName
 
-class Generator constructor(
+abstract class Generator constructor(
     private val resolver: Resolver,
     private val logger: KSPLogger,
     private val functionsMiner: FunctionsMiner,
-    private val codeBlockFactory: CodeBlockFactory
-) {
+): CodeBlockFactory {
 
     fun createClass(ksTypeRef: KSTypeReference): FileSpec {
 
@@ -60,19 +59,19 @@ class Generator constructor(
 
         val packageName = className.packageName
         val externalClass =
-            resolver.getClassDeclarationByName(resolver.getKSNameFromString("com.careem.mockingbird.test.${codeBlockFactory.resolveSupertype()}"))
+            resolver.getClassDeclarationByName(resolver.getKSNameFromString("com.careem.mockingbird.test.${resolveSupertype()}"))
 
         logger.info("Generating mocks for $simpleName")
 
         val (functionsToMock, propertiesToMock) = functionsMiner.extractFunctionsAndProperties(ksClassDeclaration)
 
-        val mockClassBuilder = TypeSpec.classBuilder("${simpleName}${classGenerics}${codeBlockFactory.resolveSupertype()}")
+        val mockClassBuilder = TypeSpec.classBuilder("${simpleName}${classGenerics}${resolveSupertype()}")
             .addType(functionsToMock.buildMethodObject())
             .addType(functionsToMock.buildArgObject())
             .addType(propertiesToMock.buildPropertyObject())
             .addSuperinterface(classToMock.toTypeName())
             .addSuperinterface(externalClass!!.toClassName())
-        codeBlockFactory.decorateConstructor(ksClassDeclaration, mockClassBuilder)
+        decorateConstructor(ksClassDeclaration, mockClassBuilder)
 
         ksClassDeclaration.modifiers.filter {
             it == Modifier.PUBLIC || it == Modifier.INTERNAL || it == Modifier.PROTECTED || it == Modifier.PRIVATE
@@ -96,12 +95,12 @@ class Generator constructor(
         mockClassBuilder.addProperty(uuid)
 
         propertiesToMock.forEach { property ->
-            mockProperty(typeResolver, mockClassBuilder, property)
+            mockProperty(ksClassDeclaration, typeResolver, mockClassBuilder, property)
         }
 
         val mockedClass = mockClassBuilder.build()
 
-        return FileSpec.builder(packageName, "${simpleName}${codeBlockFactory.resolveSupertype()}")
+        return FileSpec.builder(packageName, "${simpleName}${resolveSupertype()}")
             .addType(mockedClass)
             .build()
     }
@@ -173,7 +172,7 @@ class Generator constructor(
         return propertyObjectBuilder.build()
     }
 
-    private fun adjustPropertyName(isGetter: Boolean, rawName: String): String {
+    internal fun adjustPropertyName(isGetter: Boolean, rawName: String): String {
         val prefix = if (isGetter) {
             if (rawName.startsWith("is", ignoreCase = true)) ""
             else "get"
@@ -209,6 +208,7 @@ class Generator constructor(
     }
 
     private fun mockProperty(
+        classToMock: KSClassDeclaration,
         typeResolver: Map<KSTypeParameter, KSTypeArgument>,
         mockClassBuilder: TypeSpec.Builder,
         property: KSPropertyDeclaration
@@ -221,55 +221,11 @@ class Generator constructor(
                 KModifier.OVERRIDE
             )
         if (property.getter != null) {
-            val getterBuilder = FunSpec.getterBuilder()
-            val mockFunction = MemberName("com.careem.mockingbird.test", MOCK)
-            val getterArgsValue = mutableListOf(
-                mockFunction,
-                MemberName(
-                    "",
-                    adjustPropertyName(true, property.simpleName.getShortName())
-                )
-            )
-            val getterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
-            val getterStatementString = """
-            return %M(
-                ${getterCodeBlocks.joinToString(separator = ",\n")}
-            )
-        """.trimIndent()
-            getterBuilder.addStatement(getterStatementString, *(getterArgsValue.toTypedArray()))
-            propertyBuilder.getter(getterBuilder.build())
+            decoratePropertyGetter(classToMock, property, propertyBuilder, typeResolver)
         }
 
         if (property.setter != null) {
-            val setterBuilder = FunSpec.setterBuilder()
-            val mockUnitFunction = MemberName("com.careem.mockingbird.test", MOCK_UNIT)
-            val setterArgsValue = mutableListOf(
-                mockUnitFunction,
-                MemberName(
-                    "",
-                    adjustPropertyName(false, property.simpleName.getShortName())
-                ),
-                MemberName("", PROPERTY_SETTER_VALUE),
-                PROPERTY_SETTER_VALUE
-            )
-
-            val v = mutableListOf<String>().apply {
-                add("Property.%M to %L")
-            }
-            val args = v.joinToString(separator = ",")
-            val setterCodeBlocks = mutableListOf("methodName = ${PROPERTY}.%M")
-            setterCodeBlocks.add("arguments = mapOf($args)")
-            val setterStatementString = """
-            return %M(
-                ${setterCodeBlocks.joinToString(separator = ",\n")}
-            )
-        """.trimIndent()
-            setterBuilder
-                .addParameter("value", property.type.toTypeNameResolved(typeResolver))
-                .addStatement(setterStatementString, *(setterArgsValue.toTypedArray()))
-            propertyBuilder
-                .mutable()
-                .setter(setterBuilder.build())
+            decoratePropertySetter(classToMock, property, propertyBuilder, typeResolver)
         }
 
         mockClassBuilder.addProperty(propertyBuilder.build())
@@ -333,17 +289,15 @@ class Generator constructor(
     }
 
     private fun FunSpec.Builder.addMockStatement(classToMock: KSClassDeclaration, function: KSFunctionDeclaration, isUnit: Boolean) {
-        codeBlockFactory.decorateFunctionBody(classToMock, function, isUnit, this)
+        decorateFunctionBody(classToMock, function, isUnit, this)
     }
 
     companion object {
         private const val METHOD = "Method"
         private const val ARG = "Arg"
-        private const val PROPERTY = "Property"
-        private const val MOCK = "mock" // TODO remove
-        private const val MOCK_UNIT = "mockUnit" // TODO remove
+        internal const val PROPERTY = "Property"
 
-        private const val PROPERTY_SETTER_VALUE = "value"
+        internal const val PROPERTY_SETTER_VALUE = "value"
     }
 
 }
