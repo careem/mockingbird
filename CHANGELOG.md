@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Fixing double mock generation crash
 
 ## 2.8.0
 * Bumping dependencies and migration to Kotlin 1.7.10
