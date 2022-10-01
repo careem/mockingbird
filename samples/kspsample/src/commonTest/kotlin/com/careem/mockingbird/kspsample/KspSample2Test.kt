@@ -22,10 +22,10 @@ import kotlin.test.assertNotNull
 
 class KspSample2Test {
     @Mock
-    val pippoMock: PippoSample = PippoSampleMock()
+    val pippoMock: PippoSample = PippoSampleMock() // This class was requested to be mocked also on the other test file
 
     @Mock
-    val usedOnceMock: UsedOnce = UsedOnceMock()
+    val usedOnceMock: UsedOnce = UsedOnceMock() // Used to validate a class to mock that is used only on this test
 
     @Test
     fun testGeneratedTargetProjectMock() {
