@@ -21,13 +21,8 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
-import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
-import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.ksp.toClassName
-import com.squareup.kotlinpoet.ksp.toTypeName
 import com.squareup.kotlinpoet.ksp.writeTo
 
 class GenerateMocksSymbolProcessor(
@@ -41,15 +36,21 @@ class GenerateMocksSymbolProcessor(
     override fun process(resolver: Resolver): List<KSAnnotated> {
         functionsMiner = FunctionsMiner()
         mockGenerator = MockGenerator(resolver, logger, functionsMiner)
-
-        val fields = resolver.getSymbolsWithAnnotation(MOCK_ANNOTATION)
-        fields.forEach { set ->
-            if (set !is KSPropertyDeclaration) error("$set is not a property declaration but is annotated with @Mock, not supported")
-            mockGenerator.createClass(set.type).writeTo(
-                codeGenerator = codeGenerator,
-                aggregating = false
-            )
-        }
+        resolver.getSymbolsWithAnnotation(MOCK_ANNOTATION)
+            .map {
+                if (it !is KSPropertyDeclaration) error("$it is not a property declaration but is annotated with @Mock, not supported")
+                it.type
+            }
+            .distinctBy {
+                it.resolve().toClassName().canonicalName
+            }
+            .forEach {
+                logger.info(it.resolve().toClassName().canonicalName)
+                mockGenerator.createClass(it).writeTo(
+                    codeGenerator = codeGenerator,
+                    aggregating = false
+                )
+            }
         return emptyList()
     }
 
