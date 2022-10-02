@@ -71,7 +71,7 @@ abstract class Generator constructor(
             .addType(propertiesToMock.buildPropertyObject())
             .addSuperinterface(classToMock.toTypeName())
             .addSuperinterface(externalClass!!.toClassName())
-        decorateConstructor(ksClassDeclaration, mockClassBuilder)
+        decorateConstructor(classToMock, mockClassBuilder)
 
         ksClassDeclaration.modifiers.filter {
             it == Modifier.PUBLIC || it == Modifier.INTERNAL || it == Modifier.PROTECTED || it == Modifier.PRIVATE

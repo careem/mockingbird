@@ -21,10 +21,9 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSTypeParameter
-import com.google.devtools.ksp.symbol.KSTypeReference
-import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
@@ -74,7 +73,12 @@ class MockGenerator(
         functionBuilder.addStatement(statementString, *(argsValue.toTypedArray()))
     }
 
-    override fun decoratePropertyGetter(classToMock: KSClassDeclaration, property: KSPropertyDeclaration, propertyBuilder: PropertySpec.Builder, typeResolver: Map<KSTypeParameter, KSTypeArgument>) {
+    override fun decoratePropertyGetter(
+        classToMock: KSClassDeclaration,
+        property: KSPropertyDeclaration,
+        propertyBuilder: PropertySpec.Builder,
+        typeResolver: Map<KSTypeParameter, KSTypeArgument>
+    ) {
         val getterBuilder = FunSpec.getterBuilder()
         val mockFunction = MemberName("com.careem.mockingbird.test", MOCK)
         val getterArgsValue = mutableListOf(
@@ -94,7 +98,12 @@ class MockGenerator(
         propertyBuilder.getter(getterBuilder.build())
     }
 
-    override fun decoratePropertySetter(classToMock: KSClassDeclaration, property: KSPropertyDeclaration, propertyBuilder: PropertySpec.Builder, typeResolver: Map<KSTypeParameter, KSTypeArgument>) {
+    override fun decoratePropertySetter(
+        classToMock: KSClassDeclaration,
+        property: KSPropertyDeclaration,
+        propertyBuilder: PropertySpec.Builder,
+        typeResolver: Map<KSTypeParameter, KSTypeArgument>
+    ) {
         val setterBuilder = FunSpec.setterBuilder()
         val mockUnitFunction = MemberName("com.careem.mockingbird.test", MOCK_UNIT)
         val setterArgsValue = mutableListOf(
@@ -126,7 +135,7 @@ class MockGenerator(
             .setter(setterBuilder.build())
     }
 
-    override fun decorateConstructor(classToMock: KSClassDeclaration, classBuilder: TypeSpec.Builder) {
+    override fun decorateConstructor(classToMock: KSType, classBuilder: TypeSpec.Builder) {
         // No extra constructor parameters
     }
 

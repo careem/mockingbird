@@ -57,13 +57,11 @@ class KspSampleSpyTest {
     @Spy
     lateinit var innerInnerInterface: InnerInnerInterface
 
-//    @Spy
-//    lateinit var uiDelegate: UiDelegate<UiState>
-// FIXME this is not working
+    @Spy
+    lateinit var uiDelegate: UiDelegate<UiState>
 
-//    @Spy
-//    lateinit var uiDelegate2Args: UiDelegate2Args<UiState, Value>
-// FIXME this is not working
+    @Spy
+    lateinit var uiDelegate2Args: UiDelegate2Args<UiState, Value>
 
     @Test
     fun test(){

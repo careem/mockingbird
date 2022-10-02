@@ -21,15 +21,15 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSTypeParameter
-import com.google.devtools.ksp.symbol.KSTypeReference
-import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.toClassName
+import com.squareup.kotlinpoet.ksp.toTypeName
 
 class SpyGenerator(
     resolver: Resolver,
@@ -39,9 +39,9 @@ class SpyGenerator(
 
     override fun resolveSupertype(): String = "Spy"
 
-    override fun decorateConstructor(classToMock: KSClassDeclaration, classBuilder: TypeSpec.Builder) {
-        val className = classToMock.toClassName()
-        val propertyName = className.simpleName.replaceFirstChar(Char::lowercase)
+    override fun decorateConstructor(classToMock: KSType, classBuilder: TypeSpec.Builder) {
+        val className = classToMock.toTypeName()
+        val propertyName = (classToMock.declaration as KSClassDeclaration).toClassName().simpleName.replaceFirstChar(Char::lowercase)
         classBuilder
             .primaryConstructor(
                 FunSpec.constructorBuilder()

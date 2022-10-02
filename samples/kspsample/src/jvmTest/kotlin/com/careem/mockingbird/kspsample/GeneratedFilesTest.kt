@@ -63,11 +63,11 @@ class GeneratedFilesTest {
     val uiDelegate2Args: UiDelegate2Args<UiState, Value> = UiDelegate2Args_UiState_ValueMock()
 
     @Test
-    fun testFileGeneration() {
+    fun testMockFileGeneration() {
         val expectFolder = expectedCodeGenFolder()
         val actualFolder = actualCodeGenFolder()
 
-        assertEquals(actualFolder.listFiles()!!.size, expectFolder.listFiles()!!.size)
+        assertEquals(actualFolder.listFiles()!!.filter { it.name.endsWith("Mock.kt") }.size, expectFolder.listFiles()!!.size)
 
         expectFolder.listFiles()!!.forEach { expect ->
             val actual = lookUpActual(actualFolder, expect)
