@@ -17,6 +17,7 @@
 package com.careem.mockingbird.kspsample
 
 import com.careem.mockingbird.test.annotations.Mock
+import com.careem.mockingbird.test.annotations.Spy
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
@@ -62,20 +63,75 @@ class GeneratedFilesTest {
     @Mock
     val uiDelegate2Args: UiDelegate2Args<UiState, Value> = UiDelegate2Args_UiState_ValueMock()
 
+    @Spy
+    lateinit var outerInterfaceSpy: OuterInterface
+
+    @Spy
+    lateinit var multipleGetterPropertiesSpy: MultipleGetterProperties
+
+    @Spy
+    lateinit var mockWithExternalDependenciesSpy: MockWithExternalDependencies
+
+    @Spy
+    lateinit var mock1Spy: Mock1
+
+    @Spy
+    lateinit var lambdaSampleSpy: LambdaSample
+
+    @Spy
+    lateinit var javaTypesSpy: JavaTypes
+
+    @Spy
+    internal lateinit var internalSampleInterfaceSpy: InternalSampleInterface
+
+    @Spy
+    lateinit var interfaceWithGenericsSpy: InterfaceWithGenerics
+
+    @Spy
+    lateinit var innerInterfaceSpy: InnerInterface
+
+    @Spy
+    lateinit var innerInnerInterfaceSpy: InnerInnerInterface
+
+    @Spy
+    lateinit var uiDelegateSpy: UiDelegate<UiState>
+
+    @Spy
+    lateinit var uiDelegate2ArgsSpy: UiDelegate2Args<UiState, Value>
+
     @Test
     fun testMockFileGeneration() {
-        val expectFolder = expectedCodeGenFolder()
+        val expectFolder = expectedCodeGenFolder("mocks")
         val actualFolder = actualCodeGenFolder()
 
-        assertEquals(actualFolder.listFiles()!!.filter { it.name.endsWith("Mock.kt") }.size, expectFolder.listFiles()!!.size)
+        val actualMockFiles = actualFolder.listFiles()!!.filter { it.name.endsWith("Mock.kt") }
+        val expectMockFiles = expectFolder.listFiles()!!.filter { it.name.endsWith("Mock.kt") }
 
-        expectFolder.listFiles()!!.forEach { expect ->
+        assertEquals(actualMockFiles.size, expectMockFiles.size)
+
+        expectMockFiles.forEach { expect ->
             val actual = lookUpActual(actualFolder, expect)
             assertEquals(expect.readText(), actual.readText())
         }
     }
 
-    private fun expectedCodeGenFolder(): File = File("src/jvmTest/resources/mocks/com/careem/mockingbird/kspsample")
+    @Test
+    fun testSpyFileGeneration() {
+        val expectFolder = expectedCodeGenFolder("spies")
+        val actualFolder = actualCodeGenFolder()
+
+        val actualSpyFiles = actualFolder.listFiles()!!.filter { it.name.endsWith("Spy.kt") }
+        val expectSpyFiles = expectFolder.listFiles()!!.filter { it.name.endsWith("Spy.kt") }
+
+        assertEquals(actualSpyFiles.size, expectSpyFiles.size)
+
+        expectSpyFiles.forEach { expect ->
+            val actual = lookUpActual(actualFolder, expect)
+            assertEquals(expect.readText(), actual.readText())
+        }
+    }
+
+    private fun expectedCodeGenFolder(type: String): File = File("src/jvmTest/resources/$type/com/careem/mockingbird/kspsample")
     private fun actualCodeGenFolder(): File = File("build/generated/ksp/jvm/jvmTest/kotlin/com/careem/mockingbird/kspsample")
     private fun lookUpActual(actualFolder: File, expectFile: File): File {
         return File("${actualFolder.path}/${expectFile.name}")

@@ -17,7 +17,6 @@
 package com.careem.mockingbird.kspsample
 
 import com.careem.mockingbird.test.annotations.Mock
-import com.careem.mockingbird.test.annotations.Spy
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
