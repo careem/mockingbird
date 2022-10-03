@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.9.0
 * Support Spies code generation ( suspend functions are not supported )
 * Adding test to cover code generation regression using Ksp
 
