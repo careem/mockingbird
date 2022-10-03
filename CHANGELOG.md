@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Adding test to cover code generation regression using Ksp
 
 ## 2.8.1
 * Fixing double mock generation crash
