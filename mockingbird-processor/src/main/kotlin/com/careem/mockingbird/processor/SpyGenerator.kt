@@ -61,7 +61,12 @@ class SpyGenerator(
         isUnit: Boolean,
         functionBuilder: FunSpec.Builder
     ) {
-        val mockUnit = MemberName("com.careem.mockingbird.test", SPY)
+        val spyFunction = if (function.isSuspend()) {
+            SUSPEND_SPY
+        } else {
+            SPY
+        }
+        val mockUnit = MemberName("com.careem.mockingbird.test", spyFunction)
         val v = mutableListOf<String>()
         for (i in function.parameters.indices) {
             v.add("Arg.%M to %L")
@@ -174,5 +179,6 @@ class SpyGenerator(
 
     companion object {
         private const val SPY = "spy"
+        private const val SUSPEND_SPY = "suspendSpy"
     }
 }

@@ -41,7 +41,7 @@ abstract class Generator constructor(
     private val resolver: Resolver,
     private val logger: KSPLogger,
     private val functionsMiner: FunctionsMiner,
-): CodeBlockFactory {
+) : CodeBlockFactory {
 
     fun createClass(ksTypeRef: KSTypeReference): FileSpec {
 
@@ -237,10 +237,14 @@ abstract class Generator constructor(
         return buildList {
             getFunctionVisibility(function.modifiers)?.let { add(it) }
             add(KModifier.OVERRIDE)
-            if (function.modifiers.contains(Modifier.SUSPEND)) {
+            if (function.isSuspend()) {
                 add(KModifier.SUSPEND)
             }
         }
+    }
+
+    protected fun KSFunctionDeclaration.isSuspend(): Boolean {
+        return this.modifiers.contains(Modifier.SUSPEND)
     }
 
     private fun getFunctionVisibility(modifiers: Set<Modifier>) =
@@ -288,7 +292,11 @@ abstract class Generator constructor(
         }
     }
 
-    private fun FunSpec.Builder.addMockStatement(classToMock: KSClassDeclaration, function: KSFunctionDeclaration, isUnit: Boolean) {
+    private fun FunSpec.Builder.addMockStatement(
+        classToMock: KSClassDeclaration,
+        function: KSFunctionDeclaration,
+        isUnit: Boolean
+    ) {
         decorateFunctionBody(classToMock, function, isUnit, this)
     }
 

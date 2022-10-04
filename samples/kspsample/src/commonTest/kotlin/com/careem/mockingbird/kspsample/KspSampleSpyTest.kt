@@ -17,56 +17,20 @@
 package com.careem.mockingbird.kspsample
 
 import com.careem.mockingbird.test.annotations.Spy
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.assertEquals
+import com.careem.mockingbird.test.every
+import com.careem.mockingbird.test.any
 
 class KspSampleSpyTest {
 
-    val pippoSample = object : PippoSample{
-        override val currentSession: Int
-            get() = TODO("Not yet implemented")
-        override var currentMutableSession: Int
-            get() = TODO("Not yet implemented")
-            set(value) {}
+    @Spy
+    val suspendInterfaceSpy: SuspendInterface = SuspendInterfaceSpy(SuspendInterfaceImpl())
 
-        override fun showRandom(): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun sayHi() {
-            TODO("Not yet implemented")
-        }
-
-        override fun sayHiWith(param: String) {
-            TODO("Not yet implemented")
-        }
-
-        override fun sayHiWith(param: String, someOtherParam: Boolean) {
-            TODO("Not yet implemented")
-        }
-
-        override fun sayHiWithCommonParam(param: String, intParam: Int) {
-            TODO("Not yet implemented")
-        }
-
-        override fun sayHiWith(param: String, map: Map<String, String>) {
-            TODO("Not yet implemented")
-        }
-
-        override fun sayHiWith(param: String, entry: Map.Entry<String, String>) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun thisIsSuspend(param: String, intParam: Int) {
-            TODO("Not yet implemented")
-        }
-    }
-
-//    @Spy
-//    lateinit var pippoMock: PippoSample
-
-    val pippoSpy: PippoSample = PippoSample2Spy(pippoSample)
+    @Spy
+    lateinit var pippoSampleSpy: PippoSample
 
     @Spy
     lateinit var outerInterfaceSpy: OuterInterface
@@ -105,8 +69,29 @@ class KspSampleSpyTest {
     lateinit var uiDelegate2Args: UiDelegate2Args<UiState, Value>
 
     @Test
-    fun test(){
-        assertNull(null)
+    fun testSuspendSpy() = runBlocking {
+        // Verify delegate suspend is working
+        val suspendResult = suspendInterfaceSpy.suspendFunction("a")
+        assertEquals("defered", suspendResult)
+
+        // Verifying mocking the spy works as expected
+        suspendInterfaceSpy.every(
+            methodName = SuspendInterfaceSpy.Method.suspendFunction,
+            arguments = mapOf(SuspendInterfaceSpy.Arg.a to any())
+        ){
+            "mocked"
+        }
+        val suspendResultMocked = suspendInterfaceSpy.suspendFunction("a")
+        assertEquals("mocked", suspendResultMocked)
+
+
+    }
+
+    class SuspendInterfaceImpl : SuspendInterface {
+        override suspend fun suspendFunction(a: String): String {
+            delay(1)
+            return "defered"
+        }
     }
 
 }
