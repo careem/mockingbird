@@ -270,7 +270,6 @@ class MockGenerator constructor(
         mockClassBuilder.addProperty(propertyBuilder.build())
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun buildFunctionModifiers(
         function: KmFunction
     ): List<KModifier> {
