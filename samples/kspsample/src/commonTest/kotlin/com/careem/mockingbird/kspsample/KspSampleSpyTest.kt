@@ -23,9 +23,50 @@ import kotlin.test.assertNull
 
 class KspSampleSpyTest {
 
+    val pippoSample = object : PippoSample{
+        override val currentSession: Int
+            get() = TODO("Not yet implemented")
+        override var currentMutableSession: Int
+            get() = TODO("Not yet implemented")
+            set(value) {}
+
+        override fun showRandom(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun sayHi() {
+            TODO("Not yet implemented")
+        }
+
+        override fun sayHiWith(param: String) {
+            TODO("Not yet implemented")
+        }
+
+        override fun sayHiWith(param: String, someOtherParam: Boolean) {
+            TODO("Not yet implemented")
+        }
+
+        override fun sayHiWithCommonParam(param: String, intParam: Int) {
+            TODO("Not yet implemented")
+        }
+
+        override fun sayHiWith(param: String, map: Map<String, String>) {
+            TODO("Not yet implemented")
+        }
+
+        override fun sayHiWith(param: String, entry: Map.Entry<String, String>) {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun thisIsSuspend(param: String, intParam: Int) {
+            TODO("Not yet implemented")
+        }
+    }
+
 //    @Spy
 //    lateinit var pippoMock: PippoSample
-// FIXME suspend function is not working
+
+    val pippoSpy: PippoSample = PippoSample2Spy(pippoSample)
 
     @Spy
     lateinit var outerInterfaceSpy: OuterInterface

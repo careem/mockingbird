@@ -216,6 +216,31 @@ public fun <T : Spy, R> T.spy(
     }
 }
 
+/**
+ * Convenient function to spy methods
+ * @param methodName name of the method that you want to spy
+ * @param arguments map between names and method arguments
+ * @return returns the mocked result for the method call described by arguments above if the method
+ * has been mocked, the result of the real invocation otherwise
+ */
+public suspend fun <T : Spy, R> T.suspendSpy(
+    methodName: String,
+    arguments: Map<String, Any?> = emptyMap(),
+    delegate: suspend () -> R
+): R {
+    val uuid = this.uuid
+    return MockingBird.invocationRecorder().access { recorder ->
+        val invocation = Invocation(methodName = methodName, arguments = arguments)
+        recordInvocation(uuid, recorder, invocation)
+        @Suppress("UNCHECKED_CAST")
+        return@access recorder.getResponse(
+            uuid = uuid,
+            invocation = invocation,
+            relaxed = true
+        ) as R
+    } ?: delegate()
+}
+
 
 public fun <T : Mock> T.uuid(): Lazy<String> {
     return lazy { "${this.hashCode()}-${uuidGenerator.getAndAdd(1)}" }
