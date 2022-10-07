@@ -99,6 +99,12 @@ class GeneratedFilesTest {
     @Spy
     lateinit var uiDelegate2ArgsSpy: UiDelegate2Args<UiState, Value>
 
+    @Spy
+    lateinit var suspendInterfaceSpy: SuspendInterface
+
+    @Spy
+    lateinit var pippoSampleSpy: PippoSample
+
     @Test
     fun testMockFileGeneration() {
         val expectFolder = expectedCodeGenFolder("mocks")
