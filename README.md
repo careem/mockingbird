@@ -105,7 +105,7 @@ example your plugin block could look similar to
 
 ```kotlin
 plugins {
-    id("com.google.devtools.ksp") version "1.6.21-1.0.6"
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
     id("com.careem.mockingbird")
 }
 ```
@@ -128,15 +128,13 @@ To create a spy a similar syntax can be used
 ```kotlin
 class KspSampleSpyTest {
     @Spy
-    lateinit var outerInterfaceSpy: OuterInterface = OuterInterfaceSpy(outerInterfaceRealImpl)
+    val outerInterfaceSpy: OuterInterface = OuterInterfaceSpy(outerInterfaceRealImpl)
 
     ...
 }
 ```
 
 > Note: that you have to pass the real implementation to the spy, this allow to call the real implementation if the function call is not mocked
-
-> WARNING: suspend functions are not supported yet for generated spies
 
 ##### Legacy code generator ( deprecated )
 
@@ -175,7 +173,6 @@ using `generatedMocks` is recommended
 
 #### Latest plugin Limitations
 
-* Only non `suspend` functions can be generated in case of spies
 * Only interfaces can be mocked
 * Only interfaces without `inline` functions can be mocked
 * Only interfaces without `reified` functions can be mocked

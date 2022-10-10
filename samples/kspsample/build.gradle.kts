@@ -37,6 +37,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
+                implementation(libs.kotlinx.coroutines)
                 implementation("com.careem.mockingbird:mockingbird")
             }
         }
