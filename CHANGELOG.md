@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.10.0
 * Adding support for suspend functions on spy code generation
 
 ## 2.9.0
