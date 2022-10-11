@@ -194,7 +194,7 @@ public fun <T : Mock> T.mockUnit(
  * Convenient function to spy methods
  * @param methodName name of the method that you want to spy
  * @param arguments map between names and method arguments
- * @param delegate lambda that will be invoked if no mocked response are present for the function call ( this lambda should delegate the call to the real implementation )
+ * @param delegate lambda that will be invoked if no mocked response is present for the function call (this lambda should delegate the call to the real implementation)
  * @return returns the mocked result for the method call described by arguments above if the method
  * has been mocked, the result of the real invocation otherwise
  */
@@ -221,7 +221,7 @@ public fun <T : Spy, R> T.spy(
  * Convenient function to spy methods
  * @param methodName name of the method that you want to spy
  * @param arguments map between names and method arguments
- * @param delegate lambda that will be invoked if no mocked response are present for the function call ( this lambda should delegate the call to the real implementation )
+ * @param delegate lambda that will be invoked if no mocked response is present for the function call (this lambda should delegate the call to the real implementation)
  * @return returns the mocked result for the method call described by arguments above if the method
  * has been mocked, the result of the real invocation otherwise
  */
