@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Adding doc for `delegate` and removed return type where not needed
 
 ## 2.10.0
 * Adding support for suspend functions on spy code generation

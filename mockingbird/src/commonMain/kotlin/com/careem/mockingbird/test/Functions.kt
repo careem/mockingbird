@@ -57,7 +57,7 @@ public fun <T, R> T.every(
     arguments: Map<String, Any?> = emptyMap(),
     returns: () -> R
 ) {
-    if(this !is Mock) throw IllegalArgumentException("This object is not a mock")
+    if (this !is Mock) throw IllegalArgumentException("This object is not a mock")
     val uuid = this.uuid
     val value = returns()
     MockingBird.invocationRecorder().access { recorder ->
@@ -79,7 +79,7 @@ public fun <T, R> T.everyAnswers(
     arguments: Map<String, Any?> = emptyMap(),
     answer: (Invocation) -> R
 ) {
-    if(this !is Mock) throw IllegalArgumentException("This object is not a mock")
+    if (this !is Mock) throw IllegalArgumentException("This object is not a mock")
     val uuid = this.uuid
     MockingBird.invocationRecorder().access { recorder ->
         recorder.storeAnswer(
@@ -103,7 +103,7 @@ public fun <T> T.verify(
     arguments: Map<String, Any?> = emptyMap(),
     timeoutMillis: Long = 0L
 ) {
-    if(this !is Mock) throw IllegalArgumentException("This object is not a mock")
+    if (this !is Mock) throw IllegalArgumentException("This object is not a mock")
     val elapsedTime = atomic(0L)
     val run = atomic(true)
     while (run.value && elapsedTime.value < timeoutMillis) {
@@ -162,7 +162,7 @@ public fun <T : Mock, R> T.mock(methodName: String, arguments: Map<String, Any?>
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(uuid, recorder, invocation)
         @Suppress("UNCHECKED_CAST")
-        return@access recorder.getResponse(uuid, invocation) as R
+        recorder.getResponse(uuid, invocation) as R
     }
 }
 
@@ -194,6 +194,7 @@ public fun <T : Mock> T.mockUnit(
  * Convenient function to spy methods
  * @param methodName name of the method that you want to spy
  * @param arguments map between names and method arguments
+ * @param delegate lambda that will be invoked if no mocked response are present for the function call ( this lambda should delegate the call to the real implementation )
  * @return returns the mocked result for the method call described by arguments above if the method
  * has been mocked, the result of the real invocation otherwise
  */
@@ -212,7 +213,7 @@ public fun <T : Spy, R> T.spy(
             invocation = invocation,
             relaxed = true
         ) as R
-        return@access mockResponse ?: delegate()
+        mockResponse ?: delegate()
     }
 }
 
@@ -220,6 +221,7 @@ public fun <T : Spy, R> T.spy(
  * Convenient function to spy methods
  * @param methodName name of the method that you want to spy
  * @param arguments map between names and method arguments
+ * @param delegate lambda that will be invoked if no mocked response are present for the function call ( this lambda should delegate the call to the real implementation )
  * @return returns the mocked result for the method call described by arguments above if the method
  * has been mocked, the result of the real invocation otherwise
  */
@@ -233,7 +235,7 @@ public suspend fun <T : Spy, R> T.suspendSpy(
         val invocation = Invocation(methodName = methodName, arguments = arguments)
         recordInvocation(uuid, recorder, invocation)
         @Suppress("UNCHECKED_CAST")
-        return@access recorder.getResponse(
+        recorder.getResponse(
             uuid = uuid,
             invocation = invocation,
             relaxed = true
