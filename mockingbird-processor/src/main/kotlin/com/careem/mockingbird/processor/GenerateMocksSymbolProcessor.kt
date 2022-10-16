@@ -55,14 +55,14 @@ class GenerateMocksSymbolProcessor(
             .map {
                 if (it !is KSPropertyDeclaration) error("$it is not a property declaration but is annotated with @${generator.resolveSupertype()}, not supported")
                 logger.info("Process: ${it.type}")
-                it to it.type
+                it.type
             }
-            .distinctBy { (originalProperty, type) ->
-                originalProperty to type.resolve().toClassName().canonicalName
+            .distinctBy {
+                it.resolve().toClassName().canonicalName
             }
-            .forEach { (_, type) ->
-                logger.info(type.resolve().toClassName().canonicalName)
-                generator.createClass(type).apply {
+            .forEach {
+                logger.info(it.resolve().toClassName().canonicalName)
+                generator.createClass(it).apply {
                     try {
                         writeTo(
                             codeGenerator = codeGenerator,
