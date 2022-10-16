@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+* Workaround issue where mock and spy cache was not invalidated properly
 * Adding doc for `delegate` and removed return type where not needed
 
 ## 2.10.0
