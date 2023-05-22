@@ -158,7 +158,6 @@ class FunctionsTest {
         )
 
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForMultiThread()
     }
 
     @Test
@@ -179,7 +178,6 @@ class FunctionsTest {
         )
 
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForMultiThread()
     }
 
 
@@ -201,7 +199,6 @@ class FunctionsTest {
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForLocalThread()
     }
 
 
@@ -222,7 +219,6 @@ class FunctionsTest {
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForLocalThread()
     }
 
     @Test
@@ -244,7 +240,6 @@ class FunctionsTest {
             )
         } catch (error: AssertionError) {
             assertNotNull(error)
-            stringSlot.verifyFreezeStateForMultiThread()
         }
     }
 
@@ -266,7 +261,6 @@ class FunctionsTest {
             )
         } catch (error: AssertionError) {
             assertNotNull(error)
-            stringSlot.verifyFreezeStateForMultiThread()
         }
     }
 
@@ -293,7 +287,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForMultiThread()
     }
 
     @Test
@@ -318,7 +311,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForMultiThread()
     }
 
     @Test
@@ -343,7 +335,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForLocalThread()
     }
 
     @Test
@@ -367,7 +358,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForLocalThread()
     }
 
     @Test

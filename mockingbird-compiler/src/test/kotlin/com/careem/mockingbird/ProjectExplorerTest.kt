@@ -35,7 +35,7 @@ class ProjectExplorerTest {
 
     @Before
     fun setup() {
-        val testKotlinSourceSet = DefaultKotlinSourceSet(generateTestProject(), TEST_SOURCE_SET)
+        val testKotlinSourceSet = DummyDefaultKotlinSourceSet(generateTestProject(), TEST_SOURCE_SET)
         every { sourceSetResolver.getSourceSetFromKmpExtension(any(), any()) } returns testKotlinSourceSet
         projectExplorer = ProjectExplorer(sourceSetResolver)
     }
@@ -145,4 +145,7 @@ class ProjectExplorerTest {
         private const val TEST_DEPENDENCY_NAME = "testdependency"
         private const val TEST_DEPENDENCY_VERSION = "1.0"
     }
+
+    private class DummyDefaultKotlinSourceSet(project: Project, displayName: String) :
+        DefaultKotlinSourceSet(project, displayName)
 }
