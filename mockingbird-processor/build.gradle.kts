@@ -29,8 +29,25 @@ repositories {
     gradlePluginPortal()
 }
 
+val javaTargetVersion = JavaVersion.VERSION_11
+val kotlinTargetVersion = "1.6"
+
+tasks.withType<JavaCompile>().configureEach {
+    java {
+        sourceCompatibility = javaTargetVersion
+        targetCompatibility = javaTargetVersion
+    }
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-opt-in=kotlin.RequiresOptIn"
+        )
+        apiVersion = kotlinTargetVersion
+        languageVersion = kotlinTargetVersion
+        jvmTarget = javaTargetVersion.majorVersion
+    }
 }
 
 publishing {
