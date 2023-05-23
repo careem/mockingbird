@@ -91,38 +91,6 @@ class FunctionsTest {
     }
 
     @Test
-    fun testMockNotFrozenOnEveryAnswer() {
-        val testMock = MyDependencyMock()
-        testMock.everyAnswers(
-            methodName = MyDependencyMock.Method.method4
-        ) {
-            return@everyAnswers 5
-        }
-
-        assertFalse { testMock.isFrozen }
-    }
-
-
-    @Test
-    fun testMockNotFrozenOnVerify() {
-        val testMock = MyDependencyMock()
-        testMock.everyAnswers(
-            methodName = MyDependencyMock.Method.method4
-        ) {
-            return@everyAnswers 5
-        }
-
-        assertFalse { testMock.isFrozen }
-
-        testMock.method4()
-        assertFalse { testMock.isFrozen }
-        testMock.verify(
-            methodName = MyDependencyMock.Method.method4
-        )
-        assertFalse { testMock.isFrozen }
-    }
-
-    @Test
     fun testEveryAnswer() {
         val testMock = MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)

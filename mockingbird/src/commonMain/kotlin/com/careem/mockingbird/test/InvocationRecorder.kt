@@ -18,10 +18,6 @@ package com.careem.mockingbird.test
 
 internal class InvocationRecorder {
 
-    init {
-        ensureNeverFrozen()
-    }
-
     private val recorder = mutableMapOf<String, MutableList<Invocation>>()
     private val responses = mutableMapOf<String, LinkedHashMap<Invocation, (Invocation) -> Any?>>()
 

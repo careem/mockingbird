@@ -50,7 +50,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
             "-language-version=${libs.versions.kotlinTarget.get()}",
             "-api-version=${libs.versions.kotlinTarget.get()}"
         )
-        jvmTarget = JavaVersion.VERSION_11.majorVersion
+        jvmTarget = JavaVersion.VERSION_17.majorVersion
     }
 }
 
