@@ -42,6 +42,14 @@ buildConfig{
     buildConfigField("String", "VERSION", "\"${project.property("VERSION") as String}\"")
 }
 
+val javaVersion = JavaVersion.VERSION_17
+
+tasks.withType<JavaCompile>().configureEach {
+    java {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+}
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
@@ -50,7 +58,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
             "-language-version=${libs.versions.kotlinTarget.get()}",
             "-api-version=${libs.versions.kotlinTarget.get()}"
         )
-        jvmTarget = JavaVersion.VERSION_17.majorVersion
+        jvmTarget = javaVersion.majorVersion
     }
 }
 
