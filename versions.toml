@@ -1,7 +1,9 @@
 [versions]
+kotlinTarget = "1.6"
+jvmTarget = "1.8"
+
 kotlin = "1.8.21"
 kspVersion = "1.8.21-1.0.11"
-kotlinTarget = "1.6"
 junit = "4.13.1"
 jacoco = "0.8.8"
 stately = "1.2.5"
