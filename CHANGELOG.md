@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## master
+
+## 2.12.0
 * Catching up with latest dependencies
 * Deprecated old memory model support
 
