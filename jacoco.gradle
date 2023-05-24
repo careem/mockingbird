@@ -27,12 +27,12 @@ subprojects {
 def mainSubProject = "mockingbird"
 
 task jacocoTestReport(type: JacocoReport,
-        dependsOn: []) {
+        dependsOn: [":mockingbird:allTests"]) {
     reports {
-        xml.enabled = true
-        html.enabled = true
-        xml.destination = file("${project(":${mainSubProject}").buildDir}/reports/jacoco/jacocoUnitTestReport.xml")
-        html.destination = file("${project(":${mainSubProject}").buildDir}/reports/jacoco/html")
+        xml.required.set(true)
+        html.required.set(true)
+        xml.outputLocation.set(file("${project(":${mainSubProject}").buildDir}/reports/jacoco/jacocoUnitTestReport.xml"))
+        html.outputLocation.set(file("${project(":${mainSubProject}").buildDir}/reports/jacoco/html"))
     }
 
     def srcDirectoryList = []

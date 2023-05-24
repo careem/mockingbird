@@ -38,19 +38,14 @@ repositories {
     gradlePluginPortal()
 }
 
-buildConfig{
+buildConfig {
     buildConfigField("String", "VERSION", "\"${project.property("VERSION") as String}\"")
 }
 
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + listOf(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-language-version=${libs.versions.kotlinTarget.get()}",
-            "-api-version=${libs.versions.kotlinTarget.get()}"
-        )
-        jvmTarget = JavaVersion.VERSION_11.majorVersion
+tasks.withType<JavaCompile>().configureEach {
+    java {
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
     }
 }
 

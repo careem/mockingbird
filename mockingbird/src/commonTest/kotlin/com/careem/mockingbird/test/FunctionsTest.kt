@@ -91,38 +91,6 @@ class FunctionsTest {
     }
 
     @Test
-    fun testMockNotFrozenOnEveryAnswer() {
-        val testMock = MyDependencyMock()
-        testMock.everyAnswers(
-            methodName = MyDependencyMock.Method.method4
-        ) {
-            return@everyAnswers 5
-        }
-
-        assertFalse { testMock.isFrozen }
-    }
-
-
-    @Test
-    fun testMockNotFrozenOnVerify() {
-        val testMock = MyDependencyMock()
-        testMock.everyAnswers(
-            methodName = MyDependencyMock.Method.method4
-        ) {
-            return@everyAnswers 5
-        }
-
-        assertFalse { testMock.isFrozen }
-
-        testMock.method4()
-        assertFalse { testMock.isFrozen }
-        testMock.verify(
-            methodName = MyDependencyMock.Method.method4
-        )
-        assertFalse { testMock.isFrozen }
-    }
-
-    @Test
     fun testEveryAnswer() {
         val testMock = MyDependencyMock()
         val iWillBeSet: AtomicRef<String?> = atomic(null)
@@ -158,7 +126,6 @@ class FunctionsTest {
         )
 
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForMultiThread()
     }
 
     @Test
@@ -179,7 +146,6 @@ class FunctionsTest {
         )
 
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForMultiThread()
     }
 
 
@@ -201,7 +167,6 @@ class FunctionsTest {
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForLocalThread()
     }
 
 
@@ -222,7 +187,6 @@ class FunctionsTest {
             arguments = mapOf(MyDependencyMock.Arg.str to capture(stringSlot))
         )
         assertEquals(TEST_STRING, stringSlot.captured)
-        stringSlot.verifyFreezeStateForLocalThread()
     }
 
     @Test
@@ -244,7 +208,6 @@ class FunctionsTest {
             )
         } catch (error: AssertionError) {
             assertNotNull(error)
-            stringSlot.verifyFreezeStateForMultiThread()
         }
     }
 
@@ -266,7 +229,6 @@ class FunctionsTest {
             )
         } catch (error: AssertionError) {
             assertNotNull(error)
-            stringSlot.verifyFreezeStateForMultiThread()
         }
     }
 
@@ -293,7 +255,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForMultiThread()
     }
 
     @Test
@@ -318,7 +279,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForMultiThread()
     }
 
     @Test
@@ -343,7 +303,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForLocalThread()
     }
 
     @Test
@@ -367,7 +326,6 @@ class FunctionsTest {
         assertEquals(TEST_STRING, capturedList.captured[0])
         assertEquals(TEST_STRING, capturedList.captured[1])
         assertEquals(TEST_STRING, capturedList.captured[2])
-        capturedList.verifyFreezeStateForLocalThread()
     }
 
     @Test

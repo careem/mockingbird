@@ -32,7 +32,7 @@ abstract class JsPlugin : Plugin<Project> {
 
     private fun configureJsCompilation(target: Project) {
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
-            js("js") {
+            js(IR) {
                 nodejs {
                     testTask {
                         useCommonJs()

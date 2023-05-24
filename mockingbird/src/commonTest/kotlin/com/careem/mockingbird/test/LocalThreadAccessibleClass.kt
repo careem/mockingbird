@@ -23,10 +23,6 @@ class LocalThreadAccessibleClass(
     var counter: Int = 0
         private set
 
-    init {
-        ensureNeverFrozen()
-    }
-
     fun execute() {
         myDependency.method6 { counter++ }
     }

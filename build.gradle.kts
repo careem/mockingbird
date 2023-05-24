@@ -39,6 +39,13 @@ allprojects {
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-opt-in=kotlin.RequiresOptIn"
+            )
+            apiVersion = libs.versions.kotlinTarget.get()
+            languageVersion = libs.versions.kotlinTarget.get()
+            jvmTarget = libs.versions.jvmTarget.get()
+
             allWarningsAsErrors = true
         }
     }

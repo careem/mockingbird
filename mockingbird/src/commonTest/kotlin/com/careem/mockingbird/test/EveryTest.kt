@@ -43,20 +43,6 @@ class EveryTest {
     }
 
     @Test
-    fun testMockNotFrozenOnEvery() {
-        val testMock = MyDependencyMock()
-        testMock.every(
-            methodName = MyDependencyMock.Method.method3,
-            arguments = mapOf(
-                MyDependencyMock.Arg.value1 to TEST_INT,
-                MyDependencyMock.Arg.value2 to TEST_INT
-            )
-        ) { 1 }
-
-        assertFalse { testMock.isFrozen }
-    }
-
-    @Test
     fun testEveryWhenNoArgs() {
         val testMock = MyDependencyMock()
         testMock.every(
@@ -82,22 +68,5 @@ class EveryTest {
         val value = testMock.method3(TEST_INT, TEST_INT)
 
         assertEquals(1, value)
-    }
-
-    @Test
-    fun testMockNotFrozenOnMock() {
-        val testMock = MyDependencyMock()
-        testMock.every(
-            methodName = MyDependencyMock.Method.method4
-        ) { 1 }
-        testMock.method4()
-        assertFalse{ testMock.isFrozen }
-    }
-
-    @Test
-    fun testMockNotFrozenOnMockUnit() {
-        val testMock = MyDependencyMock()
-        testMock.method1("str")
-        assertFalse{ testMock.isFrozen }
     }
 }
