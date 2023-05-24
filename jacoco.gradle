@@ -27,7 +27,7 @@ subprojects {
 def mainSubProject = "mockingbird"
 
 task jacocoTestReport(type: JacocoReport,
-        dependsOn: []) {
+        dependsOn: [":mockingbird:compileKotlinJvm"]) {
     reports {
         xml.required.set(true)
         html.required.set(true)
