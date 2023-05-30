@@ -49,6 +49,7 @@ buildscript {
     dependencies {
         classpath(libs.kotlinx.atomicfu.gradle)
         classpath(libs.jacoco.jacoco)
+        classpath(libs.kotlin.gradle)
     }
 }
 
