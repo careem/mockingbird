@@ -23,7 +23,9 @@ apply(from = "jacoco.gradle")
 
 val prop = java.util.Properties().apply {
     val localProp = File(rootProject.rootDir, "local.properties")
-    load(java.io.FileInputStream(localProp))
+    if (localProp.exists()) {
+        load(java.io.FileInputStream(localProp))
+    }
 }
 
 nexusPublishing {
