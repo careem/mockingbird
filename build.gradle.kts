@@ -23,17 +23,7 @@ apply(from = "jacoco.gradle")
 
 val prop = java.util.Properties().apply {
     val localProp = File(rootProject.rootDir, "local.properties")
-    if(localProp.exists()){
-        load(java.io.FileInputStream(localProp))
-    } else {
-        this["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
-        this["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
-        this["sonatypeStagingProfileId"] = System.getenv("SONATYPE_STAGING_PROFILE_ID")
-
-        this["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
-        this["signing.password"] = System.getenv("SIGNING_PASSWORD")
-        this["signing.key"] = System.getenv("SIGNING_KEY")
-    }
+    load(java.io.FileInputStream(localProp))
 }
 
 nexusPublishing {
@@ -41,9 +31,9 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(prop["ossrhUsername"] as String)
-            password.set(prop["ossrhPassword"] as String)
-            stagingProfileId.set(prop["sonatypeStagingProfileId"] as String)
+            username.set((prop["ossrhUsername"] ?: System.getenv("OSSRH_USERNAME")) as String)
+            password.set((prop["ossrhPassword"] ?: System.getenv("OSSRH_PASSWORD")) as String)
+            stagingProfileId.set((prop["sonatypeStagingProfileId"] ?: System.getenv("SONATYPE_STAGING_PROFILE_ID")) as String)
         }
     }
 }
@@ -129,9 +119,9 @@ subprojects {
     pluginManager.withPlugin("signing") {
         extensions.configure<SigningExtension> {
             useInMemoryPgpKeys(
-                prop["signing.keyId"] as String,
-                prop["signing.key"] as String,
-                prop["signing.password"] as String
+                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID")) as String,
+                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD")) as String,
+                (prop["signing.key"] ?: System.getenv("SIGNING_KEY")) as String
             )
             sign(publishing.publications)
         }
