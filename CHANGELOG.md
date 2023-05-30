@@ -3,8 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 ---
-
 ## master
+* Refactoring publication and configuration logic
+
+## 2.12.1
+* Fixed publication
+
+## 2.12.0
 * Catching up with latest dependencies
 * Deprecated old memory model support
 

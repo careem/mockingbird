@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-
 plugins {
     `kotlin-dsl`
     id("com.github.gmazzo.buildconfig") version libs.versions.buildconfig.get()
+    id("maven-publish")
+    signing
 }
-
-apply(from = "../publishing.gradle")
 
 gradlePlugin {
     plugins {
         register("mockingbird") {
             id = "com.careem.mockingbird"
             implementationClass = "com.careem.mockingbird.MockingbirdPlugin"
+            displayName = "mockingbird"
+            description = "mockingbird"
         }
     }
 }
@@ -52,6 +53,14 @@ tasks.withType<JavaCompile>().configureEach {
 val sourcesJar by tasks.registering(Jar::class) {
     from("src/main/kotlin")
     archiveClassifier.set("sources")
+}
+
+publishing {
+    publications {
+        withType<MavenPublication> {
+            artifact(sourcesJar)
+        }
+    }
 }
 
 dependencies {

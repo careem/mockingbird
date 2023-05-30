@@ -22,11 +22,14 @@ plugins {
     id("com.careem.mockingbird")
 }
 
-apply(from = "../../utils.gradle")
-val setupMultiplatformLibrary: Closure<Any> by ext
-setupMultiplatformLibrary(project, false, false)
-
 kotlin {
+    ios()
+    iosSimulatorArm64()
+    jvm()
+//    js(IR) {
+//        nodejs()
+//    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -38,6 +41,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlinx.coroutines)
+                implementation(libs.kotlin.test)
                 implementation("com.careem.mockingbird:mockingbird")
             }
         }

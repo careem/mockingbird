@@ -273,7 +273,7 @@ class MockGenerator constructor(
     private fun buildFunctionModifiers(
         function: KmFunction
     ): List<KModifier> {
-        return buildList {
+        return mutableListOf<KModifier>().apply {
             getFunctionVisibility(function.flags)?.let { add(it) }
             add(KModifier.OVERRIDE)
             if (function.isSuspend) {

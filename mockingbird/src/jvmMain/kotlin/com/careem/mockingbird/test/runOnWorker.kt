@@ -14,25 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import groovy.lang.Closure
+package com.careem.mockingbird.test
 
-plugins{
-    id("org.jetbrains.kotlin.multiplatform")
-}
-
-kotlin {
-    ios()
-    iosSimulatorArm64()
-    jvm()
-//    js(IR) {
-//        nodejs()
-//    }
-
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.kotlinx.atomicfu)
-            }
-        }
-    }
-}
+public actual fun <T> runOnWorker(body: () -> T): T = body()
