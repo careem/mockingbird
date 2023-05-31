@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import groovy.lang.Closure
-
-plugins{
+plugins {
     id("org.jetbrains.kotlin.multiplatform")
+    id("maven-publish")
+    signing
 }
 
-apply(from = "../utils.gradle")
-val setupMultiplatformLibrary: Closure<Any> by ext
-setupMultiplatformLibrary(project, true, true)
-
 kotlin {
+    ios()
+    iosSimulatorArm64()
+    jvm()
+    js(IR) {
+        nodejs()
+    }
+
     explicitApi()
     sourceSets {
         val commonMain by getting {
@@ -34,6 +37,10 @@ kotlin {
                 implementation(libs.kotlinx.coroutines)
                 implementation(libs.kotlin.test)
             }
+        }
+        val iosMain by getting
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
         }
     }
 }

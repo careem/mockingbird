@@ -14,16 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    `kotlin-dsl`
-}
+package com.careem.mockingbird.test
 
-repositories {
-    mavenCentral()
-    google()
-    gradlePluginPortal()
-}
-
-dependencies {
-    implementation(libs.kotlin.gradle)
-}
+public actual fun <T> runOnWorker(body: () -> T): T = body()

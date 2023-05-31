@@ -14,7 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+plugins {
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("maven-publish")
+    signing
+}
 apply(from = "jacoco.gradle")
+
+val prop = java.util.Properties().apply {
+    val localProp = File(rootProject.rootDir, "local.properties")
+    if (localProp.exists()) {
+        load(java.io.FileInputStream(localProp))
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set((prop["ossrhUsername"] ?: System.getenv("OSSRH_USERNAME")) as String)
+            password.set((prop["ossrhPassword"] ?: System.getenv("OSSRH_PASSWORD")) as String)
+            stagingProfileId.set((prop["sonatypeStagingProfileId"] ?: System.getenv("SONATYPE_STAGING_PROFILE_ID")) as String)
+        }
+    }
+}
 
 buildscript {
     repositories {
@@ -25,6 +49,7 @@ buildscript {
     dependencies {
         classpath(libs.kotlinx.atomicfu.gradle)
         classpath(libs.jacoco.jacoco)
+        classpath(libs.kotlin.gradle)
     }
 }
 
@@ -47,6 +72,61 @@ allprojects {
             jvmTarget = libs.versions.jvmTarget.get()
 
             allWarningsAsErrors = true
+        }
+    }
+
+    tasks.withType(AbstractPublishToMaven::class.java).configureEach {
+        dependsOn(tasks.withType(Sign::class.java))
+    }
+}
+
+subprojects {
+    tasks.register<Jar>("javadocJar") {
+        archiveClassifier.set("javadoc")
+    }
+
+    pluginManager.withPlugin("maven-publish") {
+        extensions.configure<PublishingExtension> {
+            publications {
+                withType<MavenPublication> {
+
+                    artifact(tasks.getByName("javadocJar"))
+
+                    pom {
+                        name.set("mockingbird")
+                        description.set("A Koltin multiplatform library that provides an easier way to mock and write unit tests for a multiplatform project")
+                        url.set("https://github.com/careem/mockingbird")
+                        licenses {
+                            license {
+                                name.set("The Apache License, Version 2.0")
+                                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                            }
+                        }
+                        developers {
+                            developer {
+                                organization.set("Careem Inc")
+                                organizationUrl.set("https://careem.com")
+                            }
+                        }
+                        scm {
+                            url.set("https://github.com/careem/mockingbird")
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    pluginManager.withPlugin("signing") {
+        extensions.configure<SigningExtension> {
+            useInMemoryPgpKeys(
+                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID")) as String,
+                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD")) as String,
+                (prop["signing.key"] ?: System.getenv("SIGNING_KEY")) as String
+            )
+            sign(publishing.publications)
         }
     }
 }

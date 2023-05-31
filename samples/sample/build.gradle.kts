@@ -21,11 +21,14 @@ plugins{
     id("com.careem.mockingbird")
 }
 
-apply(from = "../../utils.gradle")
-val setupMultiplatformLibrary: Closure<Any> by ext
-setupMultiplatformLibrary(project, false, false) // TODO extract JsPlugin from buildSrc to be used in other modules
-
 kotlin {
+    ios()
+    iosSimulatorArm64()
+    jvm()
+//    js(IR) {
+//        nodejs()
+//    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -33,6 +36,11 @@ kotlin {
                 implementation(project(":common:sample"))
                 implementation("com.careem.mockingbird:mockingbird")
                 implementation(libs.touchlab.stately.isolate)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
             }
         }
     }

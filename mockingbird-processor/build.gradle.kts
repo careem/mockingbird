@@ -19,9 +19,8 @@
 plugins {
     kotlin("jvm")
     id("maven-publish")
+    signing
 }
-
-apply(from = "../publishing.gradle")
 
 repositories {
     mavenCentral()
@@ -36,17 +35,18 @@ tasks.withType<JavaCompile>().configureEach {
     }
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    from("src/main/kotlin")
+    archiveClassifier.set("sources")
+}
+
 publishing {
     publications {
         create<MavenPublication>("mockingbird-processor") {
             from(components["java"])
+            artifact(sourcesJar)
         }
     }
-}
-
-val sourcesJar by tasks.registering(Jar::class) {
-    from("src/main/kotlin")
-    archiveClassifier.set("sources")
 }
 
 dependencies {
