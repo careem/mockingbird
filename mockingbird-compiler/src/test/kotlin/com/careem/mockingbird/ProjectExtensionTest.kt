@@ -33,12 +33,18 @@ class ProjectExtensionTest {
 
     @Test
     fun testGetClassPath() {
-        assertEquals("${testProject.buildDir}/classes/kotlin/jvm/main", testProject.classPath())
+        assertEquals(
+            "${testProject.layout.buildDirectory.asFile.get().absolutePath}/classes/kotlin/jvm/main",
+            testProject.classPath()
+        )
     }
 
     @Test
     fun testGetThirdPartiesClassPath() {
-        assertEquals("${testProject.buildDir.absolutePath}/dependencies", testProject.thirdPartiesClassPath())
+        assertEquals(
+            "${testProject.layout.buildDirectory.asFile.get().absolutePath}/dependencies",
+            testProject.thirdPartiesClassPath()
+        )
     }
 
     private fun generateTestProject(): Project {

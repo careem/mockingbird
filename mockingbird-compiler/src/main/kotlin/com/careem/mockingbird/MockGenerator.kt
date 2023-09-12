@@ -27,25 +27,23 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
-import com.squareup.kotlinpoet.metadata.isInternal
 import com.squareup.kotlinpoet.metadata.isNullable
-import com.squareup.kotlinpoet.metadata.isPrivate
-import com.squareup.kotlinpoet.metadata.isProtected
-import com.squareup.kotlinpoet.metadata.isPublic
 import com.squareup.kotlinpoet.metadata.isSuspend
-import kotlinx.metadata.Flags
 import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
 import kotlinx.metadata.KmProperty
 import kotlinx.metadata.KmType
+import kotlinx.metadata.Visibility
 import kotlinx.metadata.jvm.getterSignature
 import kotlinx.metadata.jvm.setterSignature
+import kotlinx.metadata.visibility
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 
+// TODO remove suppression once KmFunction is not using deprecated flags
 @OptIn(KotlinPoetMetadataPreview::class)
 class MockGenerator constructor(
     private val classLoader: ClassLoaderWrapper,
@@ -205,7 +203,12 @@ class MockGenerator constructor(
         mockClassBuilder: TypeSpec.Builder,
         property: KmProperty
     ) {
-        logger.debug("===> Mocking Property ${property.getterSignature?.name} and ${property.setterSignature?.name} and ${property.setterSignature}")
+        logger.debug(
+            "===> Mocking Property {} and {} and {}",
+            property.getterSignature?.name,
+            property.setterSignature?.name,
+            property.setterSignature
+        )
         val propertyBuilder = PropertySpec
             .builder(
                 property.name,
@@ -274,7 +277,7 @@ class MockGenerator constructor(
         function: KmFunction
     ): List<KModifier> {
         return mutableListOf<KModifier>().apply {
-            getFunctionVisibility(function.flags)?.let { add(it) }
+            getFunctionVisibility(function.visibility)?.let { add(it) }
             add(KModifier.OVERRIDE)
             if (function.isSuspend) {
                 add(KModifier.SUSPEND)
@@ -282,16 +285,16 @@ class MockGenerator constructor(
         }
     }
 
-    private fun getFunctionVisibility(flags: Flags) =
-        if (flags.isInternal) {
-            KModifier.INTERNAL
-        } else if (flags.isPrivate) {
-            KModifier.PRIVATE
-        } else if (flags.isProtected) {
-            KModifier.PROTECTED
-        } else if (flags.isPublic) {
-            KModifier.PUBLIC
-        } else null
+    private fun getFunctionVisibility(visibility: Visibility) =
+        when (visibility) {
+            Visibility.INTERNAL -> KModifier.INTERNAL
+            Visibility.PRIVATE -> KModifier.PRIVATE
+            Visibility.PROTECTED -> KModifier.PROTECTED
+            Visibility.PUBLIC -> KModifier.PUBLIC
+            Visibility.PRIVATE_TO_THIS -> null
+            Visibility.LOCAL -> null
+        }
+
 
     private fun mockFunction(
         mockClassBuilder: TypeSpec.Builder,

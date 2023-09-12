@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ---
 ## master
 * Refactoring publication and configuration logic
+* Bumping dependencies and migration to Kotlin 1.9.10
 
 ## 2.12.1
 * Fixed publication
