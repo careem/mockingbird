@@ -34,9 +34,9 @@ class MockingbirdPluginKspDelegate {
                 //    in commonTest. The plugin will add this the code generated at point 1 as source set for common test so that
                 //    this code will be available for each platform and resolvable by the IDE
                 target.extensions.configure(KotlinMultiplatformExtension::class.java) {
-                    val firstTargetName = targets.filter { it.targetName != "metadata" }.first().targetName
+                    val firstTargetName = targets.first { it.targetName != "metadata" }.targetName
                     val selectedTargetName =
-                        targets.filter { it.targetName == "jvm" }.firstOrNull()?.targetName ?: firstTargetName
+                        targets.firstOrNull { it.targetName == "jvm" }?.targetName ?: firstTargetName
                     sourceSets.getByName("commonTest") {
                         kotlin.srcDir("build/generated/ksp/$selectedTargetName/${selectedTargetName}Test/kotlin")
                     }

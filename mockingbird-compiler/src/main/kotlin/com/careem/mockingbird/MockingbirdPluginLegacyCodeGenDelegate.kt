@@ -44,7 +44,7 @@ class MockingbirdPluginLegacyCodeGenDelegate {
         projectExplorer = ProjectExplorer(sourceSetResolver)
         try {
             target.afterEvaluate {
-                if(legacyCodeGenRequired(this)){
+                if (legacyCodeGenRequired(this)) {
                     target.gradle.projectsEvaluated {
                         val generateMocksTask = target.task(GradleTasks.GENERATE_MOCKS) {
                             dependsOn(target.tasks.getByName(GradleTasks.JVM_JAR))
@@ -115,7 +115,7 @@ class MockingbirdPluginLegacyCodeGenDelegate {
     }
 
     private fun targetOutputDir(target: Project): File {
-        return File(target.buildDir.absolutePath + File.separator + "generated" + File.separator + "mockingbird")
+        return File(target.layout.buildDirectory.asFile.get().absolutePath + File.separator + "generated" + File.separator + "mockingbird")
     }
 
 
@@ -131,7 +131,7 @@ class MockingbirdPluginLegacyCodeGenDelegate {
         mockGenerator = MockGenerator(classLoader, functionsMiner)
     }
 
-    companion object{
+    companion object {
         private const val EXTENSION_NAME = "mockingBird"
     }
 }

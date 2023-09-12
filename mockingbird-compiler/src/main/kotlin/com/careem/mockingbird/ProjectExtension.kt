@@ -30,13 +30,13 @@ fun Project.fullQualifier(): String{
  * Path where current project will generate .class files
  */
 fun Project.classPath(): String{
-    return "${this.buildDir}/classes/kotlin/jvm/main"
+    return "${this.layout.buildDirectory.asFile.get().absolutePath}/classes/kotlin/jvm/main"
 }
 
 /**
  * Path where the plugin will move dependencies .class files
  */
 fun Project.thirdPartiesClassPath(): String {
-    return this.buildDir.absolutePath + File.separator + "dependencies"
+    return this.layout.buildDirectory.asFile.get().absolutePath + File.separator + "dependencies"
 }
 
