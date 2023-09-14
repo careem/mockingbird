@@ -35,7 +35,6 @@ kotlin {
             dependencies {
                 implementation(project(":common-sample"))
                 implementation(project(":common:sample"))
-                implementation(libs.touchlab.stately.isolate)
             }
         }
         val commonTest by getting {

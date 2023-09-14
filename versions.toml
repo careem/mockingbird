@@ -16,7 +16,8 @@ coroutines = "1.7.3"
 
 [libraries]
 jacoco-jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
-touchlab-stately-isolate = { module = "co.touchlab:stately-isolate", version.ref = "stately" }
+touchlab-stately-concurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
+touchlab-stately-concurrent-collections = { module = "co.touchlab:stately-concurrent-collections", version.ref = "stately" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicFu" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

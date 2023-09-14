@@ -35,7 +35,6 @@ kotlin {
                 implementation(project(":common-sample"))
                 implementation(project(":common:sample"))
                 implementation("com.careem.mockingbird:mockingbird")
-                implementation(libs.touchlab.stately.isolate)
             }
         }
         val commonTest by getting {

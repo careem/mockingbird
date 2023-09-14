@@ -16,57 +16,20 @@
 
 package com.careem.mockingbird.test
 
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
-import kotlin.native.concurrent.SharedImmutable
-import kotlin.native.concurrent.ThreadLocal
 
-@SharedImmutable
-private val mtInvocationRecorder = IsolateStateInvocationRecorderProvider()
+internal const val NEW_MM_MODEL_DEPRECATION_MESSAGE = "This is deprecated with the new Kotlin Native memory model"
 
-@ThreadLocal
-private val localInvocationRecorder = SimpleInvocationRecorderProvider()
+private val defaultInvocationRecorder = SimpleInvocationRecorderProvider()
 
 
+@Deprecated(
+    message = NEW_MM_MODEL_DEPRECATION_MESSAGE,
+    level = DeprecationLevel.WARNING
+)
 public enum class TestMode {
     MULTI_THREAD, LOCAL_THREAD
 }
 
 internal object MockingBird {
-    private val DEFAULT_TEST_MODE = TestMode.MULTI_THREAD
-    private val DEFAULT_STATE = State(
-        mode = DEFAULT_TEST_MODE,
-        canChangeMode = true
-    )
-
-    private val state = atomic(DEFAULT_STATE)
-    internal var mode: TestMode
-        get() = state.value.mode
-        set(value) =
-            state.update {
-                if (!it.canChangeMode) throw UnsupportedOperationException("Test mode cannot be changed after mock interaction")
-                it.copy(mode = value)
-            }
-
-    /**
-     * Reset the test mode configuration, this function should be called on the @After function
-     */
-    internal fun reset() {
-        state.value = DEFAULT_STATE
-    }
-
-    internal fun invocationRecorder(): InvocationRecorderProvider {
-        // the mode must be chosen before any mock once the mode has been chosen and any operation on the mock is executed
-        // you cannot change the mode anymore
-        state.update { it.copy(canChangeMode = false) }
-        return when (mode) {
-            TestMode.LOCAL_THREAD -> localInvocationRecorder
-            TestMode.MULTI_THREAD -> mtInvocationRecorder
-        }
-    }
-
-    private data class State(
-        val mode: TestMode,
-        val canChangeMode: Boolean
-    )
+    internal fun invocationRecorder(): InvocationRecorderProvider = defaultInvocationRecorder
 }
