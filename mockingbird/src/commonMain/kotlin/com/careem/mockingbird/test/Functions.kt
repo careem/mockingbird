@@ -40,11 +40,12 @@ public interface Spy : Mock
  * test allowing you to run a test in a specific mode in isolation.
  * @see README section [Test Mode]
  */
-public fun runWithTestMode(testMode: TestMode, testBlock: () -> Unit) {
-    MockingBird.reset() // Reset in case of test not running using runWithTestMode
-    MockingBird.mode = testMode
+@Deprecated(
+    message = NEW_MM_MODEL_DEPRECATION_MESSAGE,
+    level = DeprecationLevel.WARNING
+)
+public fun runWithTestMode(@Suppress("UNUSED_PARAMETER", "DEPRECATION")  testMode: TestMode, testBlock: () -> Unit) {
     testBlock()
-    MockingBird.reset()
 }
 
 /**

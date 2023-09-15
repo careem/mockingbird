@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
+
 package com.careem.mockingbird.test
 
 import com.careem.mockingbird.test.Mocks.MyDependencyMock
@@ -233,59 +235,10 @@ class FunctionsTest {
     }
 
     @Test
-    fun testCapturedListSucceedDeprecated() {
-        val testMock = MyDependencyMock()
-
-        @Suppress("DEPRECATION")
-        val capturedList = CapturedList<String>()
-        testMock.every(
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
-        ) {}
-
-        testMock.method1(TEST_STRING)
-        testMock.method1(TEST_STRING)
-        testMock.method1(TEST_STRING)
-        testMock.verify(
-            exactly = 3,
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to capture(capturedList))
-        )
-        assertEquals(3, capturedList.captured.size)
-        assertEquals(TEST_STRING, capturedList.captured[0])
-        assertEquals(TEST_STRING, capturedList.captured[1])
-        assertEquals(TEST_STRING, capturedList.captured[2])
-    }
-
-    @Test
     fun testCapturedListSucceed() {
         val testMock = MyDependencyMock()
 
         val capturedList = capturedList<String>()
-        testMock.every(
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
-        ) {}
-
-        testMock.method1(TEST_STRING)
-        testMock.method1(TEST_STRING)
-        testMock.method1(TEST_STRING)
-        testMock.verify(
-            exactly = 3,
-            methodName = MyDependencyMock.Method.method1,
-            arguments = mapOf(MyDependencyMock.Arg.str to capture(capturedList))
-        )
-        assertEquals(3, capturedList.captured.size)
-        assertEquals(TEST_STRING, capturedList.captured[0])
-        assertEquals(TEST_STRING, capturedList.captured[1])
-        assertEquals(TEST_STRING, capturedList.captured[2])
-    }
-
-    @Test
-    fun testCapturedListSucceedOnLocalThreadDeprecated() = runWithTestMode(TestMode.LOCAL_THREAD) {
-        val testMock = MyDependencyMock()
-        @Suppress("DEPRECATION")
-        val capturedList = CapturedList<String>()
         testMock.every(
             methodName = MyDependencyMock.Method.method1,
             arguments = mapOf(MyDependencyMock.Arg.str to TEST_STRING)
@@ -589,6 +542,5 @@ class FunctionsTest {
 
     companion object {
         const val VERIFY_TIMEOUT = 500L
-        const val BUFFER_TIME = 300L
     }
 }

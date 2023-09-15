@@ -16,7 +16,7 @@
  */
 package com.careem.mockingbird.test
 
-import co.touchlab.stately.isolate.IsolateState
+import co.touchlab.stately.collections.ConcurrentMutableList
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
@@ -77,7 +77,8 @@ private class LocalThreadSlot<T> : Slot<T> {
 
 @Deprecated(
     message = "Use different function call instead",
-    replaceWith = ReplaceWith("slot()", "com.careem.mockingbird.test.slot")
+    replaceWith = ReplaceWith("slot()", "com.careem.mockingbird.test.slot"),
+    level = DeprecationLevel.WARNING
 )
 /**
  * A slot using to fetch the method invocation and compare the property inside invocation arguments
@@ -91,12 +92,7 @@ public fun <T> Slot(): Slot<T> {
  * A slot using to fetch the method invocation and compare the property inside invocation arguments
  * Usage example @see [FunctionsTest]
  */
-public fun <T> slot(): Slot<T> {
-    return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> ThreadSafeSlot()
-        TestMode.LOCAL_THREAD -> LocalThreadSlot()
-    }
-}
+public fun <T> slot(): Slot<T> = ThreadSafeSlot()
 
 public interface CapturedList<T> : Captureable {
     public val captured: List<T>
@@ -104,7 +100,8 @@ public interface CapturedList<T> : Captureable {
 
 @Deprecated(
     message = "Use different function call instead",
-    replaceWith = ReplaceWith("capturedList()", "com.careem.mockingbird.test.capturedList")
+    replaceWith = ReplaceWith("capturedList()", "com.careem.mockingbird.test.capturedList"),
+    level = DeprecationLevel.WARNING
 )
 /**
  * A list that using to fetch the method invocation and compare the property inside
@@ -121,30 +118,11 @@ public fun <T> CapturedList(): CapturedList<T> {
  * Usage example @see [FunctionsTest]
  */
 public fun <T> capturedList(): CapturedList<T> {
-    return when (MockingBird.mode) {
-        TestMode.MULTI_THREAD -> ThreadSafeCapturedList()
-        TestMode.LOCAL_THREAD -> LocalThreadCapturedList()
-    }
+    return ThreadSafeCapturedList()
 }
 
 private class ThreadSafeCapturedList<T> : CapturedList<T> {
-
-    private val _captured = IsolateState { mutableListOf<T>() }
-
-    override val captured: List<T>
-        get() {
-            return _captured.access { it.toList() }
-        }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun storeCapturedValue(value: Any?) {
-        _captured.access { it.add(value as T) }
-    }
-}
-
-private class LocalThreadCapturedList<T> : CapturedList<T> {
-
-    private val _captured = mutableListOf<T>()
+    private val _captured = ConcurrentMutableList<T>()
 
     override val captured: List<T>
         get() {
@@ -153,7 +131,7 @@ private class LocalThreadCapturedList<T> : CapturedList<T> {
 
     @Suppress("UNCHECKED_CAST")
     override fun storeCapturedValue(value: Any?) {
-        this._captured.add(value as T)
+        _captured.add(value as T)
     }
 }
 

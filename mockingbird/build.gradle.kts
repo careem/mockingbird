@@ -33,7 +33,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlinx.atomicfu)
-                implementation(libs.touchlab.stately.isolate)
+                implementation(libs.touchlab.stately.concurrency)
+                implementation(libs.touchlab.stately.concurrent.collections)
                 implementation(libs.kotlinx.coroutines)
                 implementation(libs.kotlin.test)
             }

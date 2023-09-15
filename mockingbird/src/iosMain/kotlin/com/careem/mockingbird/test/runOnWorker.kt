@@ -16,10 +16,11 @@
  */
 package com.careem.mockingbird.test
 
+import kotlin.native.concurrent.ObsoleteWorkersApi
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
-import kotlin.native.concurrent.freeze
 
+@OptIn(ObsoleteWorkersApi::class)
 public actual fun <T> runOnWorker(body: () -> T): T {
     val worker = Worker.start()
     val future = worker.execute(TransferMode.SAFE, { body }) {
