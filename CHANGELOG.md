@@ -4,11 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 ## master
+
+## 2.13.0
 * Refactoring publication and configuration logic
 * Bumping dependencies and migration to Kotlin 1.9.10
 * Cleaning up in favor of new Kotlin/Native memory model
 * `TestMode` is deprecated now since we don't need to run on Local or Multithreaded modes anymore
 * Removing stately isolate and replacing with `stately-concurrent-collections`
+* Fixed publication
 
 ## 2.12.1
 * Fixed publication

@@ -122,9 +122,9 @@ subprojects {
     pluginManager.withPlugin("signing") {
         extensions.configure<SigningExtension> {
             useInMemoryPgpKeys(
-                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID")) as String,
-                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD")) as String,
-                (prop["signing.key"] ?: System.getenv("SIGNING_KEY")) as String
+                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID")).toString(),
+                (prop["signing.key"] ?: System.getenv("SIGNING_KEY")).toString(),
+                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD")).toString()
             )
             sign(publishing.publications)
         }
