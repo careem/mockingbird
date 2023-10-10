@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 ## master
+* Fix ksp code generation for non-jvm target
 
 ## 2.13.0
 * Refactoring publication and configuration logic

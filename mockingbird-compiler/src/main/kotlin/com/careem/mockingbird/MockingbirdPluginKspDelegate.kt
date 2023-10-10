@@ -34,18 +34,38 @@ class MockingbirdPluginKspDelegate {
                 //    in commonTest. The plugin will add this the code generated at point 1 as source set for common test so that
                 //    this code will be available for each platform and resolvable by the IDE
                 target.extensions.configure(KotlinMultiplatformExtension::class.java) {
-                    val firstTargetName = targets.first { it.targetName != "metadata" }.targetName
-                    val selectedTargetName =
-                        targets.firstOrNull { it.targetName == "jvm" }?.targetName ?: firstTargetName
-                    sourceSets.getByName("commonTest") {
-                        kotlin.srcDir("build/generated/ksp/$selectedTargetName/${selectedTargetName}Test/kotlin")
+                    val selectedTarget =
+                        targets.firstOrNull { it.preset?.name == "jvm" }
+                            ?: targets.firstOrNull { it.preset?.name == "android" }
+                            ?: targets.first { it.preset?.name != "metadata" }
+
+                    val srcDir = if (selectedTarget.preset!!.name == "android") {
+                        "build/generated/ksp/${selectedTarget.name}/${selectedTarget.name}UnitTestRelease/kotlin"
+                    } else {
+                        "build/generated/ksp/${selectedTarget.name}/${selectedTarget.name}Test/kotlin"
                     }
+
+                    sourceSets.getByName("commonTest") { kotlin.srcDir(srcDir) }
+
+                    val kspConfiguration = if (selectedTarget.preset!!.name == "android") {
+                        "ksp${selectedTarget.name.capitalized()}TestRelease"
+                    } else {
+                        "ksp${selectedTarget.name.capitalized()}Test"
+                    }
+
                     target.dependencies {
-                        "ksp${selectedTargetName.capitalized()}Test"("com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}")
+                        kspConfiguration("com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}")
                     }
+
+                    val kspTask = if (selectedTarget.preset!!.name == "android") {
+                        "kspReleaseUnitTestKotlin${selectedTarget.name.capitalized()}"
+                    } else {
+                        "kspTestKotlin${selectedTarget.name.capitalized()}"
+                    }
+
                     tasks.forEach { task ->
                         if (task.name.contains("Test") && (task is KotlinCompile<*>)) {
-                            task.dependsOn("kspTestKotlin${selectedTargetName.capitalized()}")
+                            task.dependsOn(kspTask)
                         }
                     }
                 }
