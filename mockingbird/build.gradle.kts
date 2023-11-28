@@ -36,9 +36,16 @@ kotlin {
                 implementation(libs.touchlab.stately.concurrency)
                 implementation(libs.touchlab.stately.concurrent.collections)
                 implementation(libs.kotlinx.coroutines)
-                implementation(libs.kotlin.test)
             }
         }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
+            }
+        }
+
         val iosMain by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)

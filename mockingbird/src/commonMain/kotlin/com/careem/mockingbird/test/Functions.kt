@@ -18,14 +18,10 @@ package com.careem.mockingbird.test
 
 import kotlinx.atomicfu.AtomicInt
 import kotlinx.atomicfu.atomic
-import kotlin.native.concurrent.SharedImmutable
-import kotlin.test.assertEquals
 
 
-@SharedImmutable
 internal const val AWAIT_POOLING_TIME = 10L
 
-@SharedImmutable
 private val uuidGenerator: AtomicInt = atomic(0)
 
 public interface Mock {
@@ -148,6 +144,16 @@ internal fun <T : Mock> T.rawVerify(
             found: $methodInvocations
         """.trimIndent()
         )
+    }
+}
+
+private fun assertEquals(
+    expected: Int,
+    actual: Int,
+    message: String
+) {
+    if (expected != actual) {
+        throw AssertionError(message)
     }
 }
 
