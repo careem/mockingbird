@@ -33,8 +33,8 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set((prop["ossrhUsername"] ?: System.getenv("OSSRH_USERNAME")) as String)
-            password.set((prop["ossrhPassword"] ?: System.getenv("OSSRH_PASSWORD")) as String)
+            username.set((prop["ossrhUsername"] ?: System.getenv("OSSRH_USERNAME") ?: "not-set") as String)
+            password.set((prop["ossrhPassword"] ?: System.getenv("OSSRH_PASSWORD") ?: "not-set") as String)
             stagingProfileId.set((prop["sonatypeStagingProfileId"] ?: System.getenv("SONATYPE_STAGING_PROFILE_ID")) as String?)
         }
     }
@@ -122,9 +122,9 @@ subprojects {
     pluginManager.withPlugin("signing") {
         extensions.configure<SigningExtension> {
             useInMemoryPgpKeys(
-                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID")).toString(),
-                (prop["signing.key"] ?: System.getenv("SIGNING_KEY")).toString(),
-                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD")).toString()
+                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID") ?: "not-set").toString(),
+                (prop["signing.key"] ?: System.getenv("SIGNING_KEY") ?: "not-set").toString(),
+                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD") ?: "not-set").toString()
             )
             sign(publishing.publications)
         }
