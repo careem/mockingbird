@@ -16,14 +16,24 @@
  */
 package com.careem.mockingbird.test
 
-import kotlin.test.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class InvocationRecorderTest {
 
     private val invocationRecorder = InvocationRecorder()
 
     @Test
-    fun testEmptyListWhenNoInvocationsRegisteredForAnInstance(){
+    fun testEmptyListWhenNoInvocationsRegisteredForAnInstance() {
         val mock = newMock()
 
         val mockInvocations = invocationRecorder.getInvocations(mock.uuid)
@@ -85,7 +95,7 @@ class InvocationRecorderTest {
         val invocation1 = Invocation(METHOD_1, ARGS_1)
         val uuid = mutableSetOf<String>()
 
-        (0 until iterations).forEach {
+        (0 until iterations).forEach { _ ->
             val mock = Mocks.MyDependencyMock()
             uuid.add(mock.uuid)
             invocationRecorder.storeInvocation(mock.uuid, invocation1)
@@ -178,7 +188,10 @@ class InvocationRecorderTest {
             invocationRecorder.getResponse(mock.uuid, invocation1)
         } catch (ise: IllegalStateException) {
             e = ise
-            assertEquals("Not mocked response for current object and instance, instance:${mock.uuid}, invocation: $invocation1", e.message)
+            assertEquals(
+                "Not mocked response for current object and instance, instance:${mock.uuid}, invocation: $invocation1",
+                e.message
+            )
         }
         assertNotNull(e)
     }
@@ -247,7 +260,48 @@ class InvocationRecorderTest {
         assertEquals(responseInv2, response2)
     }
 
-    fun newMock(): Mock{
+    @Test
+    fun concurrentRecordInvocation() = runTest {
+        val jobs = mutableListOf<Job>()
+
+        repeat(10_000) {
+            launch(Dispatchers.Default) {
+                val invocation = Invocation("abc $it", mapOf(ARG_NAME_1 to "value1"))
+                invocationRecorder.storeInvocation("uuid", invocation)
+            }.also { jobs.add(it) }
+        }
+
+        jobs.joinAll()
+
+        assertEquals(10_000, invocationRecorder.getInvocations("uuid").size)
+    }
+
+    @Test
+    fun concurrentRecordAnswers() = runTest {
+        val jobs = mutableListOf<Job>()
+
+        repeat(1000) { counter ->
+            launch(Dispatchers.Default) {
+                val invocation = Invocation("abc $counter", mapOf(ARG_NAME_1 to "value1"))
+                invocationRecorder.storeAnswer("uuid", invocation) { "Yo $counter" }
+            }.also { jobs.add(it) }
+        }
+
+        jobs.joinAll()
+
+        repeat(1000) { counter ->
+            assertEquals(
+                "Yo $counter", invocationRecorder.getResponse(
+                    "uuid",
+                    Invocation("abc $counter", mapOf(ARG_NAME_1 to "value1")),
+                    relaxed = false
+                )
+            )
+        }
+
+    }
+
+    private fun newMock(): Mock {
         return object : Mock {
             override val uuid: String by uuid()
         }

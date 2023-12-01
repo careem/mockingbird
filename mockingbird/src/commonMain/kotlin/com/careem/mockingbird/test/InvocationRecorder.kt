@@ -16,21 +16,23 @@
  */
 package com.careem.mockingbird.test
 
+import co.touchlab.stately.collections.ConcurrentMutableMap
+
 internal class InvocationRecorder {
 
-    private val recorder = mutableMapOf<String, MutableList<Invocation>>()
-    private val responses = mutableMapOf<String, LinkedHashMap<Invocation, (Invocation) -> Any?>>()
+    private val recorder = ConcurrentMutableMap<String, MutableList<Invocation>>()
+    private val responses = ConcurrentMutableMap<String, LinkedHashMap<Invocation, (Invocation) -> Any?>>()
 
     /**
-     * This function must be called by the mock when a function call is exceuted on it
+     * This function must be called by the mock when a function call is executed on it
      * @param uuid the uuid of the mock
      * @param invocation the Invocation object @see [Invocation]
      */
     fun storeInvocation(uuid: String, invocation: Invocation) {
-        if (!recorder.containsKey(uuid)) {
-            recorder[uuid] = mutableListOf()
+        recorder.block { map ->
+            val list = map.getOrPut(uuid) { mutableListOf() }
+            list.add(invocation)
         }
-        recorder[uuid]!!.add(invocation)
     }
 
     /**
@@ -60,10 +62,10 @@ internal class InvocationRecorder {
      * @param answer the lambda that must be invoked when the invocation happen
      */
     fun <T> storeAnswer(uuid: String, invocation: Invocation, answer: (Invocation) -> T) {
-        if (!responses.containsKey(uuid)) {
-            responses[uuid] = LinkedHashMap()
+        responses.block { map ->
+            val invocationsMap = map.getOrPut(uuid) { LinkedHashMap() }
+            invocationsMap[invocation] = answer as (Invocation) -> Any?
         }
-        responses[uuid]!![invocation] = answer as (Invocation) -> Any?
     }
 
     /**
@@ -75,8 +77,8 @@ internal class InvocationRecorder {
      * @return the mocked response, or null if relaxed (throws if not relaxed)
      */
     fun getResponse(uuid: String, invocation: Invocation, relaxed: Boolean = false): Any? {
-        return if (uuid in responses.keys) {
-            responses[uuid]!!.let {
+        return if (uuid in responses) {
+            responses.getValue(uuid).let {
                 val lambda = findResponseByInvocation(it, invocation, relaxed)
                 return@let lambda(invocation)
             }

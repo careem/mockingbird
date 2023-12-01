@@ -6,7 +6,7 @@ kotlin = "1.9.10"
 kspVersion = "1.9.10-1.0.13"
 junit = "4.13.1"
 jacoco = "0.8.10"
-stately = "2.0.0-rc3"
+stately = "2.0.5"
 atomicFu = "0.22.0"
 kotlinPoet = "1.14.2"
 kotlinxMetadata = "0.7.0"
@@ -20,6 +20,7 @@ touchlab-stately-concurrency = { module = "co.touchlab:stately-concurrency", ver
 touchlab-stately-concurrent-collections = { module = "co.touchlab:stately-concurrent-collections", version.ref = "stately" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicFu" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 kotlin-test-annotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
