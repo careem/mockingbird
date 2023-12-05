@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 ## master
+* Fix missed calls recorded by InvocationRecorder switching to ConcurrentMutableMap to record methods calls
 
 ## 2.15.0
 
