@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ---
 ## master
+* Bump kotlin to 1.9.22
+* Bump Gradle to 8.5
 * Fix issue when fetch src directory from jvm projects
 
 ## 2.17.0

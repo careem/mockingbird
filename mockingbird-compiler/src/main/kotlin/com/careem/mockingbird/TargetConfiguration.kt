@@ -17,12 +17,13 @@
 package com.careem.mockingbird
 
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
 internal class TargetConfigurationFactory {
-    fun get(target: KotlinTarget): TargetConfiguration = when (target.preset!!.name) {
-        "android" -> AndroidTargetConfiguration(target)
-        "jvm" -> JvmTargetConfiguration(target)
+    fun get(target: KotlinTarget): TargetConfiguration = when (target.platformType) {
+        KotlinPlatformType.androidJvm -> AndroidTargetConfiguration(target)
+        KotlinPlatformType.jvm -> JvmTargetConfiguration(target)
         else -> throw IllegalArgumentException("Unsupported target: ${target.name}")
     }
 }
