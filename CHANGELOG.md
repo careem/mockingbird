@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 ## master
+* Fix issue when fetch src directory from jvm projects
 
 ## 2.17.0
 
