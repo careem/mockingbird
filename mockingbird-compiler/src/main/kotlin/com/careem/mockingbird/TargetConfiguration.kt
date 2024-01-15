@@ -52,7 +52,7 @@ internal class JvmTargetConfiguration(private val target: KotlinTarget) : Target
         "ksp${target.name.replaceFirstChar { it.titlecase() }}Test"
 
     override fun getSrcDir(project: Project): List<String> = listOf(
-        "${project.layout.buildDirectory}/generated/ksp/${target.name}/${target.name}Test/kotlin"
+        "${project.layout.buildDirectory.asFile.get()}/generated/ksp/${target.name}/${target.name}Test/kotlin"
     )
 
     override fun getKspTask(): String =
