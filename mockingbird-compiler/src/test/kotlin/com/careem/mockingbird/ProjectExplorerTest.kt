@@ -22,7 +22,6 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
 import org.gradle.testfixtures.ProjectBuilder
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.sources.DefaultKotlinSourceSet
 import org.junit.Before
 import org.junit.Test
@@ -46,10 +45,8 @@ class ProjectExplorerTest {
         val rootProject = projectBuilder.withName(TEST_PROJECT_NAME).build()
         val subProject1 = projectBuilder.withName("${TEST_SUBPROJECT_NAME}_1").withParent(rootProject).build()
         val subProject2 = projectBuilder.withName("${TEST_DEPENDENCY_NAME}_2").withParent(rootProject).build()
-        subProject1.extensions.add(TEST_EXTENSION_NAME, KotlinMultiplatformExtension::class.java)
-        subProject2.extensions.add(TEST_EXTENSION_NAME, KotlinMultiplatformExtension::class.java)
-        subProject1.configurations.create("${TEST_SOURCE_SET}Implementation")
-        subProject2.configurations.create("${TEST_SOURCE_SET}Implementation")
+        subProject1.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+        subProject2.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
         addImplementationDependencyToProject(subProject1, TEST_DEPENDENCY_NAME)
         addImplementationDependencyToProject(subProject1, "${TEST_DEPENDENCY_NAME}_2", dependencyGroup = "new_group")
         addImplementationDependencyToProject(subProject2, "${TEST_DEPENDENCY_NAME}_3")
@@ -71,10 +68,8 @@ class ProjectExplorerTest {
         val rootProject = projectBuilder.withName(TEST_PROJECT_NAME).build()
         val subProject1 = projectBuilder.withName("${TEST_SUBPROJECT_NAME}_1").withParent(rootProject).build()
         val subProject2 = projectBuilder.withName("${TEST_DEPENDENCY_NAME}_2").withParent(rootProject).build()
-        subProject1.extensions.add(TEST_EXTENSION_NAME, KotlinMultiplatformExtension::class.java)
-        subProject2.extensions.add(TEST_EXTENSION_NAME, KotlinMultiplatformExtension::class.java)
-        subProject1.configurations.create("${TEST_SOURCE_SET}Implementation")
-        subProject2.configurations.create("${TEST_SOURCE_SET}Implementation")
+        subProject1.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+        subProject2.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
         addImplementationDependencyToProject(subProject1, TEST_DEPENDENCY_NAME)
         addImplementationDependencyToProject(subProject1, "${TEST_DEPENDENCY_NAME}_2", dependencyVersion = "2.0")
         addImplementationDependencyToProject(subProject2, "${TEST_DEPENDENCY_NAME}_3", dependencyVersion = "3.0")
@@ -97,8 +92,7 @@ class ProjectExplorerTest {
     @Test
     fun testExploreProjectWithKMPExtension() {
         val testProject = generateTestProject()
-        testProject.extensions.add(TEST_EXTENSION_NAME, KotlinMultiplatformExtension::class.java)
-        testProject.configurations.create("${TEST_SOURCE_SET}Implementation")
+        testProject.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
         addImplementationDependencyToProject(testProject, TEST_DEPENDENCY_NAME)
 
         val dependencySet = projectExplorer.explore(testProject)
@@ -139,7 +133,6 @@ class ProjectExplorerTest {
     companion object {
         private const val TEST_PROJECT_NAME = "testProject"
         private const val TEST_SUBPROJECT_NAME = "testSubproject"
-        private const val TEST_EXTENSION_NAME = "testExtension"
         private const val TEST_SOURCE_SET = "commonMain"
         private const val TEST_DEPENDENCY_GROUP = "testgroup"
         private const val TEST_DEPENDENCY_NAME = "testdependency"
