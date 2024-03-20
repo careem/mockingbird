@@ -119,14 +119,14 @@ subprojects {
 
     }
 
-    pluginManager.withPlugin("signing") {
-        extensions.configure<SigningExtension> {
-            useInMemoryPgpKeys(
-                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID") ?: "not-set").toString(),
-                (prop["signing.key"] ?: System.getenv("SIGNING_KEY") ?: "not-set").toString(),
-                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD") ?: "not-set").toString()
-            )
-            sign(publishing.publications)
-        }
-    }
+//    pluginManager.withPlugin("signing") {
+//        extensions.configure<SigningExtension> {
+//            useInMemoryPgpKeys(
+//                (prop["signing.keyId"] ?: System.getenv("SIGNING_KEY_ID") ?: "not-set").toString(),
+//                (prop["signing.key"] ?: System.getenv("SIGNING_KEY") ?: "not-set").toString(),
+//                (prop["signing.password"] ?: System.getenv("SIGNING_PASSWORD") ?: "not-set").toString()
+//            )
+//            sign(publishing.publications)
+//        }
+//    }
 }
