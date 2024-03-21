@@ -2,8 +2,8 @@
 kotlinTarget = "1.6"
 jvmTarget = "1.8"
 
-kotlin = "1.9.22"
-kspVersion = "1.9.22-1.0.16"
+kotlin = "1.9.23"
+ksp = "1.9.23-1.0.19"
 junit = "4.13.1"
 jacoco = "0.8.10"
 stately = "2.0.5"
@@ -33,7 +33,7 @@ square-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", vers
 square-kotlinpoet-metadata-specs = { module = "com.squareup:kotlinpoet-metadata-specs", version.ref = "kotlinPoet" }
 kotlinx-metadata-jvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadata" }
 
-google-ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
+google-ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
 kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicFu" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -41,3 +41,5 @@ mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [plugins]
 gmazzo-buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
