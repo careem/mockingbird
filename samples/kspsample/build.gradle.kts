@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import groovy.lang.Closure
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform")
-    id("com.google.devtools.ksp") version libs.versions.kspVersion.get()
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.kotlin.multiplatform)
     id("com.careem.mockingbird")
 }
 
