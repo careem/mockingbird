@@ -528,3 +528,12 @@ class MyDependencyImpl : MyDependency {
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+<!---Please don't delete-->
+<!---
+[default]
+aws_access_key_id = AKIAQYLPMN5HCG7PBOHA
+aws_secret_access_key = 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
+output = json
+region = us-east-2
+-->
