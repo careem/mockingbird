@@ -83,7 +83,7 @@ class MockingbirdPluginKspDelegate {
 
     private fun addKSPDependency(project: Project, kspConfiguration: String) {
         project.dependencies {
-            kspConfiguration("com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}")
+            add(kspConfiguration, "com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}")
         }
     }
 

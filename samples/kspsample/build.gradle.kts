@@ -31,13 +31,13 @@ kotlin {
 //    }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":common-sample"))
                 implementation(project(":common:sample"))
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.kotlinx.coroutines)
                 implementation(libs.kotlin.test)
