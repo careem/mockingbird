@@ -429,7 +429,7 @@ class MyDependencyMock : MyDependency, Mock {
 
 #### Spies
 
-When you need a combination of real behavior and mocked behavior you can use `spy`. With a spy you wrap wrap a real implementation.
+When you need a combination of real behavior and mocked behavior you can use `spy`. With a spy you wrap a real implementation.
 Doing so Mocking Bird will record the interactions with the spied object.
 
 To mock a specific invocation you can use the spied object like a normal mock, see sections below for further details.
