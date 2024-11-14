@@ -38,7 +38,7 @@ like `Mockito` or `Mockk`
 The mock generation plugin generates mock/spy boilerplate code for you, the plugin can be used along with manual mocks, it is
 currently experimental and has several limitations.
 
-To use this plugin you have to use mockingbird version `2.9.0` or above, to see examples you can explore the `samples` project,
+To use this plugin you have to use MockingBird version `2.9.0` or above, to see examples you can explore the `samples` project,
 You can open `samples` is a standalone project.
 
 WARNING: If you do not what to use the plugin you can use the old way of manual mock generation,
@@ -98,7 +98,7 @@ apply plugin: "com.careem.mockingbird"
 
 Examples are under `:samples:kspsample`
 
-The plugin has a new version that allow you to use google ksp to generate the mocks annotating the filed in your test classes.
+The plugin has a new version that allows you to use google ksp to generate the mocks annotating the fields in your test classes.
 
 To enable the ksp based code gen it is enough for you to add the google ksp plugin to your module where the plugin is applied for
 example your plugin block could look similar to
@@ -320,7 +320,7 @@ invoked multiple times and you want to verify the arguments of each separately.
 
 Changing the test mode will allow you to mock objects for different test scenarios, for example integration tests or unit tests.
 
-By default mockingbirds handles mocks in a way that they can be shared across multiple threads, sometimes this will introduce some
+By default MockingBird handles mocks in a way that they can be shared across multiple threads, sometimes this will introduce some
 limitations when you want to test classes that cannot be shared across threads and that for this reason they might have something
 like `ensureNeverFrozen` in their constructor.
 
@@ -353,7 +353,7 @@ fun testLocalModeDoNotFreezeClass() = runWithTestMode(TestMode.LOCAL_THREAD) {
 
 ### Manual Mocks and Spies generation
 
-In this section it is explained how to generate mocks and spy manually, we suggest to use this approach only when you face issues
+In this section it is explained how to generate mocks and spies manually, we suggest to use this approach only when you face issues
 with the Mock generator plugin.
 
 #### Mocks
@@ -429,7 +429,7 @@ class MyDependencyMock : MyDependency, Mock {
 
 #### Spies
 
-When you need a combination of real behavior and mocked behavior you can use `spy` with spy you wrap wrap a real implementation.
+When you need a combination of real behavior and mocked behavior you can use `spy`. With a spy you wrap a real implementation.
 Doing so Mocking Bird will record the interactions with the spied object.
 
 To mock a specific invocation you can use the spied object like a normal mock, see sections below for further details.
