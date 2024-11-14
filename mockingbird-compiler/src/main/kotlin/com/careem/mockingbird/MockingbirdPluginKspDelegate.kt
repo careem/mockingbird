@@ -22,10 +22,13 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.targets
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
 class MockingbirdPluginKspDelegate {
     private val targetConfigurationFactory: TargetConfigurationFactory by lazy { TargetConfigurationFactory() }
@@ -44,7 +47,7 @@ class MockingbirdPluginKspDelegate {
             //    in commonTest. The plugin will add this the code generated at point 1 as source set for common test so that
             //    this code will be available for each platform and resolvable by the IDE
 
-            val kotlin = project.kotlinExtension
+            val kotlin: KotlinProjectExtension = project.kotlinExtension
 
             val jvmTarget = kotlin.targets.firstOrNull { it.platformType == KotlinPlatformType.jvm }
                 ?: kotlin.targets.firstOrNull { it.platformType == KotlinPlatformType.androidJvm }
@@ -80,7 +83,7 @@ class MockingbirdPluginKspDelegate {
 
     private fun addKSPDependency(project: Project, kspConfiguration: String) {
         project.dependencies {
-            kspConfiguration("com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}")
+            add(kspConfiguration, "com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}")
         }
     }
 
@@ -93,3 +96,10 @@ class MockingbirdPluginKspDelegate {
     private fun hasKspPlugin(target: Project): Boolean =
         target.plugins.findPlugin("com.google.devtools.ksp") != null
 }
+
+private val KotlinProjectExtension.targets: Iterable<KotlinTarget>
+    get() = when (this) {
+        is KotlinSingleTargetExtension<*> -> listOf(this.target)
+        is KotlinMultiplatformExtension -> targets
+        else -> error("Unexpected 'kotlin' extension $this")
+    }
