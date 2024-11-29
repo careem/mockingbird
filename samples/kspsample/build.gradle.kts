@@ -16,8 +16,8 @@
  */
 
 plugins {
-    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.ksp)
     id("com.careem.mockingbird")
 }
 

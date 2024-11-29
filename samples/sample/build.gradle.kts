@@ -17,7 +17,7 @@
 import groovy.lang.Closure
 
 plugins{
-    id("org.jetbrains.kotlin.multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
     id("com.careem.mockingbird")
 }
 

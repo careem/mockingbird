@@ -15,10 +15,21 @@
  * limitations under the License.
  */
 pluginManagement {
+    apply(from = "properties.gradle")
     repositories {
         gradlePluginPortal()
         mavenCentral()
         google()
+        mavenLocal()
+    }
+
+    resolutionStrategy {
+        val publishVersion = extra["VERSION"] as String
+        eachPlugin {
+            if (requested.id.id == "com.careem.mockingbird") {
+                useVersion(publishVersion)
+            }
+        }
     }
 }
 

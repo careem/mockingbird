@@ -15,16 +15,10 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath(libs.kotlin.gradle)
-        classpath("com.careem.mockingbird:mockingbird-compiler")
-    }
+plugins {
+    alias(libs.plugins.kotlin.ksp) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    id("com.careem.mockingbird") apply false
 }
 
 allprojects {

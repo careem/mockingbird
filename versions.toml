@@ -13,6 +13,7 @@ kotlinxMetadata = "0.7.0"
 mockk = "1.13.5"
 buildconfig = "4.1.2"
 coroutines = "1.7.3"
+nexus-publish = "1.1.0"
 
 [libraries]
 jacoco-jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
@@ -40,6 +41,7 @@ kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [plugins]
+nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus-publish" }
 gmazzo-buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
