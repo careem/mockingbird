@@ -17,7 +17,7 @@
 
 plugins {
     `kotlin-dsl`
-    id("com.github.gmazzo.buildconfig") version libs.versions.buildconfig.get()
+    alias(libs.plugins.gmazzo.buildconfig)
     id("maven-publish")
     signing
 }

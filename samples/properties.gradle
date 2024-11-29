@@ -1,0 +1,57 @@
+/*
+ * Copyright Careem, an Uber Technologies Inc. company
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Copies main project Gradle properties to sample project. Can't use buildSrc because settings.gradle
+// must access these properties.
+
+List<String> propertiesFiles = [
+        "../gradle.properties",
+        "../local.properties",
+]
+
+propertiesFiles.each { fileName ->
+    File file = file(fileName)
+    if (file.exists()) {
+        Properties properties = new Properties()
+        file.withInputStream { properties.load(it) }
+
+        int moduleNameStartIndex = fileName.indexOf('/') + 1
+        int moduleNameEndIndex = fileName.lastIndexOf('/')
+        String namespace
+        if (moduleNameStartIndex < moduleNameEndIndex) {
+            namespace = fileName.substring(moduleNameStartIndex, moduleNameEndIndex)
+                    .replace('/', '.')
+        } else {
+            namespace = null
+        }
+
+        properties.each { key, value ->
+            String namespacedKey
+            if (namespace == null) {
+                namespacedKey = key
+            } else {
+                namespacedKey = "$namespace.$key"
+            }
+            try {
+                properties.set(namespacedKey, value)
+            } catch (MissingMethodException ignored) {
+                // We are in a pluginManagement block that can't set properties, so set an extra instead:
+                ext.set(namespacedKey, value)
+            }
+        }
+    }
+
+}

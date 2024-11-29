@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    alias(libs.plugins.kotlin.ksp) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.gmazzo.buildconfig) apply false
+    alias(libs.plugins.nexus.publish)
     id("maven-publish")
     signing
 }
