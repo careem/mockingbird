@@ -59,11 +59,26 @@ class MockingbirdPluginKspDelegate {
 
             project.afterEvaluate {
                 val commonTest = kotlin.sourceSets.getByName("commonTest")
+                // TODO make this generic
+                val androidUnitTestDebug = kotlin.sourceSets.getByName("androidUnitTestDebug")
 
                 addRuntimeDependencies(commonTest)
 
+                val targetGeneratedSources = targetConfiguration.getSrcDir(this)
+
+
+                // Workaround, we used ksp to generate for a specific target, we need to add this
+                // generated code to commonTest and remove the target we used just for generation, this
+                // target will get the generated code through the commonTest source set
+                val filteredSourceSet = androidUnitTestDebug.kotlin.srcDirs.filter { it.path !in targetGeneratedSources }
+
                 // Adding ksp generated code as source set for commonTest
-                commonTest.kotlin.srcDirs(targetConfiguration.getSrcDir(this))
+                commonTest.kotlin.srcDirs(targetGeneratedSources)
+                androidUnitTestDebug.kotlin.setSrcDirs(filteredSourceSet)
+
+                println(">> commonTest source sets: ${commonTest.kotlin.srcDirs}")
+                println(">> androidUnitTestDebug source sets: ${androidUnitTestDebug.kotlin.srcDirs}")
+
 
                 // Turns out that the simple fact of calling `project.tasks.withType<KotlinCompile<*>>()`
                 // breaks KSP if it isn't set in a deep level of afterEvaluate
