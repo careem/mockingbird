@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ---
 ## master
 
+## 2.20.0
+
 ## 2.19.0
 
 ## 2.18.0
