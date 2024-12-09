@@ -54,16 +54,26 @@ class MockingbirdPluginKspDelegate {
                 ?: throw GradleException("Could not find JVM or Android target")
 
             val targetConfiguration = targetConfigurationFactory.get(jvmTarget)
-
             addKSPDependency(project, targetConfiguration.getKspConfiguration())
 
             project.afterEvaluate {
                 val commonTest = kotlin.sourceSets.getByName("commonTest")
+                val platformSourceSet = kotlin.sourceSets.getByName(targetConfiguration.getSourceSet())
 
                 addRuntimeDependencies(commonTest)
 
+                val targetGeneratedSources = targetConfiguration.getSrcDir(this)
+
+
+                // Workaround, we used ksp to generate for a specific target, we need to add this
+                // generated code to commonTest and remove the target we used just for generation, this
+                // target will get the generated code through the commonTest source set
+                val filteredSourceSet =
+                    platformSourceSet.kotlin.srcDirs.filter { it.path !in targetGeneratedSources }
+
                 // Adding ksp generated code as source set for commonTest
-                commonTest.kotlin.srcDirs(targetConfiguration.getSrcDir(this))
+                commonTest.kotlin.srcDirs(targetGeneratedSources)
+                platformSourceSet.kotlin.setSrcDirs(filteredSourceSet)
 
                 // Turns out that the simple fact of calling `project.tasks.withType<KotlinCompile<*>>()`
                 // breaks KSP if it isn't set in a deep level of afterEvaluate
@@ -83,7 +93,10 @@ class MockingbirdPluginKspDelegate {
 
     private fun addKSPDependency(project: Project, kspConfiguration: String) {
         project.dependencies {
-            add(kspConfiguration, "com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}")
+            add(
+                kspConfiguration,
+                "com.careem.mockingbird:mockingbird-processor:${BuildConfig.VERSION}"
+            )
         }
     }
 
