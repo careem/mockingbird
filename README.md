@@ -16,16 +16,8 @@ This project may contain experimental code and may not be ready for general use.
 
 In your multiplatform project include
 
-Koltin DSL:
-
 ```kotlin
 implementation("com.careem.mockingbird:mockingbird:$mockingBirdVersion")
-```
-
-Groovy DSL:
-
-```groovy
-implementation "com.careem.mockingbird:mockingbird:$mockingBirdVersion"
 ```
 
 ## Usage
@@ -44,6 +36,9 @@ You can open `samples` is a standalone project.
 WARNING: If you do not what to use the plugin you can use the old way of manual mock generation,
 check [Mocks](https://github.com/careem/mockingbird#mocks) or [Spies](https://github.com/careem/mockingbird#spies)
 
+WARNING: The plugin manipulates ksp source sets adding the platform source set to the common source set, 
+this workaround will make other ksp task applied to platform test targets not working properly.
+
 #### Plugin Setup
 
 To start using the plugin you need to include it in your project `build.gradle.kts` or `build.gradle`
@@ -53,30 +48,8 @@ Be sure you have `mavenCentral()` in your `buildscripts` repositories, your proj
 Kotlin DSL:
 
 ```kotlin
-buildscript {
-    repositories {
-        ...
-        mavenCentral()
-    }
-    dependencies {
-        ...
-        classpath("com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion")
-    }
-}
-```
-
-Groovy DSL:
-
-```groovy
-buildscript {
-    repositories {
-        ...
-        mavenCentral()
-    }
-    dependencies {
-        ...
-        classpath "com.careem.mockingbird:mockingbird-compiler:$mockingBirdVersion"
-    }
+plugins {
+    id("com.careem.mockingbird") version "$mockingBirdVersion" apply false
 }
 ```
 
@@ -85,13 +58,11 @@ To generate mocks for a specific module you have first to apply the plugin in th
 Kotlin DSL:
 
 ```kotlin
-apply(plugin = "com.careem.mockingbird")
-```
-
-Groovy DSL:
-
-```groovy
-apply plugin: "com.careem.mockingbird"
+plugins {
+    ...
+    id("com.careem.mockingbird")
+    
+}
 ```
 
 ##### Ksp code generator
