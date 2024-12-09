@@ -31,6 +31,7 @@ internal class TargetConfigurationFactory {
 internal interface TargetConfiguration {
     fun getKspConfiguration(): String
     fun getSrcDir(project: Project): List<String>
+    fun getSourceSet(): String
     fun getKspTask(): String
 }
 
@@ -46,6 +47,8 @@ internal class AndroidTargetConfiguration(private val target: KotlinTarget) : Ta
 
     override fun getKspTask(): String =
         "kspDebugUnitTestKotlin${target.name.replaceFirstChar { it.titlecase() }}"
+
+    override fun getSourceSet(): String = "androidUnitTestDebug"
 }
 
 internal class JvmTargetConfiguration(private val target: KotlinTarget) : TargetConfiguration {
@@ -58,4 +61,6 @@ internal class JvmTargetConfiguration(private val target: KotlinTarget) : Target
 
     override fun getKspTask(): String =
         "kspTestKotlin${target.name.replaceFirstChar { it.titlecase() }}"
+
+    override fun getSourceSet(): String = "jvmTest"
 }
